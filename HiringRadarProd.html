@@ -1,0 +1,2588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hiring Intent Radar — TheHireHub.AI</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.absolute{position:absolute}.relative{position:relative}.left-3{left:.75rem}.right-0{right:0}.right-2{right:.5rem}.right-4{right:1rem}.top-1\/2{top:50%}.top-2{top:.5rem}.top-4{top:1rem}.top-full{top:100%}.z-10{z-index:10}.z-50{z-index:50}.col-span-2{grid-column:span 2/span 2}.my-1{margin-top:.25rem;margin-bottom:.25rem}.-mb-px{margin-bottom:-1px}.mb-0\.5{margin-bottom:.125rem}.mb-1{margin-bottom:.25rem}.mb-1\.5{margin-bottom:.375rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-1{margin-left:.25rem}.ml-auto{margin-left:auto}.mr-1{margin-right:.25rem}.mt-0\.5{margin-top:.125rem}.mt-1{margin-top:.25rem}.mt-1\.5{margin-top:.375rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.table{display:table}.grid{display:grid}.hidden{display:none}.h-1\.5{height:.375rem}.h-2{height:.5rem}.h-2\.5{height:.625rem}.h-3{height:.75rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-full{height:100%}.h-screen{height:100vh}.min-h-\[200px\]{min-height:200px}.w-1\.5{width:.375rem}.w-16{width:4rem}.w-2\.5{width:.625rem}.w-20{width:5rem}.w-24{width:6rem}.w-3{width:.75rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-56{width:14rem}.w-6{width:1.5rem}.w-8{width:2rem}.w-80{width:20rem}.w-full{width:100%}.min-w-0{min-width:0}.min-w-48{min-width:12rem}.flex-1{flex:1 1 0%}.flex-shrink-0{flex-shrink:0}.-translate-y-1\/2{--tw-translate-y:-50%}.-translate-y-1\/2,.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}@keyframes spin{to{transform:rotate(1turn)}}.animate-spin{animation:spin 1s linear infinite}.cursor-grab{cursor:grab}.cursor-pointer{cursor:pointer}.cursor-wait{cursor:wait}.resize-none{resize:none}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-start{justify-content:flex-start}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-0\.5{gap:.125rem}.gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-y-1>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.25rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.25rem*var(--tw-space-y-reverse))}.space-y-1\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.375rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.375rem*var(--tw-space-y-reverse))}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.5rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.5rem*var(--tw-space-y-reverse))}.space-y-3>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.75rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.75rem*var(--tw-space-y-reverse))}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem*var(--tw-space-y-reverse))}.space-y-6>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem*var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis}.truncate,.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:.5rem}.rounded-md{border-radius:.375rem}.rounded-xl{border-radius:.75rem}.rounded-l-lg{border-top-left-radius:.5rem;border-bottom-left-radius:.5rem}.rounded-r-lg{border-bottom-right-radius:.5rem}.rounded-r-lg,.rounded-t-lg{border-top-right-radius:.5rem}.rounded-t-lg{border-top-left-radius:.5rem}.rounded-bl-sm{border-bottom-left-radius:.125rem}.rounded-br-sm{border-bottom-right-radius:.125rem}.border{border-width:1px}.border-x{border-left-width:1px;border-right-width:1px}.border-b{border-bottom-width:1px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-amber-500\/30{border-color:rgba(245,158,11,.3)}.border-amber-500\/50{border-color:rgba(245,158,11,.5)}.border-amber-600{--tw-border-opacity:1;border-color:rgb(217 119 6/var(--tw-border-opacity,1))}.border-blue-600{--tw-border-opacity:1;border-color:rgb(37 99 235/var(--tw-border-opacity,1))}.border-cyan-600{--tw-border-opacity:1;border-color:rgb(8 145 178/var(--tw-border-opacity,1))}.border-emerald-600{--tw-border-opacity:1;border-color:rgb(5 150 105/var(--tw-border-opacity,1))}.border-emerald-700{--tw-border-opacity:1;border-color:rgb(4 120 87/var(--tw-border-opacity,1))}.border-gray-600{--tw-border-opacity:1;border-color:rgb(75 85 99/var(--tw-border-opacity,1))}.border-gray-700{--tw-border-opacity:1;border-color:rgb(55 65 81/var(--tw-border-opacity,1))}.border-gray-700\/60{border-color:rgba(55,65,81,.6)}.border-gray-800{--tw-border-opacity:1;border-color:rgb(31 41 55/var(--tw-border-opacity,1))}.border-gray-800\/50{border-color:rgba(31,41,55,.5)}.border-green-800{--tw-border-opacity:1;border-color:rgb(22 101 52/var(--tw-border-opacity,1))}.border-indigo-600{--tw-border-opacity:1;border-color:rgb(79 70 229/var(--tw-border-opacity,1))}.border-orange-700{--tw-border-opacity:1;border-color:rgb(194 65 12/var(--tw-border-opacity,1))}.border-purple-600{--tw-border-opacity:1;border-color:rgb(147 51 234/var(--tw-border-opacity,1))}.border-red-700{--tw-border-opacity:1;border-color:rgb(185 28 28/var(--tw-border-opacity,1))}.border-sky-900\/50{border-color:rgba(12,74,110,.5)}.border-yellow-700{--tw-border-opacity:1;border-color:rgb(161 98 7/var(--tw-border-opacity,1))}.bg-amber-400{--tw-bg-opacity:1;background-color:rgb(251 191 36/var(--tw-bg-opacity,1))}.bg-amber-500{--tw-bg-opacity:1;background-color:rgb(245 158 11/var(--tw-bg-opacity,1))}.bg-amber-500\/10{background-color:rgba(245,158,11,.1)}.bg-amber-500\/20{background-color:rgba(245,158,11,.2)}.bg-amber-500\/5{background-color:rgba(245,158,11,.05)}.bg-amber-900\/50{background-color:rgba(120,53,15,.5)}.bg-blue-900{--tw-bg-opacity:1;background-color:rgb(30 58 138/var(--tw-bg-opacity,1))}.bg-blue-900\/50{background-color:rgba(30,58,138,.5)}.bg-cyan-600{--tw-bg-opacity:1;background-color:rgb(8 145 178/var(--tw-bg-opacity,1))}.bg-cyan-900{--tw-bg-opacity:1;background-color:rgb(22 78 99/var(--tw-bg-opacity,1))}.bg-cyan-900\/50{background-color:rgba(22,78,99,.5)}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129/var(--tw-bg-opacity,1))}.bg-emerald-900\/50{background-color:rgba(6,78,59,.5)}.bg-emerald-900\/80{background-color:rgba(6,78,59,.8)}.bg-gray-700{--tw-bg-opacity:1;background-color:rgb(55 65 81/var(--tw-bg-opacity,1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55/var(--tw-bg-opacity,1))}.bg-gray-800\/50{background-color:rgba(31,41,55,.5)}.bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39/var(--tw-bg-opacity,1))}.bg-gray-900\/50{background-color:rgba(17,24,39,.5)}.bg-gray-950{--tw-bg-opacity:1;background-color:rgb(3 7 18/var(--tw-bg-opacity,1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94/var(--tw-bg-opacity,1))}.bg-green-900{--tw-bg-opacity:1;background-color:rgb(20 83 45/var(--tw-bg-opacity,1))}.bg-green-900\/50{background-color:rgba(20,83,45,.5)}.bg-indigo-900{--tw-bg-opacity:1;background-color:rgb(49 46 129/var(--tw-bg-opacity,1))}.bg-indigo-900\/50{background-color:rgba(49,46,129,.5)}.bg-orange-500{--tw-bg-opacity:1;background-color:rgb(249 115 22/var(--tw-bg-opacity,1))}.bg-orange-900{--tw-bg-opacity:1;background-color:rgb(124 45 18/var(--tw-bg-opacity,1))}.bg-orange-900\/80{background-color:rgba(124,45,18,.8)}.bg-pink-900{--tw-bg-opacity:1;background-color:rgb(131 24 67/var(--tw-bg-opacity,1))}.bg-purple-900{--tw-bg-opacity:1;background-color:rgb(88 28 135/var(--tw-bg-opacity,1))}.bg-purple-900\/50{background-color:rgba(88,28,135,.5)}.bg-red-900{--tw-bg-opacity:1;background-color:rgb(127 29 29/var(--tw-bg-opacity,1))}.bg-red-900\/80{background-color:rgba(127,29,29,.8)}.bg-teal-900{--tw-bg-opacity:1;background-color:rgb(19 78 74/var(--tw-bg-opacity,1))}.bg-transparent{background-color:transparent}.bg-violet-900{--tw-bg-opacity:1;background-color:rgb(76 29 149/var(--tw-bg-opacity,1))}.bg-yellow-500{--tw-bg-opacity:1;background-color:rgb(234 179 8/var(--tw-bg-opacity,1))}.bg-yellow-900\/80{background-color:rgba(113,63,18,.8)}.p-0\.5{padding:.125rem}.p-1{padding:.25rem}.p-1\.5{padding:.375rem}.p-2{padding:.5rem}.p-2\.5{padding:.625rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-1{padding-left:.25rem;padding-right:.25rem}.px-1\.5{padding-left:.375rem;padding-right:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-2\.5{padding-left:.625rem;padding-right:.625rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0{padding-top:0;padding-bottom:0}.py-0\.5{padding-top:.125rem;padding-bottom:.125rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-2\.5{padding-top:.625rem;padding-bottom:.625rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pb-4{padding-bottom:1rem}.pl-10{padding-left:2.5rem}.pr-3{padding-right:.75rem}.pr-4{padding-right:1rem}.pt-3{padding-top:.75rem}.pt-4{padding-top:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-.025em}.tracking-wide{letter-spacing:.025em}.text-amber-100{--tw-text-opacity:1;color:rgb(254 243 199/var(--tw-text-opacity,1))}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36/var(--tw-text-opacity,1))}.text-amber-500{--tw-text-opacity:1;color:rgb(245 158 11/var(--tw-text-opacity,1))}.text-blue-300{--tw-text-opacity:1;color:rgb(147 197 253/var(--tw-text-opacity,1))}.text-blue-400{--tw-text-opacity:1;color:rgb(96 165 250/var(--tw-text-opacity,1))}.text-cyan-300{--tw-text-opacity:1;color:rgb(103 232 249/var(--tw-text-opacity,1))}.text-cyan-400{--tw-text-opacity:1;color:rgb(34 211 238/var(--tw-text-opacity,1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183/var(--tw-text-opacity,1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153/var(--tw-text-opacity,1))}.text-gray-200{--tw-text-opacity:1;color:rgb(229 231 235/var(--tw-text-opacity,1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219/var(--tw-text-opacity,1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175/var(--tw-text-opacity,1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128/var(--tw-text-opacity,1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99/var(--tw-text-opacity,1))}.text-gray-950{--tw-text-opacity:1;color:rgb(3 7 18/var(--tw-text-opacity,1))}.text-green-300{--tw-text-opacity:1;color:rgb(134 239 172/var(--tw-text-opacity,1))}.text-green-400{--tw-text-opacity:1;color:rgb(74 222 128/var(--tw-text-opacity,1))}.text-green-500{--tw-text-opacity:1;color:rgb(34 197 94/var(--tw-text-opacity,1))}.text-indigo-300{--tw-text-opacity:1;color:rgb(165 180 252/var(--tw-text-opacity,1))}.text-orange-300{--tw-text-opacity:1;color:rgb(253 186 116/var(--tw-text-opacity,1))}.text-orange-400{--tw-text-opacity:1;color:rgb(251 146 60/var(--tw-text-opacity,1))}.text-pink-300{--tw-text-opacity:1;color:rgb(249 168 212/var(--tw-text-opacity,1))}.text-purple-300{--tw-text-opacity:1;color:rgb(216 180 254/var(--tw-text-opacity,1))}.text-purple-400{--tw-text-opacity:1;color:rgb(192 132 252/var(--tw-text-opacity,1))}.text-red-300{--tw-text-opacity:1;color:rgb(252 165 165/var(--tw-text-opacity,1))}.text-sky-400{--tw-text-opacity:1;color:rgb(56 189 248/var(--tw-text-opacity,1))}.text-teal-300{--tw-text-opacity:1;color:rgb(94 234 212/var(--tw-text-opacity,1))}.text-violet-300{--tw-text-opacity:1;color:rgb(196 181 253/var(--tw-text-opacity,1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.text-yellow-300{--tw-text-opacity:1;color:rgb(253 224 71/var(--tw-text-opacity,1))}.text-yellow-400{--tw-text-opacity:1;color:rgb(250 204 21/var(--tw-text-opacity,1))}.underline{text-decoration-line:underline}.placeholder-gray-600::-moz-placeholder{--tw-placeholder-opacity:1;color:rgb(75 85 99/var(--tw-placeholder-opacity,1))}.placeholder-gray-600::placeholder{--tw-placeholder-opacity:1;color:rgb(75 85 99/var(--tw-placeholder-opacity,1))}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgba(0,0,0,.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color)}.shadow-2xl,.shadow-lg{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color),0 4px 6px -4px var(--tw-shadow-color)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color),0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-amber-500\/20{--tw-shadow-color:rgba(245,158,11,.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-amber-500\/5{--tw-shadow-color:rgba(245,158,11,.05);--tw-shadow:var(--tw-shadow-colored)}.shadow-black\/50{--tw-shadow-color:rgba(0,0,0,.5);--tw-shadow:var(--tw-shadow-colored)}.outline{outline-style:solid}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}.hover\:border-gray-600:hover{--tw-border-opacity:1;border-color:rgb(75 85 99/var(--tw-border-opacity,1))}.hover\:bg-amber-400:hover{--tw-bg-opacity:1;background-color:rgb(251 191 36/var(--tw-bg-opacity,1))}.hover\:bg-amber-500\/10:hover{background-color:rgba(245,158,11,.1)}.hover\:bg-cyan-500:hover{--tw-bg-opacity:1;background-color:rgb(6 182 212/var(--tw-bg-opacity,1))}.hover\:bg-gray-700:hover{--tw-bg-opacity:1;background-color:rgb(55 65 81/var(--tw-bg-opacity,1))}.hover\:bg-gray-800:hover{--tw-bg-opacity:1;background-color:rgb(31 41 55/var(--tw-bg-opacity,1))}.hover\:bg-gray-800\/50:hover{background-color:rgba(31,41,55,.5)}.hover\:text-amber-300:hover{--tw-text-opacity:1;color:rgb(252 211 77/var(--tw-text-opacity,1))}.hover\:text-blue-300:hover{--tw-text-opacity:1;color:rgb(147 197 253/var(--tw-text-opacity,1))}.hover\:text-gray-200:hover{--tw-text-opacity:1;color:rgb(229 231 235/var(--tw-text-opacity,1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.focus\:border-amber-500:focus{--tw-border-opacity:1;border-color:rgb(245 158 11/var(--tw-border-opacity,1))}.focus\:border-cyan-500:focus{--tw-border-opacity:1;border-color:rgb(6 182 212/var(--tw-border-opacity,1))}.focus\:border-sky-400:focus{--tw-border-opacity:1;border-color:rgb(56 189 248/var(--tw-border-opacity,1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.active\:cursor-grabbing:active{cursor:grabbing}.group:hover .group-hover\:block{display:block}@media (min-width:768px){.md\:col-span-2{grid-column:span 2/span 2}.md\:col-span-3{grid-column:span 3/span 3}.md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.md\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.md\:grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}}
+    body { margin:0; background:#030712; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .score-bar-fill { transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .kanban-col { min-height: 300px; }
+    .chat-bubble { max-width: 85%; }
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:#111827; }
+    ::-webkit-scrollbar-thumb { background:#374151; border-radius:4px; }
+    .drag-over { border-color: #f59e0b !important; background: rgba(245,158,11,0.05) !important; }
+    .editable-field:hover { background: rgba(245,158,11,0.08); }
+    .editable-field:focus { outline: 1px solid #f59e0b; background: rgba(245,158,11,0.1); }
+    .radar-chart { position: relative; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .animate-spin { animation: spin 1s linear infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+    .animate-pulse { animation: pulse 2s ease-in-out infinite; }
+    .group:hover .group-hover\:block { display: block; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+const {
+  useState,
+  useEffect,
+  useRef,
+  useCallback
+} = React;
+
+// ═══════════════════════════════════════════════════
+// ICON COMPONENT
+// ═══════════════════════════════════════════════════
+function Icon({
+  name,
+  className = "w-5 h-5",
+  style
+}) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (ref.current && lucide.icons[name]) {
+      var wM = className.match(/w-(\d+)/);
+      var hM = className.match(/h-(\d+)/);
+      const w = wM && wM[1] || "5";
+      const h = hM && hM[1] || "5";
+      const size = parseInt(w) * 4;
+      ref.current.innerHTML = lucide.icons[name].toSvg({
+        width: size,
+        height: size,
+        class: className
+      });
+    }
+  }, [name, className]);
+  return /*#__PURE__*/React.createElement("span", {
+    ref: ref,
+    className: "inline-flex items-center",
+    style: style
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// DATA ENGINE — Dynamic Candidate Generation
+// ═══════════════════════════════════════════════════
+
+// Name pools for generating unique candidates
+const FIRST_NAMES = ["Aarav", "Aditi", "Ajay", "Akshay", "Alisha", "Amit", "Ananya", "Ankur", "Anubhav", "Arjun", "Arindam", "Azaan", "Bhavya", "Chirag", "Deepak", "Deepika", "Devika", "Dhruv", "Divya", "Gaurav", "Harshit", "Ishita", "Jaydeep", "Kabir", "Karan", "Kavya", "Kunal", "Lakshmi", "Manmeet", "Maya", "Medhavini", "Mohit", "Nandini", "Naveen", "Neha", "Nikhil", "Nisha", "Pallavi", "Pranav", "Priya", "Rahul", "Rajat", "Rashi", "Ravi", "Rhea", "Ritika", "Rohit", "Rohan", "Saanvi", "Sahil", "Sakshi", "Sameer", "Sandeep", "Sanya", "Shubham", "Shreya", "Simran", "Sneha", "Srishti", "Tanvi", "Varun", "Veer", "Vikram", "Vinay", "Vivek", "Yash", "Zara"];
+const LAST_NAMES = ["Agarwal", "Banerjee", "Bhat", "Chakraborty", "Choudhary", "Das", "Desai", "Dubey", "Garg", "Goyal", "Gupta", "Iyer", "Jain", "Joshi", "Kapoor", "Khan", "Kumar", "Malhotra", "Mehta", "Menon", "Mishra", "Mukherjee", "Nair", "Nanda", "Patel", "Pillai", "Rao", "Reddy", "Roy", "Saxena", "Sharma", "Shukla", "Singh", "Sinha", "Srivastava", "Thakur", "Tiwari", "Varma", "Verma", "Yadav"];
+const COMPANY_POOLS = {
+  "SaaS": ["BrowserStack", "Freshworks", "Chargebee", "Postman", "Zoho", "CleverTap", "WebEngage", "MoEngage", "Whatfix", "Sprinklr", "Druva", "Icertis", "Wingify", "RateGain", "LeadSquared"],
+  "HR Tech": ["PeopleStrong", "Darwinbox", "Keka HR", "HackerEarth", "Hyreo", "tapplent", "Zimyo", "Pocket HRMS", "greytHR", "Zoho Recruit", "HireX Inc", "Zeko AI"],
+  "AI": ["Zeko AI", "Darwix AI", "Yellow.ai", "Haptik", "Observe.AI", "Uniphore", "Avaamo", "Locus", "Netradyne", "Mindtickle", "Amagi", "Fractal"],
+  "FinTech": ["Razorpay", "PhonePe", "Paytm", "Pine Labs", "BharatPe", "Cred", "Jupiter", "Groww", "Zerodha", "Navi", "MobiKwik", "PolicyBazaar"],
+  "Enterprise": ["LinkedIn", "Microsoft", "Google", "Amazon", "Salesforce", "Oracle", "SAP", "ServiceNow", "Atlassian", "Confluent", "Databricks", "Snowflake"],
+  "Consulting": ["Deloitte", "McKinsey", "BCG", "Bain", "Accenture", "KPMG", "EY", "PwC", "Capgemini"],
+  "EdTech": ["upGrad", "Byju's", "Unacademy", "Vedantu", "Simplilearn", "Great Learning", "Scaler", "Masai School"],
+  "General": ["Infosys", "TCS", "Wipro", "HCL", "Tech Mahindra", "Cognizant", "Reliance Jio", "Swiggy", "Flipkart", "Myntra", "Ola", "Uber India"]
+};
+const TITLE_TEMPLATES = {
+  "Sales": ["Sr. Sales Manager", "Lead Account Executive", "Sales Manager", "Senior Account Executive", "Regional Sales Head", "Enterprise Sales Lead", "Inside Sales Manager", "Business Development Manager", "Sr. AE", "Sales Team Lead"],
+  "Engineering": ["Sr. Engineering Manager", "Principal Engineer", "Staff Engineer", "Engineering Lead", "Tech Lead", "VP Engineering", "Platform Architect", "Sr. Software Engineer", "Backend Lead", "Full-Stack Lead"],
+  "Product": ["Sr. Product Manager", "Product Lead", "Group PM", "Director of Product", "Principal PM", "Product Strategist", "Growth PM", "Platform PM", "Technical PM", "Head of Product"],
+  "Marketing": ["Sr. Marketing Manager", "Head of Growth", "Digital Marketing Lead", "Brand Manager", "Content Strategist", "Performance Marketing Manager", "CMO", "Marketing Director", "Demand Gen Lead", "Growth Marketing Manager"],
+  "Operations": ["Operations Manager", "Sr. Ops Lead", "Head of Operations", "COO", "Process Excellence Lead", "Supply Chain Manager", "Operations Director", "Program Manager"],
+  "Default": ["Sr. Manager", "Team Lead", "Director", "Head of Department", "Principal Consultant", "Strategy Lead", "Senior Specialist", "Program Director"]
+};
+const SKILL_POOLS = {
+  "Sales": ["B2B SaaS", "Enterprise Sales", "Revenue Growth", "GTM Strategy", "Pipeline Management", "Solution Selling", "Account Management", "Sales Leadership", "CRM", "Deal Negotiation", "Team Building", "Strategic Partnerships", "Channel Sales", "Customer Success", "Outbound Sales"],
+  "Engineering": ["System Design", "Microservices", "React", "Python", "AWS", "Kubernetes", "CI/CD", "API Design", "Database Optimization", "Machine Learning", "TypeScript", "Go", "Distributed Systems", "DevOps", "Security"],
+  "Product": ["Product Strategy", "Roadmapping", "User Research", "A/B Testing", "Agile", "Scrum", "Data Analytics", "PRD Writing", "Stakeholder Mgmt", "Market Analysis", "Prioritization", "OKRs", "Design Thinking", "Competitive Analysis"],
+  "Marketing": ["SEO/SEM", "Content Marketing", "Brand Strategy", "Analytics", "Social Media", "Email Marketing", "Growth Hacking", "Marketing Automation", "Demand Generation", "ABM", "PLG", "Community Building"],
+  "Default": ["Strategy", "Leadership", "Analytics", "Process Optimization", "Stakeholder Management", "Project Management", "Communication", "Problem Solving"]
+};
+const LOCATIONS_POOL = ["Gurgaon", "Bangalore", "Mumbai", "Delhi NCR", "Hyderabad", "Pune", "Chennai", "Noida", "San Francisco", "New York", "London", "Singapore", "Dubai", "Remote"];
+let globalIdCounter = 1000;
+function generateCandidates(params) {
+  const {
+    role = "",
+    company = "",
+    location = "",
+    experience = "",
+    industry = "",
+    mustHaveSkills = ""
+  } = params;
+  const roleCategory = role.toLowerCase().includes("sales") || role.toLowerCase().includes("revenue") || role.toLowerCase().includes("business dev") ? "Sales" : role.toLowerCase().includes("engineer") || role.toLowerCase().includes("tech") || role.toLowerCase().includes("developer") ? "Engineering" : role.toLowerCase().includes("product") || role.toLowerCase().includes("pm") ? "Product" : role.toLowerCase().includes("market") || role.toLowerCase().includes("growth") || role.toLowerCase().includes("brand") ? "Marketing" : role.toLowerCase().includes("ops") || role.toLowerCase().includes("operation") ? "Operations" : "Default";
+  const industryKey = industry.toLowerCase().includes("hr") || industry.toLowerCase().includes("recruit") ? "HR Tech" : industry.toLowerCase().includes("ai") || industry.toLowerCase().includes("ml") ? "AI" : industry.toLowerCase().includes("fintech") || industry.toLowerCase().includes("finance") || industry.toLowerCase().includes("payment") ? "FinTech" : industry.toLowerCase().includes("edtech") || industry.toLowerCase().includes("education") ? "EdTech" : industry.toLowerCase().includes("saas") || industry.toLowerCase().includes("software") ? "SaaS" : "General";
+  const companyPool = [...(COMPANY_POOLS[industryKey] || []), ...(COMPANY_POOLS["SaaS"] || []), ...(COMPANY_POOLS["Enterprise"] || [])];
+  const titles = TITLE_TEMPLATES[roleCategory] || TITLE_TEMPLATES["Default"];
+  const skills = SKILL_POOLS[roleCategory] || SKILL_POOLS["Default"];
+  const targetLoc = location.split(",")[0].trim() || "Gurgaon";
+  const usedNames = new Set();
+  const candidates = [];
+  const count = 12 + Math.floor(Math.random() * 5); // 12-16 candidates
+
+  for (let i = 0; i < count; i++) {
+    let firstName, lastName, fullName;
+    do {
+      firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+      lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+      fullName = firstName + " " + lastName;
+    } while (usedNames.has(fullName));
+    usedNames.add(fullName);
+    const comp = companyPool[Math.floor(Math.random() * companyPool.length)];
+    const title = titles[Math.floor(Math.random() * titles.length)];
+    const candidateSkills = [];
+    const usedSkillIdx = new Set();
+    const numSkills = 3 + Math.floor(Math.random() * 3);
+    for (let j = 0; j < numSkills; j++) {
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * skills.length);
+      } while (usedSkillIdx.has(idx));
+      usedSkillIdx.add(idx);
+      candidateSkills.push(skills[idx]);
+    }
+    const isLocationMatch = Math.random() > 0.3;
+    const loc = isLocationMatch ? targetLoc : LOCATIONS_POOL[Math.floor(Math.random() * LOCATIONS_POOL.length)];
+    const expYrs = experience ? (parseFloat(experience) + (Math.random() * 3 - 1.5)).toFixed(1) : (4 + Math.random() * 6).toFixed(1);
+
+    // Generate scores
+    const roleScore = i < 3 ? 5 : i < 7 ? 4 + Math.floor(Math.random() * 2) : i < 11 ? 3 + Math.floor(Math.random() * 2) : 2 + Math.floor(Math.random() * 2);
+    const skillScore = Math.min(5, Math.max(2, roleScore + Math.floor(Math.random() * 3) - 1));
+    const industryScore = Math.min(5, Math.max(2, roleScore + Math.floor(Math.random() * 3) - 1));
+    const companyScore = 3 + Math.floor(Math.random() * 3);
+    const trajectoryScore = 3 + Math.floor(Math.random() * 3);
+    const locationScore = isLocationMatch ? 5 : 2 + Math.floor(Math.random() * 2);
+    const compScore = 3 + Math.floor(Math.random() * 3);
+    const stabilityScore = 3 + Math.floor(Math.random() * 3);
+    const weightedScore = roleScore * 0.25 + skillScore * 0.20 + industryScore * 0.15 + companyScore * 0.10 + trajectoryScore * 0.10 + locationScore * 0.10 + compScore * 0.05 + stabilityScore * 0.05;
+    const finalScore = Math.round(weightedScore * 100) / 100;
+    const rating = finalScore >= 4.0 ? "STRONG_FIT" : finalScore >= 3.5 ? "GOOD_FIT" : "PARTIAL_FIT";
+    const emailDomain = comp.toLowerCase().replace(/[^a-z]/g, "") + ".com";
+    const hasEmail = Math.random() > 0.3;
+    const hasPhone = Math.random() > 0.4;
+    const strengthPool = [`Strong ${roleCategory.toLowerCase()} experience at ${comp}`, `${candidateSkills[0]} expertise — direct match`, `${expYrs} years of relevant experience`, `${comp} pedigree — top-tier company`, `Proven ${roleCategory.toLowerCase()} leadership`, `Deep ${industryKey} domain knowledge`, `Located in ${loc} — no relocation needed`, `Track record of exceeding targets`];
+    const concernPool = [`Verify current compensation expectations`, `${comp} to startup transition risk`, `May need domain ramp-up for ${industry}`, `Confirm management experience level`, `Relocation may be needed from ${loc}`, `Counter-offer risk from current employer`];
+    candidates.push({
+      id: ++globalIdCounter,
+      name: fullName,
+      title: title,
+      company: comp,
+      location: loc,
+      experience: expYrs + " yrs",
+      industry: industryKey + " / " + roleCategory,
+      score: finalScore,
+      rating: rating,
+      skills: candidateSkills,
+      email: hasEmail ? `${firstName.toLowerCase()}.${lastName.charAt(0).toLowerCase()}@${emailDomain}` : "Enrichment needed",
+      phone: hasPhone ? `+91-${Math.floor(90000 + Math.random() * 10000)}-${Math.floor(10000 + Math.random() * 90000)}` : "Enrichment needed",
+      source: "AI Generated",
+      linkedin: "",
+      linkedinDirect: "",
+      sourceLinks: {
+        linkedin: "",
+        linkedinDirect: "",
+        naukri: "",
+        indeed: "",
+        google: `https://www.google.com/search?q=%22${encodeURIComponent(fullName)}%22+%22${encodeURIComponent(comp)}%22+%22${encodeURIComponent(title)}%22`
+      },
+      strengths: [strengthPool[Math.floor(Math.random() * strengthPool.length)], strengthPool[Math.floor(Math.random() * strengthPool.length)]].filter((v, i, a) => a.indexOf(v) === i),
+      concerns: [concernPool[Math.floor(Math.random() * concernPool.length)]],
+      outreach: `Your ${candidateSkills[0].toLowerCase()} expertise at ${comp} is exactly what ${company || "our client"} needs for the ${role || "role"} position.`,
+      scores: {
+        role: roleScore,
+        skills: skillScore,
+        industry: industryScore,
+        company: companyScore,
+        trajectory: trajectoryScore,
+        location: locationScore,
+        comp: compScore,
+        stability: stabilityScore
+      }
+    });
+  }
+  return candidates.sort((a, b) => b.score - a.score);
+}
+function generateSearchStrings(params) {
+  const {
+    role = "Head of Sales",
+    industry = "SaaS",
+    location = "Gurgaon"
+  } = params;
+  const loc = location.split(",")[0].trim();
+  const r = role;
+  const ind = industry.split("/")[0].trim();
+  return [{
+    platform: "LinkedIn",
+    query: `"${r}" OR "${r.replace("Head of", "Manager")}" AND "${ind}" AND "${loc}"`,
+    region: "India",
+    type: "Search Bar"
+  }, {
+    platform: "Google X-Ray",
+    query: `site:linkedin.com/in/ ("${r}" OR "Manager") "${ind}" "${loc}"`,
+    region: "India",
+    type: "X-Ray"
+  }, {
+    platform: "Naukri",
+    query: `site:naukri.com "${r}" "${ind}" "${loc}"`,
+    region: "India",
+    type: "X-Ray"
+  }, {
+    platform: "IIMJobs",
+    query: `site:iimjobs.com "${r}" "${ind}" "${loc}"`,
+    region: "India",
+    type: "X-Ray"
+  }, {
+    platform: "Instahyre",
+    query: `site:instahyre.com "${r.split(" ").pop()}" "${ind}" "${loc}"`,
+    region: "India",
+    type: "X-Ray"
+  }, {
+    platform: "Hirist",
+    query: `site:hirist.com "${r}" "${ind}" "${loc}"`,
+    region: "India",
+    type: "X-Ray"
+  }, {
+    platform: "Indeed",
+    query: `site:indeed.com/r/ "${r}" "${ind}" "${loc}"`,
+    region: "India",
+    type: "X-Ray"
+  }, {
+    platform: "Cutshort",
+    query: `site:cutshort.io "${r.split(" ").pop()}" "${ind}"`,
+    region: "India",
+    type: "X-Ray"
+  }, {
+    platform: "Glassdoor",
+    query: `site:glassdoor.com/member/profile "${r}" "${ind}"`,
+    region: "Global",
+    type: "X-Ray"
+  }, {
+    platform: "Crunchbase",
+    query: `site:crunchbase.com/person "${r}"`,
+    region: "Global",
+    type: "X-Ray (Exec)"
+  }];
+}
+
+// Real candidates sourced from LinkedIn Search
+var REAL_LINKEDIN_CANDIDATES = [
+  { id: 9001, name: "A. K. Chaubey", title: "Head of Sales (India) | Scaled HR Tech SaaS", company: "Keka", location: "Hyderabad, India", experience: "10+ yrs", industry: "HR Tech / SaaS", score: 4.65, rating: "STRONG_FIT", skills: ["HR Tech SaaS","Enterprise Sales","Mid-Market GTM","Team Building","Revenue Growth"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/akchaubey/", linkedinDirect: "https://www.linkedin.com/in/akchaubey/", sourceLinks: { linkedin: "https://www.linkedin.com/in/akchaubey/", linkedinDirect: "https://www.linkedin.com/in/akchaubey/", naukri: "https://www.google.com/search?q=site:naukri.com+%22A+K+Chaubey%22+%22Keka%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22A+K+Chaubey%22+%22Keka%22", google: "https://www.google.com/search?q=%22A+K+Chaubey%22+%22Keka%22+%22Head+of+Sales%22" }, strengths: ["Scaled HR Tech SaaS sales at Keka — direct domain match","Enterprise & Mid-Market GTM experience"], concerns: ["Based in Hyderabad — relocation may be needed"], outreach: "Your track record scaling HR Tech SaaS sales at Keka is exactly what TheHireHub.AI needs for the Head of Sales role.", scores: { role:5, skills:5, industry:5, company:5, trajectory:4, location:3, comp:4, stability:4 } },
+  { id: 9002, name: "Bilal Hasan", title: "Sales Leader | International Sales | SaaS Sales | HR Tech", company: "Eurasia Staffing Solutions", location: "Delhi, India", experience: "15+ yrs", industry: "HR Tech / SaaS", score: 4.45, rating: "STRONG_FIT", skills: ["SaaS Sales","HR Tech","International Sales","Partnerships","Alliances"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/bilal-hasan-6221704/", linkedinDirect: "https://www.linkedin.com/in/bilal-hasan-6221704/", sourceLinks: { linkedin: "https://www.linkedin.com/in/bilal-hasan-6221704/", linkedinDirect: "https://www.linkedin.com/in/bilal-hasan-6221704/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Bilal+Hasan%22+%22Sales%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Bilal+Hasan%22+%22Sales%22", google: "https://www.google.com/search?q=%22Bilal+Hasan%22+%22Eurasia%22+%22Sales+Leader%22" }, strengths: ["SaaS Sales + HR Tech combined expertise — rare match","6K+ LinkedIn followers — strong industry network"], concerns: ["Currently in staffing, not pure SaaS product sales"], outreach: "Your SaaS sales leadership combined with HR Tech expertise is exactly the profile TheHireHub.AI is looking for.", scores: { role:5, skills:4, industry:5, company:4, trajectory:4, location:5, comp:4, stability:4 } },
+  { id: 9003, name: "Divyesh Sindhwaad", title: "Country Head – India | HR Tech & Ed Tech SaaS Platform", company: "Skillsoft", location: "Mumbai, India", experience: "12+ yrs", industry: "HR Tech / SaaS", score: 4.35, rating: "STRONG_FIT", skills: ["Revenue Growth","SaaS Platform Sales","HR Tech","Ed Tech","Country Leadership"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/divyeshsindhwaad/", linkedinDirect: "https://www.linkedin.com/in/divyeshsindhwaad/", sourceLinks: { linkedin: "https://www.linkedin.com/in/divyeshsindhwaad/", linkedinDirect: "https://www.linkedin.com/in/divyeshsindhwaad/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Divyesh+Sindhwaad%22+%22Skillsoft%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Divyesh+Sindhwaad%22", google: "https://www.google.com/search?q=%22Divyesh+Sindhwaad%22+%22Skillsoft%22+%22Country+Head%22" }, strengths: ["Country Head level — proven P&L ownership","Global SaaS HR Tech platform experience at Skillsoft"], concerns: ["Mumbai-based — relocation to Gurgaon needed","May expect higher comp for Country Head step-down"], outreach: "Your experience driving revenue for global HR Tech SaaS platforms at Skillsoft maps perfectly to the Head of Sales opportunity at TheHireHub.AI.", scores: { role:5, skills:5, industry:5, company:4, trajectory:5, location:2, comp:3, stability:4 } },
+  { id: 9004, name: "Harsh Babbar", title: "Enterprise IT/SaaS Sales | Darwinbox", company: "Darwinbox", location: "Delhi, India", experience: "8+ yrs", industry: "HR Tech / SaaS", score: 4.20, rating: "STRONG_FIT", skills: ["Enterprise SaaS Sales","HR Tech","Darwinbox","IT Sales","Solution Selling"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/harsh-babbar-818a3760/", linkedinDirect: "https://www.linkedin.com/in/harsh-babbar-818a3760/", sourceLinks: { linkedin: "https://www.linkedin.com/in/harsh-babbar-818a3760/", linkedinDirect: "https://www.linkedin.com/in/harsh-babbar-818a3760/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Harsh+Babbar%22+%22Darwinbox%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Harsh+Babbar%22", google: "https://www.google.com/search?q=%22Harsh+Babbar%22+%22Darwinbox%22+%22Sales%22" }, strengths: ["Darwinbox pedigree — India's top HR Tech unicorn","Enterprise SaaS sales methodology from HR Tech leader"], concerns: ["Director level — verify readiness for Head of Sales scope","Counter-offer risk from Darwinbox"], outreach: "Your enterprise SaaS sales experience at Darwinbox — India's leading HR Tech unicorn — is a perfect fit for the Head of Sales role at TheHireHub.AI.", scores: { role:4, skills:5, industry:5, company:5, trajectory:4, location:5, comp:3, stability:3 } },
+  { id: 9005, name: "Divyang Khattri", title: "Head of Sales & Partnerships", company: "Quirk", location: "Noida, India", experience: "7+ yrs", industry: "SaaS / Tech", score: 3.90, rating: "GOOD_FIT", skills: ["Sales Leadership","Partnerships","B2B Sales","GTM Strategy","Team Management"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/divyang-khattri-100264b8/", linkedinDirect: "https://www.linkedin.com/in/divyang-khattri-100264b8/", sourceLinks: { linkedin: "https://www.linkedin.com/in/divyang-khattri-100264b8/", linkedinDirect: "https://www.linkedin.com/in/divyang-khattri-100264b8/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Divyang+Khattri%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Divyang+Khattri%22", google: "https://www.google.com/search?q=%22Divyang+Khattri%22+%22Quirk%22+%22Head+of+Sales%22" }, strengths: ["Already Head of Sales — proven title match","NCR-based — no relocation needed"], concerns: ["Quirk is not HR Tech — domain ramp-up needed","Verify SaaS sales methodology depth"], outreach: "Your Head of Sales experience at Quirk, combined with your partnerships expertise, aligns well with the growth-stage opportunity at TheHireHub.AI.", scores: { role:5, skills:4, industry:3, company:3, trajectory:4, location:5, comp:4, stability:3 } },
+  { id: 9006, name: "Divyanshu Gautam", title: "Business Head | SaaS Sales | HR Tech", company: "Megamax Services", location: "Noida, India", experience: "6+ yrs", industry: "HR Tech / SaaS", score: 3.75, rating: "GOOD_FIT", skills: ["SaaS Sales","HR Tech","Business Development","Team Building","IndiaMart"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/divyanshu-gautam-4446641b1/", linkedinDirect: "https://www.linkedin.com/in/divyanshu-gautam-4446641b1/", sourceLinks: { linkedin: "https://www.linkedin.com/in/divyanshu-gautam-4446641b1/", linkedinDirect: "https://www.linkedin.com/in/divyanshu-gautam-4446641b1/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Divyanshu+Gautam%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Divyanshu+Gautam%22", google: "https://www.google.com/search?q=%22Divyanshu+Gautam%22+%22SaaS+Sales%22+%22HR+Tech%22" }, strengths: ["SaaS Sales + HR Tech keywords — domain aware","NCR-based, ex-Byju's and Extramarks experience"], concerns: ["Current role at Megamax may not be pure SaaS","Verify enterprise deal experience and ticket size"], outreach: "Your SaaS sales background combined with HR Tech experience is a strong match for what we're building at TheHireHub.AI.", scores: { role:4, skills:4, industry:4, company:3, trajectory:3, location:5, comp:4, stability:3 } },
+  { id: 9007, name: "Reecha Singh", title: "Head of Sales - Institute of Project Management", company: "Institute of Project Management", location: "Gurgaon, India", experience: "8+ yrs", industry: "Ed Tech / Services", score: 3.55, rating: "GOOD_FIT", skills: ["Sales Leadership","Partnerships","Growth","B2B Sales","Consulting"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/reecha-singh26/", linkedinDirect: "https://www.linkedin.com/in/reecha-singh26/", sourceLinks: { linkedin: "https://www.linkedin.com/in/reecha-singh26/", linkedinDirect: "https://www.linkedin.com/in/reecha-singh26/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Reecha+Singh%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Reecha+Singh%22", google: "https://www.google.com/search?q=%22Reecha+Singh%22+%22Head+of+Sales%22" }, strengths: ["Head of Sales title — proven leadership","Gurgaon-based — no relocation needed"], concerns: ["Ed Tech / Services background — not SaaS or HR Tech","May need significant domain ramp-up for AI recruitment"], outreach: "Your Head of Sales experience and growth focus align well with the leadership opportunity we're building at TheHireHub.AI.", scores: { role:5, skills:3, industry:2, company:3, trajectory:4, location:5, comp:4, stability:3 } },
+  { id: 9008, name: "Rajesh Choudhary", title: "Head of Sales @ Zenergize", company: "Zenergize", location: "Gurgaon, India", experience: "7+ yrs", industry: "CleanTech / Hardware", score: 3.40, rating: "PARTIAL_FIT", skills: ["Sales Management","B2B Sales","Channel Sales","Team Leadership","Revenue Growth"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/rajeshchoudhary15/", linkedinDirect: "https://www.linkedin.com/in/rajeshchoudhary15/", sourceLinks: { linkedin: "https://www.linkedin.com/in/rajeshchoudhary15/", linkedinDirect: "https://www.linkedin.com/in/rajeshchoudhary15/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Rajesh+Choudhary%22+%22Zenergize%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Rajesh+Choudhary%22", google: "https://www.google.com/search?q=%22Rajesh+Choudhary%22+%22Zenergize%22+%22Head+of+Sales%22" }, strengths: ["Head of Sales title — proven leadership","Gurgaon-based — no relocation"], concerns: ["CleanTech/Hardware — no SaaS or HR Tech background","Significant domain transition required"], outreach: "Your Head of Sales experience and Gurgaon presence caught our attention for the sales leadership role at TheHireHub.AI.", scores: { role:5, skills:3, industry:2, company:2, trajectory:3, location:5, comp:4, stability:3 } },
+  { id: 9010, name: "Madhusudhan Rajendra", title: "Head of Sales (8 yrs) | HR Tech SaaS", company: "Zwayam (now Zensible)", location: "Bangalore, India", experience: "12+ yrs", industry: "HR Tech / SaaS", score: 4.50, rating: "STRONG_FIT", skills: ["HR Tech SaaS Sales","Enterprise Accounts","Recruitment Tech","Regional Sales","B2B SaaS"], email: "Enrichment needed", phone: "Enrichment needed", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/madhusudhan-rajendra/", linkedinDirect: "https://www.linkedin.com/in/madhusudhan-rajendra/", sourceLinks: { linkedin: "https://www.linkedin.com/in/madhusudhan-rajendra/", linkedinDirect: "https://www.linkedin.com/in/madhusudhan-rajendra/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Madhusudhan+Rajendra%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Madhusudhan+Rajendra%22", google: "https://www.google.com/search?q=%22Madhusudhan+Rajendra%22+%22Zwayam%22+%22Head+of+Sales%22" }, strengths: ["8 years as Head of Sales at Zwayam — deep HR Tech SaaS expertise","Enterprise accounts experience at Times Internet"], concerns: ["Bangalore-based — relocation to Gurgaon needed","Recently co-founded Zensible — may prefer entrepreneurship"], outreach: "Your 8-year run leading sales at Zwayam in HR Tech SaaS is incredibly relevant — TheHireHub.AI needs exactly this expertise.", scores: { role:5, skills:5, industry:5, company:5, trajectory:5, location:3, comp:4, stability:3 } },
+  { id: 9011, name: "Anand Iyer", title: "Sales Leader | HR Tech AI Platform", company: "inFeedo AI", location: "India", experience: "10+ yrs", industry: "HR Tech / AI", score: 4.40, rating: "STRONG_FIT", skills: ["HR Tech AI","SaaS Sales","Employee Engagement","Enterprise Sales","Business Development"], email: "Enrichment needed", phone: "Enrichment needed", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/anand-iyer-infeedo/", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Anand+Iyer%22+%22inFeedo%22", sourceLinks: { linkedin: "https://www.google.com/search?q=site:linkedin.com/in+%22Anand+Iyer%22+%22inFeedo%22", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Anand+Iyer%22+%22inFeedo%22", naukri: "https://www.google.com/search?q=site:naukri.com+%22Anand+Iyer%22+%22inFeedo%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Anand+Iyer%22+%22inFeedo%22", google: "https://www.google.com/search?q=%22Anand+Iyer%22+%22inFeedo%22+%22Sales%22" }, strengths: ["inFeedo AI — leading HR Tech AI platform, direct competitor ecosystem","11.8K+ LinkedIn followers — major industry influencer"], concerns: ["Verify current role scope and willingness to move","inFeedo may counter-offer aggressively"], outreach: "Your experience at inFeedo AI — one of India's most exciting HR Tech AI platforms — makes you a perfect fit for the Head of Sales role at TheHireHub.AI.", scores: { role:5, skills:5, industry:5, company:5, trajectory:4, location:4, comp:4, stability:3 } },
+  { id: 9012, name: "Hafeez M", title: "Head of Sales/Business Dev | Custom SaaS Solutions", company: "SaaS Company", location: "India", experience: "8+ yrs", industry: "SaaS / HR Tech", score: 4.05, rating: "STRONG_FIT", skills: ["Custom SaaS Solutions","Business Development","HR Tech","Sales Management","Lead Generation"], email: "Enrichment needed", phone: "Enrichment needed", source: "Google X-Ray", linkedin: "https://www.google.com/search?q=site:linkedin.com/in+%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22", sourceLinks: { linkedin: "https://www.google.com/search?q=site:linkedin.com/in+%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22", naukri: "https://www.google.com/search?q=site:naukri.com+%22Hafeez%22+%22Head+of+Sales%22+%22SaaS%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Hafeez%22+%22Head+of+Sales%22+%22SaaS%22", google: "https://www.google.com/search?q=%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22" }, strengths: ["Head of Sales title with custom SaaS solutions expertise","720+ followers — solid network in SaaS/HR Tech space"], concerns: ["Need to verify specific HR Tech domain depth","Company name unclear — verify current employer"], outreach: "Your expertise leading sales for custom SaaS solutions aligns well with what TheHireHub.AI is building in the AI recruitment space.", scores: { role:5, skills:4, industry:4, company:3, trajectory:4, location:4, comp:4, stability:3 } },
+  { id: 9013, name: "Benaya Vikram", title: "Head of Sales | HR Tech SaaS | Business Development", company: "KernelSphere Technologies", location: "Hyderabad, India", experience: "9+ yrs", industry: "HR Tech / SaaS", score: 3.85, rating: "GOOD_FIT", skills: ["SaaS Sales","Business Analytics","HR Tech","Android Development","Business Development"], email: "Enrichment needed", phone: "Enrichment needed", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/benaya-vikram/", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Benaya+Vikram%22+%22Head+of+Sales%22", sourceLinks: { linkedin: "https://www.google.com/search?q=site:linkedin.com/in+%22Benaya+Vikram%22", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Benaya+Vikram%22", naukri: "https://www.google.com/search?q=site:naukri.com+%22Benaya+Vikram%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Benaya+Vikram%22", google: "https://www.google.com/search?q=%22Benaya+Vikram%22+%22Head+of+Sales%22+%22KernelSphere%22" }, strengths: ["7K+ LinkedIn followers — strong personal brand","3 years as Head of Sales at KernelSphere — proven tenure"], concerns: ["Hyderabad-based — relocation to Gurgaon needed","Verify depth of HR Tech SaaS experience vs general tech"], outreach: "Your Head of Sales track record and 7K+ following in the tech space caught our attention for TheHireHub.AI's sales leadership role.", scores: { role:5, skills:4, industry:4, company:3, trajectory:4, location:3, comp:4, stability:3 } },
+  { id: 9009, name: "Gaurav Dhawan", title: "Head of Sales & Operations | Founder Hault.in", company: "Punjab Roadlines", location: "New Delhi, India", experience: "6+ yrs", industry: "Logistics / Operations", score: 3.20, rating: "PARTIAL_FIT", skills: ["Sales Management","Operations","Logistics","Business Development","Founding"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", linkedinDirect: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", sourceLinks: { linkedin: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", linkedinDirect: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Gaurav+Dhawan%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Gaurav+Dhawan%22", google: "https://www.google.com/search?q=%22Gaurav+Dhawan%22+%22Head+of+Sales%22+%22Hault%22" }, strengths: ["Entrepreneurial — founded Hault.in","Delhi NCR-based — close proximity"], concerns: ["Logistics/Operations — not SaaS at all","No HR Tech or software sales background"], outreach: "Your entrepreneurial drive and sales leadership at Hault.in are impressive — we'd love to explore the Head of Sales opportunity at TheHireHub.AI.", scores: { role:4, skills:2, industry:2, company:2, trajectory:4, location:5, comp:3, stability:3 } }
+];
+
+// Initial search data — only real sourced candidates (no fake/generated ones)
+const INITIAL_CANDIDATES = REAL_LINKEDIN_CANDIDATES.slice().sort(function(a,b){return b.score - a.score;});
+const INITIAL_SEARCH_STRINGS = generateSearchStrings({
+  role: "Head of Sales",
+  industry: "SaaS / AI / HR Tech",
+  location: "Gurgaon, India"
+});
+const KANBAN_STAGES = ["Sourced", "Screening", "Round 1", "Round 2", "Round 3", "Offer", "Hired"];
+
+// CHATBOT — now takes dynamic candidates
+function getChatResponse(msg, candidates) {
+  const lower = msg.toLowerCase();
+  const candidate = candidates.find(c => lower.includes(c.name.split(" ")[0].toLowerCase()));
+  if (candidate) {
+    const s = candidate.scores;
+    return `**${candidate.name}** — ${candidate.title} at ${candidate.company}\n\n📊 Score: ${candidate.score}/5.0 (${candidate.rating.replace("_", " ")})\n📍 ${candidate.location} | ⏱ ${candidate.experience}\n🔗 [LinkedIn Profile](${candidate.linkedin})\n\n**Scoring Breakdown:**\nRole Match: ${"★".repeat(s.role)}${"☆".repeat(5 - s.role)} (${s.role}/5)\nSkills: ${"★".repeat(s.skills)}${"☆".repeat(5 - s.skills)} (${s.skills}/5)\nIndustry: ${"★".repeat(s.industry)}${"☆".repeat(5 - s.industry)} (${s.industry}/5)\nCompany: ${"★".repeat(s.company)}${"☆".repeat(5 - s.company)} (${s.company}/5)\nTrajectory: ${"★".repeat(s.trajectory)}${"☆".repeat(5 - s.trajectory)} (${s.trajectory}/5)\n\n✅ **Strengths:** ${candidate.strengths.join(", ")}\n⚠️ **Concerns:** ${candidate.concerns.join(", ")}\n\n📧 Email: ${candidate.email}\n📞 Phone: ${candidate.phone}`;
+  }
+  if (lower.includes("compare") || lower.includes("top 3") || lower.includes("top three")) {
+    const top3 = candidates.slice(0, 3);
+    return `**Top 3 Comparison:**\n\n${top3.map((c, i) => `${["🥇", "🥈", "🥉"][i]} **${c.name} (${c.score})** — ${c.company}\n${c.title}. ${c.strengths[0] || ""}`).join("\n\n")}`;
+  }
+  if (lower.includes("market") || lower.includes("talent pool") || lower.includes("19k")) return `**Talent Market Snapshot:**\n\n• Total addressable pool: ~${Math.floor(Math.random() * 15) + 10}K+ professionals\n• Domain-specific matches: ~${50 + Math.floor(Math.random() * 100)}\n• Direct role matches: ~${20 + Math.floor(Math.random() * 40)}\n• Avg time-to-hire: 45-60 days\n• Offer acceptance rate (startup): ~65%\n• Counter-offer risk: HIGH`;
+  if (lower.includes("comp") || lower.includes("salary") || lower.includes("ctc") || lower.includes("pay")) return `**Compensation Benchmarks:**\n\n• Manager (SaaS startup): ₹18L-30L + variable + equity\n• Head/Director level (AI startup): ₹25L-40L CTC + equity\n• Lead (Unicorn tier): ₹20L-35L CTC\n• Sr. role (FAANG/MNC): ₹18L-30L + benefits\n\nRecommendation: Offer ₹30-35L CTC + 0.5-1% equity to be competitive.`;
+  if (lower.includes("strong")) return `**Strong Fit Candidates (score ≥ 4.0):**\n\n${candidates.filter(c => c.rating === "STRONG_FIT").map((c, i) => `${i + 1}. **${c.name}** (${c.score}) — ${c.title} at ${c.company}`).join("\n")}`;
+  if (lower.includes("good fit")) return `**Good Fit Candidates (3.5-3.9):**\n\n${candidates.filter(c => c.rating === "GOOD_FIT").map((c, i) => `${i + 1}. **${c.name}** (${c.score}) — ${c.title} at ${c.company}`).join("\n")}`;
+  if (lower.includes("partial")) return `**Partial Fit Candidates (<3.5):**\n\n${candidates.filter(c => c.rating === "PARTIAL_FIT").map((c, i) => `${i + 1}. **${c.name}** (${c.score}) — ${c.title} at ${c.company}`).join("\n")}`;
+  if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) return `Hi! I'm your Hiring Intel Assistant. I have **${candidates.length}** candidates loaded.\n\nTry asking:\n• "Tell me about [name]"\n• "Compare top 3"\n• "Market intel"\n• "Compensation"\n• "Show strong fits"`;
+  return `I can help with:\n• **Candidate profiles** — "Tell me about [name]"\n• **Compare candidates** — "Compare top 3"\n• **Market intel** — "What's the talent market like?"\n• **Compensation** — "Salary benchmarks"\n• **By rating** — "Show strong fits" / "good fits" / "partial fits"`;
+}
+
+// ═══════════════════════════════════════════════════
+// SMALL COMPONENTS
+// ═══════════════════════════════════════════════════
+function ScoreBadge({
+  score
+}) {
+  const bg = score >= 4.5 ? "bg-emerald-500" : score >= 4.0 ? "bg-green-500" : score >= 3.5 ? "bg-yellow-500" : "bg-orange-500";
+  return /*#__PURE__*/React.createElement("span", {
+    className: `${bg} text-white text-xs font-bold px-2 py-0.5 rounded-full`
+  }, score.toFixed(2));
+}
+function RatingBadge({
+  rating
+}) {
+  const styles = {
+    STRONG_FIT: "bg-emerald-900/80 text-emerald-300 border border-emerald-700",
+    GOOD_FIT: "bg-yellow-900/80 text-yellow-300 border border-yellow-700",
+    PARTIAL_FIT: "bg-orange-900/80 text-orange-300 border border-orange-700",
+    WEAK_FIT: "bg-red-900/80 text-red-300 border border-red-700"
+  };
+  return /*#__PURE__*/React.createElement("span", {
+    className: `text-xs font-semibold px-2 py-0.5 rounded ${styles[rating] || styles.PARTIAL_FIT}`
+  }, rating.replace(/_/g, " "));
+}
+function ScoreBar({
+  label,
+  value,
+  weight,
+  max = 5
+}) {
+  const pct = value / max * 100;
+  const color = value >= 4 ? "bg-emerald-500" : value >= 3 ? "bg-yellow-500" : "bg-orange-500";
+  return /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 text-xs"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "w-20 text-gray-400 truncate"
+  }, label), /*#__PURE__*/React.createElement("div", {
+    className: "flex-1 h-2 bg-gray-700 rounded-full overflow-hidden"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `h-full ${color} rounded-full score-bar-fill`,
+    style: {
+      width: `${pct}%`
+    }
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "w-6 text-gray-300 text-right font-mono"
+  }, value, "/5"), weight && /*#__PURE__*/React.createElement("span", {
+    className: "text-gray-600 w-8 text-right"
+  }, weight, "%"));
+}
+function CopyBtn({
+  text
+}) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(text).catch(() => {
+      const t = document.createElement("textarea");
+      t.value = text;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand("copy");
+      document.body.removeChild(t);
+    });
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return /*#__PURE__*/React.createElement("button", {
+    onClick: copy,
+    className: "p-1 rounded hover:bg-gray-700 transition-colors",
+    title: "Copy"
+  }, copied ? /*#__PURE__*/React.createElement(Icon, {
+    name: "check",
+    className: "w-3 h-3 text-green-400"
+  }) : /*#__PURE__*/React.createElement(Icon, {
+    name: "copy",
+    className: "w-3 h-3 text-gray-500"
+  }));
+}
+
+// ═══════════════════════════════════════════════════
+// CHATBOT
+// ═══════════════════════════════════════════════════
+function ChatBot({
+  candidates
+}) {
+  const [messages, setMessages] = useState([{
+    role: "bot",
+    text: "Hi! I'm your Hiring Intel Assistant. Ask me about candidates, market intel, or compensation."
+  }]);
+  const [input, setInput] = useState("");
+  const chatEnd = useRef(null);
+  const quickActions = ["Compare top 3", "Market intel", "HR Tech candidates", "Compensation", "Strong fits"];
+  useEffect(() => {
+    if (chatEnd.current) chatEnd.current.scrollIntoView({
+      behavior: "smooth"
+    });
+  }, [messages]);
+  const send = text => {
+    if (!text.trim()) return;
+    const userMsg = {
+      role: "user",
+      text: text.trim()
+    };
+    const botMsg = {
+      role: "bot",
+      text: getChatResponse(text.trim(), candidates)
+    };
+    setMessages(prev => [...prev, userMsg, botMsg]);
+    setInput("");
+  };
+  const renderMarkdown = text => {
+    return text.split("\n").map((line, i) => {
+      let html = line.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>').replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" class="text-amber-400 underline hover:text-amber-300">$1</a>').replace(/^• /, '<span class="text-amber-400 mr-1">•</span> ').replace(/^(\d+)\. /, '<span class="text-amber-400 mr-1">$1.</span> ');
+      if (line.startsWith("🥇") || line.startsWith("🥈") || line.startsWith("🥉")) html = `<span class="text-lg">${line.charAt(0)}${line.charAt(1)}</span>${html.slice(2)}`;
+      return /*#__PURE__*/React.createElement("div", {
+        key: i,
+        className: "leading-relaxed",
+        dangerouslySetInnerHTML: {
+          __html: html || "&nbsp;"
+        }
+      });
+    });
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col h-full bg-gray-900 border-r border-gray-800"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "p-3 border-b border-gray-800 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-amber-500 p-1 rounded"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "bot",
+    className: "w-4 h-4 text-gray-950"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-sm font-bold text-white"
+  }, "Hiring Intel Bot"), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-500"
+  }, "Ask about candidates, market, comp"))), /*#__PURE__*/React.createElement("div", {
+    className: "flex-1 overflow-y-auto p-3 space-y-3"
+  }, messages.map((m, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: `flex ${m.role === "user" ? "justify-end" : "justify-start"} fade-in`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `chat-bubble rounded-xl px-3 py-2 text-sm ${m.role === "user" ? "bg-amber-500/20 text-amber-100 rounded-br-sm" : "bg-gray-800 text-gray-300 rounded-bl-sm"}`
+  }, m.role === "bot" ? renderMarkdown(m.text) : m.text))), /*#__PURE__*/React.createElement("div", {
+    ref: chatEnd
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "p-2 border-t border-gray-800"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1 flex-wrap mb-2"
+  }, quickActions.map(a => /*#__PURE__*/React.createElement("button", {
+    key: a,
+    onClick: () => send(a),
+    className: "text-xs bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white px-2 py-1 rounded-full transition-colors border border-gray-700"
+  }, a))), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2"
+  }, /*#__PURE__*/React.createElement("input", {
+    value: input,
+    onChange: e => setInput(e.target.value),
+    onKeyDown: e => {
+      if (e.key === "Enter") send(input);
+    },
+    placeholder: "Ask about candidates...",
+    className: "flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500"
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: () => send(input),
+    className: "bg-amber-500 hover:bg-amber-400 text-gray-950 px-3 py-2 rounded-lg transition-colors"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "send",
+    className: "w-4 h-4"
+  })))));
+}
+
+// ═══════════════════════════════════════════════════
+// SCORE DISTRIBUTION CHART (Canvas-based)
+// ═══════════════════════════════════════════════════
+function ScoreChart({
+  candidates,
+  onScoreChange
+}) {
+  const canvasRef = useRef(null);
+  const [editingIdx, setEditingIdx] = useState(null);
+  const [editVal, setEditVal] = useState("");
+  const [barPositions, setBarPositions] = useState([]);
+  const [tooltip, setTooltip] = useState(null);
+
+  var sorted = [].concat(candidates).sort(function(a,b){return b.score - a.score;});
+
+  var handleCanvasClick = function(e) {
+    if (!canvasRef.current || !barPositions.length) return;
+    var rect = canvasRef.current.getBoundingClientRect();
+    var clickX = e.clientX - rect.left;
+    var clickY = e.clientY - rect.top;
+    for (var bi = 0; bi < barPositions.length; bi++) {
+      var bp = barPositions[bi];
+      if (clickX >= bp.x && clickX <= bp.x + bp.w && clickY >= bp.y && clickY <= bp.y + bp.h + 20) {
+        setEditingIdx(bi);
+        setEditVal(bp.score.toFixed(2));
+        return;
+      }
+    }
+    setEditingIdx(null);
+  };
+
+  var handleCanvasMouseMove = function(e) {
+    if (!canvasRef.current || !barPositions.length) return;
+    var rect = canvasRef.current.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var my = e.clientY - rect.top;
+    for (var bi = 0; bi < barPositions.length; bi++) {
+      var bp = barPositions[bi];
+      if (mx >= bp.x && mx <= bp.x + bp.w && my >= bp.y - 15 && my <= bp.y + bp.h + 20) {
+        setTooltip({ x: bp.x + bp.w/2, y: bp.y - 30, name: bp.name, score: bp.score, rating: bp.rating });
+        canvasRef.current.style.cursor = "pointer";
+        return;
+      }
+    }
+    setTooltip(null);
+    if (canvasRef.current) canvasRef.current.style.cursor = "default";
+  };
+
+  useEffect(function() {
+    var canvas = canvasRef.current;
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    var dpr = window.devicePixelRatio || 1;
+    var w = canvas.parentElement.offsetWidth;
+    var h = 280;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    const sorted = [...candidates].sort((a, b) => b.score - a.score);
+    const pad = {
+      top: 30,
+      right: 20,
+      bottom: 60,
+      left: 50
+    };
+    const chartW = w - pad.left - pad.right;
+    const chartH = h - pad.top - pad.bottom;
+    const barW = Math.min(40, chartW / sorted.length - 8);
+    const gap = (chartW - barW * sorted.length) / (sorted.length + 1);
+
+    // Grid lines
+    ctx.strokeStyle = "#1f2937";
+    ctx.lineWidth = 1;
+    for (let v = 0; v <= 5; v++) {
+      const y = pad.top + chartH - v / 5 * chartH;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(w - pad.right, y);
+      ctx.stroke();
+      ctx.fillStyle = "#6b7280";
+      ctx.font = "11px sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText(v.toFixed(1), pad.left - 8, y + 4);
+    }
+
+    // Threshold lines
+    const thresholds = [{
+      v: 4.0,
+      label: "Strong Fit",
+      color: "#10b981"
+    }, {
+      v: 3.5,
+      label: "Good Fit",
+      color: "#eab308"
+    }, {
+      v: 3.0,
+      label: "Partial Fit",
+      color: "#f97316"
+    }];
+    thresholds.forEach(t => {
+      const y = pad.top + chartH - t.v / 5 * chartH;
+      ctx.strokeStyle = t.color + "66";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(w - pad.right, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = t.color;
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(t.label + " ≥" + t.v, w - pad.right - 70, y - 4);
+    });
+
+    // Bars
+    sorted.forEach((c, i) => {
+      const x = pad.left + gap + i * (barW + gap);
+      const barH = c.score / 5 * chartH;
+      const y = pad.top + chartH - barH;
+      const grad = ctx.createLinearGradient(x, y, x, pad.top + chartH);
+      if (c.score >= 4.5) {
+        grad.addColorStop(0, "#10b981");
+        grad.addColorStop(1, "#065f46");
+      } else if (c.score >= 4.0) {
+        grad.addColorStop(0, "#22c55e");
+        grad.addColorStop(1, "#14532d");
+      } else if (c.score >= 3.5) {
+        grad.addColorStop(0, "#eab308");
+        grad.addColorStop(1, "#713f12");
+      } else {
+        grad.addColorStop(0, "#f97316");
+        grad.addColorStop(1, "#7c2d12");
+      }
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      const r = 4;
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + barW - r, y);
+      ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
+      ctx.lineTo(x + barW, pad.top + chartH);
+      ctx.lineTo(x, pad.top + chartH);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.fill();
+
+      // Score on top
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 11px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(c.score.toFixed(2), x + barW / 2, y - 6);
+
+      // Name below
+      ctx.save();
+      ctx.translate(x + barW / 2, pad.top + chartH + 10);
+      ctx.rotate(-Math.PI / 6);
+      ctx.fillStyle = "#9ca3af";
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText(c.name.length > 12 ? c.name.slice(0, 12) + "…" : c.name, 0, 0);
+      ctx.restore();
+    });
+
+    // Title
+    ctx.fillStyle = "#f59e0b";
+    ctx.font = "bold 12px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("CANDIDATE SCORE DISTRIBUTION", pad.left, 18);
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "10px sans-serif";
+    ctx.fillText("(click any bar to edit score)", pad.left + 230, 18);
+
+    // Store bar positions for click detection
+    var positions = [];
+    sorted.forEach(function(c, i) {
+      var bx = pad.left + gap + i * (barW + gap);
+      var bH = (c.score / 5) * chartH;
+      var by = pad.top + chartH - bH;
+      positions.push({ x: bx, y: by, w: barW, h: bH, id: c.id, name: c.name, score: c.score, rating: c.rating });
+    });
+    setBarPositions(positions);
+  }, [candidates]);
+
+  var handleScoreSave = function() {
+    if (editingIdx === null) return;
+    var newScore = parseFloat(editVal);
+    if (isNaN(newScore) || newScore < 0 || newScore > 5) { alert("Score must be between 0 and 5"); return; }
+    var cId = sorted[editingIdx].id;
+    if (onScoreChange) onScoreChange(cId, Math.round(newScore * 100) / 100);
+    setEditingIdx(null);
+  };
+
+  return /*#__PURE__*/React.createElement("div", { className: "relative" },
+    /*#__PURE__*/React.createElement("canvas", {
+      ref: canvasRef,
+      className: "w-full",
+      onClick: handleCanvasClick,
+      onMouseMove: handleCanvasMouseMove,
+      onMouseLeave: function() { setTooltip(null); }
+    }),
+    tooltip && /*#__PURE__*/React.createElement("div", {
+      className: "absolute bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-xs shadow-xl pointer-events-none z-50",
+      style: { left: tooltip.x - 60, top: tooltip.y }
+    }, /*#__PURE__*/React.createElement("div", { className: "font-bold text-white" }, tooltip.name),
+       /*#__PURE__*/React.createElement("div", { className: "text-amber-400" }, "Score: ", tooltip.score.toFixed(2)),
+       /*#__PURE__*/React.createElement("div", { className: "text-gray-400" }, tooltip.rating.replace(/_/g, " "))),
+    editingIdx !== null && /*#__PURE__*/React.createElement("div", {
+      className: "absolute bg-gray-800 border border-amber-500 rounded-xl p-4 shadow-2xl z-50",
+      style: { left: Math.min((barPositions[editingIdx] && barPositions[editingIdx].x) || 0, 400), top: 40 }
+    }, /*#__PURE__*/React.createElement("div", { className: "text-sm font-bold text-white mb-2" },
+      "Edit Score: ", sorted[editingIdx] && sorted[editingIdx].name),
+      /*#__PURE__*/React.createElement("div", { className: "flex items-center gap-2" },
+        /*#__PURE__*/React.createElement("input", {
+          type: "number",
+          min: "0",
+          max: "5",
+          step: "0.05",
+          value: editVal,
+          onChange: function(e) { setEditVal(e.target.value); },
+          onKeyDown: function(e) { if (e.key === "Enter") handleScoreSave(); },
+          className: "w-24 bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+        }),
+        /*#__PURE__*/React.createElement("span", { className: "text-gray-500 text-xs" }, "/ 5.0"),
+        /*#__PURE__*/React.createElement("button", {
+          onClick: handleScoreSave,
+          className: "bg-amber-500 hover:bg-amber-400 text-gray-950 px-3 py-2 rounded-lg text-xs font-bold"
+        }, "Save"),
+        /*#__PURE__*/React.createElement("button", {
+          onClick: function() { setEditingIdx(null); },
+          className: "text-gray-400 hover:text-white px-2 py-2 text-xs"
+        }, "Cancel")
+      ),
+      /*#__PURE__*/React.createElement("input", {
+        type: "range",
+        min: "0",
+        max: "5",
+        step: "0.05",
+        value: editVal,
+        onChange: function(e) { setEditVal(e.target.value); },
+        className: "w-full mt-2 accent-amber-500"
+      })
+    )
+  );
+}
+
+// RADAR CHART for individual candidate
+function RadarChart({
+  scores,
+  size = 160
+}) {
+  const labels = ["Role", "Skills", "Industry", "Company", "Trajectory", "Location", "Comp", "Stability"];
+  const vals = [scores.role, scores.skills, scores.industry, scores.company, scores.trajectory, scores.location, scores.comp, scores.stability];
+  const cx = size / 2,
+    cy = size / 2,
+    r = size / 2 - 20;
+  const n = labels.length;
+  const points = vals.map((v, i) => {
+    const angle = Math.PI * 2 * i / n - Math.PI / 2;
+    return {
+      x: cx + v / 5 * r * Math.cos(angle),
+      y: cy + v / 5 * r * Math.sin(angle)
+    };
+  });
+  const gridLevels = [1, 2, 3, 4, 5];
+  return /*#__PURE__*/React.createElement("svg", {
+    width: size,
+    height: size,
+    viewBox: `0 0 ${size} ${size}`
+  }, gridLevels.map(lv => {
+    const pts = Array.from({
+      length: n
+    }, (_, i) => {
+      const a = Math.PI * 2 * i / n - Math.PI / 2;
+      return `${cx + lv / 5 * r * Math.cos(a)},${cy + lv / 5 * r * Math.sin(a)}`;
+    }).join(" ");
+    return /*#__PURE__*/React.createElement("polygon", {
+      key: lv,
+      points: pts,
+      fill: "none",
+      stroke: "#374151",
+      strokeWidth: "0.5"
+    });
+  }), labels.map((l, i) => {
+    const a = Math.PI * 2 * i / n - Math.PI / 2;
+    const lx = cx + (r + 14) * Math.cos(a);
+    const ly = cy + (r + 14) * Math.sin(a);
+    return /*#__PURE__*/React.createElement("text", {
+      key: i,
+      x: lx,
+      y: ly,
+      fill: "#9ca3af",
+      fontSize: "8",
+      textAnchor: "middle",
+      dominantBaseline: "middle"
+    }, l);
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: points.map(p => `${p.x},${p.y}`).join(" "),
+    fill: "rgba(245,158,11,0.2)",
+    stroke: "#f59e0b",
+    strokeWidth: "1.5"
+  }), points.map((p, i) => /*#__PURE__*/React.createElement("circle", {
+    key: i,
+    cx: p.x,
+    cy: p.y,
+    r: "3",
+    fill: "#f59e0b"
+  })));
+}
+
+// RATING PIE CHART
+function RatingPieChart({ candidates }) {
+  var cands = candidates || [];
+  const data = [{
+    label: "Strong Fit",
+    count: cands.filter(c => c.rating === "STRONG_FIT").length,
+    color: "#10b981"
+  }, {
+    label: "Good Fit",
+    count: cands.filter(c => c.rating === "GOOD_FIT").length,
+    color: "#eab308"
+  }, {
+    label: "Partial Fit",
+    count: cands.filter(c => c.rating === "PARTIAL_FIT").length,
+    color: "#f97316"
+  }];
+  const total = data.reduce((s, d) => s + d.count, 0);
+  let cum = 0;
+  const size = 120,
+    r = 45,
+    cx = size / 2,
+    cy = size / 2;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-4"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: size,
+    height: size,
+    viewBox: `0 0 ${size} ${size}`
+  }, data.map((d, i) => {
+    const start = cum / total * Math.PI * 2 - Math.PI / 2;
+    cum += d.count;
+    const end = cum / total * Math.PI * 2 - Math.PI / 2;
+    const large = end - start > Math.PI ? 1 : 0;
+    const path = `M ${cx} ${cy} L ${cx + r * Math.cos(start)} ${cy + r * Math.sin(start)} A ${r} ${r} 0 ${large} 1 ${cx + r * Math.cos(end)} ${cy + r * Math.sin(end)} Z`;
+    return /*#__PURE__*/React.createElement("path", {
+      key: i,
+      d: path,
+      fill: d.color,
+      stroke: "#030712",
+      strokeWidth: "2"
+    });
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: cx,
+    cy: cy,
+    r: "22",
+    fill: "#030712"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: cx,
+    y: cy - 4,
+    fill: "white",
+    fontSize: "14",
+    fontWeight: "bold",
+    textAnchor: "middle"
+  }, total), /*#__PURE__*/React.createElement("text", {
+    x: cx,
+    y: cy + 8,
+    fill: "#9ca3af",
+    fontSize: "8",
+    textAnchor: "middle"
+  }, "Total")), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1"
+  }, data.map(d => /*#__PURE__*/React.createElement("div", {
+    key: d.label,
+    className: "flex items-center gap-2 text-xs"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "w-2.5 h-2.5 rounded-full",
+    style: {
+      background: d.color
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-gray-400"
+  }, d.label), /*#__PURE__*/React.createElement("span", {
+    className: "text-white font-bold"
+  }, d.count)))));
+}
+
+// ═══════════════════════════════════════════════════
+// KANBAN BOARD
+// ═══════════════════════════════════════════════════
+function KanbanBoard({
+  candidates
+}) {
+  const [kanban, setKanban] = useState(() => {
+    const init = {};
+    KANBAN_STAGES.forEach(s => init[s] = []);
+    candidates.forEach(c => init["Sourced"].push({
+      ...c
+    }));
+    return init;
+  });
+  const [dragging, setDragging] = useState(null);
+  const [dragOver, setDragOver] = useState(null);
+  const stageColors = {
+    "Sourced": "border-gray-600",
+    "Screening": "border-blue-600",
+    "Round 1": "border-purple-600",
+    "Round 2": "border-indigo-600",
+    "Round 3": "border-cyan-600",
+    "Offer": "border-amber-600",
+    "Hired": "border-emerald-600"
+  };
+  const stageHeaderBg = {
+    "Sourced": "bg-gray-800",
+    "Screening": "bg-blue-900/50",
+    "Round 1": "bg-purple-900/50",
+    "Round 2": "bg-indigo-900/50",
+    "Round 3": "bg-cyan-900/50",
+    "Offer": "bg-amber-900/50",
+    "Hired": "bg-emerald-900/50"
+  };
+  const onDragStart = (e, candidateId, fromStage) => {
+    setDragging({
+      id: candidateId,
+      from: fromStage
+    });
+    e.dataTransfer.effectAllowed = "move";
+  };
+  const onDragOver = (e, stage) => {
+    e.preventDefault();
+    setDragOver(stage);
+  };
+  const onDragLeave = () => setDragOver(null);
+  const onDrop = (e, toStage) => {
+    e.preventDefault();
+    if (!dragging) return;
+    setKanban(prev => {
+      const next = {
+        ...prev
+      };
+      Object.keys(next).forEach(k => next[k] = [...prev[k]]);
+      const idx = next[dragging.from].findIndex(c => c.id === dragging.id);
+      if (idx > -1) {
+        const [card] = next[dragging.from].splice(idx, 1);
+        next[toStage].push(card);
+      }
+      return next;
+    });
+    setDragging(null);
+    setDragOver(null);
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "kanban",
+    className: "w-4 h-4 text-amber-400"
+  }), " Hiring Pipeline \u2014 Drag candidates between stages"), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-500"
+  }, candidates.length, " candidates in pipeline")), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-3 overflow-x-auto pb-4"
+  }, KANBAN_STAGES.map(stage => /*#__PURE__*/React.createElement("div", {
+    key: stage,
+    className: `kanban-col flex-shrink-0 w-56 bg-gray-900/50 border ${stageColors[stage]} rounded-xl overflow-hidden ${dragOver === stage ? "drag-over" : ""}`,
+    onDragOver: e => onDragOver(e, stage),
+    onDragLeave: onDragLeave,
+    onDrop: e => onDrop(e, stage)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `${stageHeaderBg[stage]} px-3 py-2 border-b ${stageColors[stage]} flex items-center justify-between`
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-xs font-bold text-white uppercase"
+  }, stage), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded-full font-mono"
+  }, kanban[stage].length)), /*#__PURE__*/React.createElement("div", {
+    className: "p-2 space-y-2 min-h-[200px]"
+  }, kanban[stage].map(c => /*#__PURE__*/React.createElement("div", {
+    key: c.id,
+    draggable: true,
+    onDragStart: e => onDragStart(e, c.id, stage),
+    className: "bg-gray-800 border border-gray-700 rounded-lg p-2.5 cursor-grab active:cursor-grabbing hover:border-gray-600 transition-all"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-1"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-xs font-semibold text-white truncate"
+  }, c.name), /*#__PURE__*/React.createElement(ScoreBadge, {
+    score: c.score
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-400 truncate"
+  }, c.title), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-500 truncate"
+  }, c.company), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-1 mt-1.5"
+  }, /*#__PURE__*/React.createElement(RatingBadge, {
+    rating: c.rating
+  })))))))));
+}
+
+// ═══════════════════════════════════════════════════
+// CANDIDATE CARD (Full)
+// ═══════════════════════════════════════════════════
+function CandidateCard({
+  candidate,
+  expanded,
+  onToggle,
+  notes,
+  onAddNote
+}) {
+  const s = candidate.scores;
+  const [noteInput, setNoteInput] = useState("");
+  const [showNotes, setShowNotes] = useState(false);
+  return /*#__PURE__*/React.createElement("div", {
+    className: `bg-gray-800 border rounded-xl overflow-hidden transition-all ${candidate.rating === "STRONG_FIT" ? "border-gray-700" : "border-gray-700/60"} hover:border-gray-600`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "p-4 cursor-pointer",
+    onClick: onToggle
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-start justify-between gap-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "min-w-0 flex-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 flex-wrap"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-white"
+  }, candidate.name), /*#__PURE__*/React.createElement(ScoreBadge, {
+    score: candidate.score
+  }), /*#__PURE__*/React.createElement(RatingBadge, {
+    rating: candidate.rating
+  }), /*#__PURE__*/React.createElement("a", {
+    href: candidate.linkedin,
+    target: "_blank",
+    rel: "noopener",
+    onClick: e => e.stopPropagation(),
+    className: "text-blue-400 hover:text-blue-300 text-xs flex items-center gap-0.5"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "linkedin",
+    className: "w-3 h-3"
+  }), " Google"), /*#__PURE__*/React.createElement("a", {
+    href: candidate.linkedinDirect,
+    target: "_blank",
+    rel: "noopener",
+    onClick: e => e.stopPropagation(),
+    className: "text-sky-400 hover:text-sky-300 text-xs flex items-center gap-0.5"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "search",
+    className: "w-3 h-3"
+  }), " LinkedIn")), /*#__PURE__*/React.createElement("div", {
+    className: "text-sm text-gray-300 mt-0.5"
+  }, candidate.title), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3 mt-1 text-xs text-gray-500 flex-wrap"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "building-2",
+    className: "w-3 h-3"
+  }), candidate.company), /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "map-pin",
+    className: "w-3 h-3"
+  }), candidate.location), /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "clock",
+    className: "w-3 h-3"
+  }), candidate.experience)), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1.5 mt-2 flex-wrap"
+  }, candidate.skills.map((sk, i) => /*#__PURE__*/React.createElement("span", {
+    key: i,
+    className: "text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full"
+  }, sk))), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 mt-2 flex-wrap"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-xs text-gray-500"
+  }, "Sourced:"), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs px-1.5 py-0.5 rounded bg-blue-900/50 text-blue-300 border border-blue-800"
+  }, candidate.source), candidate.linkedin && candidate.linkedin.includes("linkedin.com/in/") ? /*#__PURE__*/React.createElement("a", {
+    href: candidate.linkedin,
+    target: "_blank",
+    rel: "noopener",
+    onClick: function(e){e.stopPropagation();},
+    className: "text-xs text-blue-400 hover:text-blue-300 underline ml-1"
+  }, "\u{1F517} LinkedIn Profile") : null, /*#__PURE__*/React.createElement("a", {
+    href: candidate.sourceLinks.google,
+    target: "_blank",
+    rel: "noopener",
+    onClick: function(e){e.stopPropagation();},
+    className: "text-xs text-amber-400 hover:text-amber-300 underline ml-1"
+  }, "\u{1F50D} Google Search"))), /*#__PURE__*/React.createElement(Icon, {
+    name: expanded ? "chevron-down" : "chevron-right",
+    className: "w-5 h-5 text-gray-500 flex-shrink-0"
+  }))), expanded && /*#__PURE__*/React.createElement("div", {
+    className: "border-t border-gray-700 p-4 bg-gray-900/50 space-y-4 fade-in"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-3 gap-4"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-semibold text-gray-400 uppercase mb-2"
+  }, "Radar Chart"), /*#__PURE__*/React.createElement(RadarChart, {
+    scores: s
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-semibold text-gray-400 uppercase mb-2"
+  }, "Score Breakdown"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1.5"
+  }, /*#__PURE__*/React.createElement(ScoreBar, {
+    label: "Role Match",
+    value: s.role,
+    weight: 25
+  }), /*#__PURE__*/React.createElement(ScoreBar, {
+    label: "Skills",
+    value: s.skills,
+    weight: 20
+  }), /*#__PURE__*/React.createElement(ScoreBar, {
+    label: "Industry",
+    value: s.industry,
+    weight: 15
+  }), /*#__PURE__*/React.createElement(ScoreBar, {
+    label: "Company",
+    value: s.company,
+    weight: 10
+  }), /*#__PURE__*/React.createElement(ScoreBar, {
+    label: "Trajectory",
+    value: s.trajectory,
+    weight: 10
+  }), /*#__PURE__*/React.createElement(ScoreBar, {
+    label: "Location",
+    value: s.location,
+    weight: 10
+  }), /*#__PURE__*/React.createElement(ScoreBar, {
+    label: "Comp Fit",
+    value: s.comp,
+    weight: 5
+  }), /*#__PURE__*/React.createElement(ScoreBar, {
+    label: "Stability",
+    value: s.stability,
+    weight: 5
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-semibold text-green-400 uppercase mb-1"
+  }, "Strengths"), candidate.strengths.map((str, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "text-xs text-gray-300 flex items-start gap-1 mb-0.5"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "check",
+    className: "w-3 h-3 text-green-500 flex-shrink-0"
+  }), str))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-semibold text-amber-400 uppercase mb-1"
+  }, "Concerns"), candidate.concerns.map((c, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "text-xs text-gray-300 flex items-start gap-1 mb-0.5"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "alert-circle",
+    className: "w-3 h-3 text-amber-500 flex-shrink-0"
+  }), c))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-semibold text-blue-400 uppercase mb-1"
+  }, "Contact"), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-300"
+  }, "Email: ", candidate.email), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-300"
+  }, "Phone: ", candidate.phone), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-300 flex items-center gap-1"
+  }, "LinkedIn: ", /*#__PURE__*/React.createElement("a", {
+    href: candidate.linkedin,
+    target: "_blank",
+    className: "text-blue-400 underline mr-2"
+  }, "Google X-Ray"), " | ", /*#__PURE__*/React.createElement("a", {
+    href: candidate.linkedinDirect,
+    target: "_blank",
+    className: "text-sky-400 underline"
+  }, "LinkedIn Search"))))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-800 rounded-lg p-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-semibold text-amber-400 uppercase"
+  }, "Outreach Angle"), /*#__PURE__*/React.createElement(CopyBtn, {
+    text: candidate.outreach
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "text-sm text-gray-300 italic"
+  }, "\"", candidate.outreach, "\"")), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-800 rounded-lg p-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-2 cursor-pointer",
+    onClick: () => setShowNotes(!showNotes)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-semibold text-cyan-400 uppercase flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "message-square",
+    className: "w-3 h-3"
+  }), " Notes & Feedback", notes && notes.length > 0 && /*#__PURE__*/React.createElement("span", {
+    className: "bg-cyan-900/50 text-cyan-300 text-xs px-1.5 py-0 rounded-full ml-1"
+  }, notes.length)), /*#__PURE__*/React.createElement(Icon, {
+    name: showNotes ? "chevron-down" : "chevron-right",
+    className: "w-3 h-3 text-gray-500"
+  })), showNotes && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2 fade-in"
+  }, notes && notes.length > 0 ? notes.map((n, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "bg-gray-900 rounded-lg px-3 py-2 text-xs"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-1"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-white"
+  }, n.author), /*#__PURE__*/React.createElement("span", {
+    className: "text-gray-600"
+  }, n.time)), /*#__PURE__*/React.createElement("div", {
+    className: "text-gray-300"
+  }, n.text), n.tag && /*#__PURE__*/React.createElement("span", {
+    className: `inline-block mt-1 text-xs px-1.5 py-0.5 rounded ${n.tag === "Positive" ? "bg-green-900/50 text-green-400" : n.tag === "Concern" ? "bg-amber-900/50 text-amber-400" : "bg-blue-900/50 text-blue-400"}`
+  }, n.tag))) : /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-600 italic"
+  }, "No notes yet. Add your first note below."), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2 mt-2"
+  }, /*#__PURE__*/React.createElement("input", {
+    value: noteInput,
+    onChange: e => setNoteInput(e.target.value),
+    onKeyDown: e => {
+      if (e.key === "Enter" && noteInput.trim()) {
+        onAddNote(candidate.id, noteInput.trim());
+        setNoteInput("");
+      }
+    },
+    placeholder: "Add a note... (press Enter)",
+    className: "flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500"
+  }), /*#__PURE__*/React.createElement("select", {
+    className: "bg-gray-900 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-gray-400 focus:outline-none",
+    id: `tag-${candidate.id}`
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "General"
+  }, "General"), /*#__PURE__*/React.createElement("option", {
+    value: "Positive"
+  }, "Positive"), /*#__PURE__*/React.createElement("option", {
+    value: "Concern"
+  }, "Concern"), /*#__PURE__*/React.createElement("option", {
+    value: "Interview"
+  }, "Interview")), /*#__PURE__*/React.createElement("button", {
+    onClick: () => {
+      if (noteInput.trim()) {
+        const tag = document.getElementById(`tag-${candidate.id}`).value;
+        onAddNote(candidate.id, noteInput.trim(), tag);
+        setNoteInput("");
+      }
+    },
+    className: "bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+  }, "Add"))))));
+}
+
+// ═══════════════════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════════════════
+function HiringRadarApp() {
+  const [tab, setTab] = useState("dashboard");
+  const [expandedId, setExpandedId] = useState(null);
+  const [filterRating, setFilterRating] = useState("STRONG_FIT");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [chatOpen, setChatOpen] = useState(true);
+  const [showNewSearch, setShowNewSearch] = useState(false);
+  const [candidateNotes, setCandidateNotes] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState("Just now");
+
+  // Dynamic candidates + search history
+  const [activeCandidates, setActiveCandidates] = useState(INITIAL_CANDIDATES);
+  const [activeSearchStrings, setActiveSearchStrings] = useState(INITIAL_SEARCH_STRINGS);
+  const [activeSearchId, setActiveSearchId] = useState(1);
+  const [searchHistory, setSearchHistory] = useState([{
+    id: 1,
+    date: "2026-03-17",
+    role: "Head of Sales",
+    company: "TheHireHub.AI",
+    location: "Gurgaon, India",
+    experience: "6-7 years",
+    industry: "SaaS / AI / HR Tech",
+    status: "Active",
+    candidates: INITIAL_CANDIDATES,
+    searchStrings: INITIAL_SEARCH_STRINGS,
+    params: {
+      role: "Head of Sales",
+      company: "TheHireHub.AI",
+      location: "Gurgaon, India",
+      experience: "6-7 years",
+      industry: "SaaS / AI / HR Tech",
+      mustHave: "B2B SaaS Sales, Revenue Growth, GTM Strategy, Team Building",
+      niceToHave: "AI/HR Tech domain, Ecosystem-led sales",
+      benchmark: "Debdeep Nandy — Manager Enterprise Sales, SaaS Labs",
+      priceBand: "₹25L-40L CTC + equity",
+      scope: "India"
+    }
+  }]);
+
+  // Load a search from history
+  const loadSearch = searchId => {
+    const search = searchHistory.find(s => s.id === searchId);
+    if (!search) return;
+    setActiveCandidates(search.candidates);
+    setActiveSearchStrings(search.searchStrings);
+    setActiveSearchId(searchId);
+    setSearchParams(search.params);
+    setSearchHistory(prev => prev.map(s => ({
+      ...s,
+      status: s.id === searchId ? "Active" : "Saved"
+    })));
+    setTab("candidates");
+    setExpandedId(null);
+    setFilterRating("ALL");
+    setSearchQuery("");
+  };
+
+  // Notes handler
+  const addNote = (candidateId, text, tag = "General") => {
+    setCandidateNotes(prev => {
+      const existing = prev[candidateId] || [];
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit"
+      }) + " · " + now.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric"
+      });
+      return {
+        ...prev,
+        [candidateId]: [...existing, {
+          author: "Ishank",
+          text,
+          tag,
+          time: timeStr
+        }]
+      };
+    });
+  };
+
+  // Score edit handler — update a candidate's score from chart
+  const handleScoreChange = (candidateId, newScore) => {
+    var newRating = newScore >= 4.0 ? "STRONG_FIT" : newScore >= 3.5 ? "GOOD_FIT" : "PARTIAL_FIT";
+    setActiveCandidates(function(prev) {
+      return prev.map(function(c) {
+        if (c.id === candidateId) return Object.assign({}, c, { score: newScore, rating: newRating });
+        return c;
+      }).sort(function(a,b) { return b.score - a.score; });
+    });
+    // Update in search history too
+    setSearchHistory(function(prev) {
+      return prev.map(function(s) {
+        if (s.id === activeSearchId) {
+          var updatedCands = s.candidates.map(function(c) {
+            if (c.id === candidateId) return Object.assign({}, c, { score: newScore, rating: newRating });
+            return c;
+          }).sort(function(a,b) { return b.score - a.score; });
+          return Object.assign({}, s, { candidates: updatedCands });
+        }
+        return s;
+      });
+    });
+  };
+
+  // Refresh handler — regenerates candidates for active search
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      const newCandidates = generateCandidates(searchParams);
+      const newStrings = generateSearchStrings(searchParams);
+      setActiveCandidates(newCandidates);
+      setActiveSearchStrings(newStrings);
+      // Update in history too
+      setSearchHistory(prev => prev.map(s => s.id === activeSearchId ? {
+        ...s,
+        candidates: newCandidates,
+        searchStrings: newStrings
+      } : s));
+      setRefreshing(false);
+      const now = new Date();
+      setLastRefresh(now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit"
+      }));
+    }, 2500);
+  };
+
+  // Export as CSV
+  const exportCSV = () => {
+    const headers = ["Rank", "Name", "Title", "Company", "Location", "Experience", "Industry", "Score", "Rating", "Email", "Phone", "LinkedIn", "Strengths", "Concerns"];
+    const rows = activeCandidates.map((c, i) => [i + 1, c.name, c.title, c.company, c.location, c.experience, c.industry, c.score, c.rating.replace(/_/g, " "), c.email, c.phone, c.linkedin, c.strengths.join("; "), c.concerns.join("; ")]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], {
+      type: "text/csv"
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `HiringRadar_${searchParams.role.replace(/\s/g, "_")}_${searchParams.company}_Export.csv`;
+    a.click();
+  };
+
+  // Export search strings
+  const exportSearchStrings = () => {
+    const text = activeSearchStrings.map(s => `[${s.platform}] (${s.region} — ${s.type})\n${s.query}`).join("\n\n");
+    const blob = new Blob([text], {
+      type: "text/plain"
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `HiringRadar_SearchStrings_${searchParams.role.replace(/\s/g, "_")}.txt`;
+    a.click();
+  };
+
+  // Export full report as JSON
+  const exportJSON = () => {
+    const report = {
+      searchParams,
+      candidates: activeCandidates,
+      searchStrings: activeSearchStrings,
+      notes: candidateNotes,
+      exportDate: new Date().toISOString(),
+      summary: {
+        total: activeCandidates.length,
+        strong: activeCandidates.filter(c => c.rating === "STRONG_FIT").length,
+        good: activeCandidates.filter(c => c.rating === "GOOD_FIT").length,
+        partial: activeCandidates.filter(c => c.rating === "PARTIAL_FIT").length
+      }
+    };
+    const blob = new Blob([JSON.stringify(report, null, 2)], {
+      type: "application/json"
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `HiringRadar_FullReport_${searchParams.company}_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+  };
+
+  // Export outreach templates
+  const exportOutreach = () => {
+    const text = activeCandidates.map((c, i) => `--- Candidate #${i + 1}: ${c.name} (${c.score}/5 — ${c.rating.replace(/_/g, " ")}) ---\n${c.title} at ${c.company}\nLinkedIn: ${c.linkedin}\nEmail: ${c.email}\n\nSubject: Exciting ${searchParams.role} opportunity at ${searchParams.company}\n\nHi ${c.name.split(" ")[0]},\n\n${c.outreach}\n\nWould love to chat about this opportunity. Are you open to a quick call this week?\n\nBest,\nIshank\n${searchParams.company}\n`).join("\n\n");
+    const blob = new Blob([text], {
+      type: "text/plain"
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `HiringRadar_OutreachTemplates_${searchParams.role.replace(/\s/g, "_")}.txt`;
+    a.click();
+  };
+  const [newSearchForm, setNewSearchForm] = useState({
+    role: "",
+    company: "",
+    location: "",
+    experience: "",
+    industry: "",
+    mustHaveSkills: "",
+    niceToHaveSkills: "",
+    priceBandMin: "",
+    priceBandMax: "",
+    priceBandCurrency: "INR",
+    benchmarkLinkedinUrl: "",
+    benchmarkName: "",
+    roleType: "Full-Time",
+    seniorityLevel: "Manager",
+    scope: "India",
+    companySize: "",
+    companyStage: "",
+    companyDescription: "",
+    hiringUrgency: "Normal",
+    teamSize: "",
+    reportingTo: "",
+    educationPreference: "",
+    certifications: "",
+    dealSizeExperience: "",
+    salesMethodology: "",
+    notes: ""
+  });
+
+  // Editable search params
+  const [searchParams, setSearchParams] = useState({
+    role: "Head of Sales",
+    company: "TheHireHub.AI",
+    location: "Gurgaon, India",
+    experience: "6-7 years",
+    industry: "SaaS / AI / HR Tech",
+    mustHave: "B2B SaaS Sales, Revenue Growth, GTM Strategy, Team Building",
+    niceToHave: "AI/HR Tech domain, Ecosystem-led sales",
+    benchmark: "Debdeep Nandy — Manager Enterprise Sales, SaaS Labs",
+    priceBand: "₹25L-40L CTC + equity",
+    scope: "India"
+  });
+  const filteredCandidates = activeCandidates.filter(c => {
+    if (filterRating !== "ALL" && c.rating !== filterRating) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return c.name.toLowerCase().includes(q) || c.company.toLowerCase().includes(q) || c.title.toLowerCase().includes(q) || c.industry.toLowerCase().includes(q);
+    }
+    return true;
+  });
+  const tabs = [{
+    id: "dashboard",
+    label: "Dashboard",
+    icon: "layout-dashboard"
+  }, {
+    id: "candidates",
+    label: "Candidates",
+    icon: "users"
+  }, {
+    id: "kanban",
+    label: "Kanban",
+    icon: "kanban"
+  }, {
+    id: "search",
+    label: "Search Strings",
+    icon: "search"
+  }, {
+    id: "outreach",
+    label: "Outreach",
+    icon: "mail"
+  }, {
+    id: "market",
+    label: "Market Intel",
+    icon: "trending-up"
+  }];
+  const EditField = ({
+    label,
+    field
+  }) => /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-gray-500 w-24 flex-shrink-0 text-sm"
+  }, label), /*#__PURE__*/React.createElement("input", {
+    value: searchParams[field],
+    onChange: e => setSearchParams({
+      ...searchParams,
+      [field]: e.target.value
+    }),
+    className: "editable-field flex-1 text-sm text-gray-200 bg-transparent border-b border-gray-700 px-1 py-0.5 rounded transition-all focus:border-amber-500"
+  }));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "flex h-screen bg-gray-950 text-white overflow-hidden"
+  }, chatOpen && /*#__PURE__*/React.createElement("div", {
+    className: "w-80 flex-shrink-0 flex flex-col border-r border-gray-800 relative"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setChatOpen(false),
+    className: "absolute top-2 right-2 z-10 text-gray-500 hover:text-white p-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "panel-left-close",
+    className: "w-4 h-4"
+  })), /*#__PURE__*/React.createElement(ChatBot, {
+    candidates: activeCandidates
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "flex-1 flex flex-col overflow-hidden"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border-b border-gray-800 flex-shrink-0"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-4 py-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3"
+  }, !chatOpen && /*#__PURE__*/React.createElement("button", {
+    onClick: () => setChatOpen(true),
+    className: "text-gray-400 hover:text-white p-1 mr-1",
+    title: "Open Intel Chat"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "panel-left-open",
+    className: "w-5 h-5"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "bg-amber-500 text-gray-950 p-1.5 rounded-lg"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "zap",
+    className: "w-5 h-5"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    className: "text-lg font-bold tracking-tight"
+  }, "Hiring Intent Radar"), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-gray-500"
+  }, searchParams.company, " \u2014 ", searchParams.role))), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 text-xs text-gray-500 mr-1"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "bg-green-900/50 text-green-400 px-2 py-0.5 rounded-full border border-green-800"
+  }, "Live"), /*#__PURE__*/React.createElement("span", null, activeCandidates.length, " candidates"), /*#__PURE__*/React.createElement("span", {
+    className: "text-gray-600"
+  }, "\xB7 ", lastRefresh)), /*#__PURE__*/React.createElement("button", {
+    onClick: handleRefresh,
+    disabled: refreshing,
+    className: `flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg transition-colors border ${refreshing ? "bg-gray-800 border-gray-700 text-gray-500 cursor-wait" : "bg-gray-800 border-gray-700 text-gray-300 hover:text-white hover:border-gray-600"}`,
+    title: "Re-run search on Apollo"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "refresh-cw",
+    className: `w-4 h-4 ${refreshing ? "animate-spin" : ""}`
+  }), refreshing ? "Searching..." : "Refresh"), /*#__PURE__*/React.createElement("div", {
+    className: "relative group"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "flex items-center gap-1.5 bg-gray-800 border border-gray-700 text-gray-300 hover:text-white hover:border-gray-600 text-sm px-3 py-2 rounded-lg transition-colors"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "download",
+    className: "w-4 h-4"
+  }), " Export", /*#__PURE__*/React.createElement(Icon, {
+    name: "chevron-down",
+    className: "w-3 h-3"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl shadow-black/50 py-1 w-56 hidden group-hover:block z-50"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: exportCSV,
+    className: "w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center gap-2 transition-colors"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "table",
+    className: "w-4 h-4 text-emerald-400"
+  }), " Candidate List (.csv)"), /*#__PURE__*/React.createElement("button", {
+    onClick: exportSearchStrings,
+    className: "w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center gap-2 transition-colors"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "search",
+    className: "w-4 h-4 text-blue-400"
+  }), " Search Strings (.txt)"), /*#__PURE__*/React.createElement("button", {
+    onClick: exportOutreach,
+    className: "w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center gap-2 transition-colors"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "mail",
+    className: "w-4 h-4 text-purple-400"
+  }), " Outreach Templates (.txt)"), /*#__PURE__*/React.createElement("div", {
+    className: "border-t border-gray-700 my-1"
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: exportJSON,
+    className: "w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center gap-2 transition-colors"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "file-json",
+    className: "w-4 h-4 text-amber-400"
+  }), " Full Report (.json)"))), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowNewSearch(!showNewSearch),
+    className: "flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-gray-950 text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-lg shadow-amber-500/20"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "plus",
+    className: "w-4 h-4"
+  }), " New Search"))), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1 mt-3 -mb-px overflow-x-auto"
+  }, tabs.map(t => /*#__PURE__*/React.createElement("button", {
+    key: t.id,
+    onClick: () => setTab(t.id),
+    className: `flex items-center gap-1.5 px-3 py-2 text-sm rounded-t-lg transition-colors whitespace-nowrap ${tab === t.id ? "bg-gray-950 text-amber-400 border-t border-x border-amber-500/50" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"}`
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: t.icon,
+    className: "w-4 h-4"
+  }), t.label))))), /*#__PURE__*/React.createElement("div", {
+    className: "flex-1 overflow-y-auto px-4 py-6"
+  }, refreshing && /*#__PURE__*/React.createElement("div", {
+    className: "bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-4 flex items-center gap-3 fade-in"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "animate-spin"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "loader",
+    className: "w-5 h-5 text-amber-400"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-sm font-semibold text-amber-400"
+  }, "Searching for candidates..."), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-500"
+  }, "Querying Apollo API \u2192 Scraping LinkedIn profiles \u2192 Scoring & ranking \u2192 Generating search strings"))), showNewSearch && /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-amber-500/30 rounded-2xl p-6 mb-6 relative fade-in shadow-xl shadow-amber-500/5"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowNewSearch(false),
+    className: "absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "x",
+    className: "w-5 h-5"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3 mb-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-amber-500 text-gray-950 p-2 rounded-xl"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "sparkles",
+    className: "w-5 h-5"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    className: "text-lg font-bold text-white"
+  }, "Launch New Hiring Search"), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-gray-500"
+  }, "Fill in the details below and we'll source the best candidates globally"))), /*#__PURE__*/React.createElement("div", {
+    className: "mb-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 mb-3"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "briefcase",
+    className: "w-4 h-4 text-amber-400"
+  }), /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-amber-400 uppercase tracking-wide"
+  }, "Role Details")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-3 gap-4"
+  }, [{
+    key: "role",
+    label: "Role Title *",
+    placeholder: "e.g. Head of Sales, VP Engineering, CTO",
+    icon: "user"
+  }, {
+    key: "roleType",
+    label: "Role Type",
+    placeholder: "Full-Time",
+    icon: "clock",
+    type: "select",
+    options: ["Full-Time", "Part-Time", "Contract", "Freelance", "Advisory"]
+  }, {
+    key: "seniorityLevel",
+    label: "Seniority Level",
+    placeholder: "Manager",
+    icon: "award",
+    type: "select",
+    options: ["Individual Contributor", "Senior IC", "Lead", "Manager", "Senior Manager", "Director", "VP", "C-Level", "Founder"]
+  }, {
+    key: "experience",
+    label: "Experience Range *",
+    placeholder: "e.g. 6-7 years, 10+ years",
+    icon: "calendar"
+  }, {
+    key: "reportingTo",
+    label: "Reports To",
+    placeholder: "e.g. CEO, VP Sales, CRO",
+    icon: "users"
+  }, {
+    key: "teamSize",
+    label: "Team Size to Manage",
+    placeholder: "e.g. 5-10, 20+, Starting from scratch",
+    icon: "user-plus"
+  }].map(f => /*#__PURE__*/React.createElement("div", {
+    key: f.key
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: f.icon,
+    className: "w-3 h-3"
+  }), f.label), f.type === "select" ? /*#__PURE__*/React.createElement("select", {
+    value: newSearchForm[f.key],
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      [f.key]: e.target.value
+    }),
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+  }, f.options.map(o => /*#__PURE__*/React.createElement("option", {
+    key: o,
+    value: o
+  }, o))) : /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm[f.key],
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      [f.key]: e.target.value
+    }),
+    placeholder: f.placeholder,
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "mb-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 mb-3"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "building-2",
+    className: "w-4 h-4 text-blue-400"
+  }), /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-blue-400 uppercase tracking-wide"
+  }, "Hiring Company")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-3 gap-4"
+  }, [{
+    key: "company",
+    label: "Company Name *",
+    placeholder: "e.g. TheHireHub.AI",
+    icon: "building"
+  }, {
+    key: "industry",
+    label: "Industry / Domain *",
+    placeholder: "e.g. SaaS / AI / HR Tech / FinTech",
+    icon: "layers"
+  }, {
+    key: "companyStage",
+    label: "Company Stage",
+    placeholder: "",
+    icon: "rocket",
+    type: "select",
+    options: ["Pre-Seed", "Seed", "Series A", "Series B", "Series C+", "Growth", "Public", "Bootstrapped"]
+  }, {
+    key: "companySize",
+    label: "Company Size",
+    placeholder: "e.g. 10-50, 50-200, 500+",
+    icon: "users"
+  }, {
+    key: "companyDescription",
+    label: "Company One-Liner",
+    placeholder: "e.g. AI-powered recruitment platform disrupting traditional hiring",
+    icon: "file-text"
+  }].map(f => /*#__PURE__*/React.createElement("div", {
+    key: f.key,
+    className: f.key === "companyDescription" ? "md:col-span-2" : ""
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: f.icon,
+    className: "w-3 h-3"
+  }), f.label), f.type === "select" ? /*#__PURE__*/React.createElement("select", {
+    value: newSearchForm[f.key],
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      [f.key]: e.target.value
+    }),
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select..."), f.options.map(o => /*#__PURE__*/React.createElement("option", {
+    key: o,
+    value: o
+  }, o))) : /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm[f.key],
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      [f.key]: e.target.value
+    }),
+    placeholder: f.placeholder,
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "mb-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 mb-3"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "map-pin",
+    className: "w-4 h-4 text-green-400"
+  }), /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-green-400 uppercase tracking-wide"
+  }, "Location & Compensation")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-4 gap-4"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "map-pin",
+    className: "w-3 h-3"
+  }), "Job Location *"), /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm.location,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      location: e.target.value
+    }),
+    placeholder: "e.g. Gurgaon, India",
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "globe",
+    className: "w-3 h-3"
+  }), "Search Scope"), /*#__PURE__*/React.createElement("select", {
+    value: newSearchForm.scope,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      scope: e.target.value
+    }),
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+  }, ["India Only", "Delhi NCR", "PAN India", "APAC", "US / Americas", "Europe", "Middle East", "Global"].map(o => /*#__PURE__*/React.createElement("option", {
+    key: o,
+    value: o
+  }, o)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "dollar-sign",
+    className: "w-3 h-3"
+  }), "Price Band (Min CTC)"), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1"
+  }, /*#__PURE__*/React.createElement("select", {
+    value: newSearchForm.priceBandCurrency,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      priceBandCurrency: e.target.value
+    }),
+    className: "bg-gray-800 border border-gray-700 rounded-l-lg px-2 py-2.5 text-xs text-gray-400 focus:outline-none focus:border-amber-500 w-16"
+  }, ["INR", "USD", "EUR", "GBP", "AED", "SGD"].map(c => /*#__PURE__*/React.createElement("option", {
+    key: c,
+    value: c
+  }, c))), /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm.priceBandMin,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      priceBandMin: e.target.value
+    }),
+    placeholder: "e.g. 25L",
+    className: "flex-1 bg-gray-800 border border-gray-700 rounded-r-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "dollar-sign",
+    className: "w-3 h-3"
+  }), "Price Band (Max CTC)"), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "bg-gray-800 border border-gray-700 rounded-l-lg px-2 py-2.5 text-xs text-gray-500 w-16 flex items-center justify-center"
+  }, newSearchForm.priceBandCurrency), /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm.priceBandMax,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      priceBandMax: e.target.value
+    }),
+    placeholder: "e.g. 40L",
+    className: "flex-1 bg-gray-800 border border-gray-700 rounded-r-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "mb-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 mb-3"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "zap",
+    className: "w-4 h-4 text-purple-400"
+  }), /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-purple-400 uppercase tracking-wide"
+  }, "Skills & Requirements")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-2 gap-4"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "check-circle",
+    className: "w-3 h-3"
+  }), "Must-Have Skills *"), /*#__PURE__*/React.createElement("textarea", {
+    value: newSearchForm.mustHaveSkills,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      mustHaveSkills: e.target.value
+    }),
+    placeholder: "e.g. B2B SaaS Sales, Revenue Growth, GTM Strategy, Enterprise Selling, Team Building",
+    rows: 3,
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors resize-none"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs text-gray-600 mt-1"
+  }, "Comma-separated. These are non-negotiable.")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "star",
+    className: "w-3 h-3"
+  }), "Nice-to-Have Skills"), /*#__PURE__*/React.createElement("textarea", {
+    value: newSearchForm.niceToHaveSkills,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      niceToHaveSkills: e.target.value
+    }),
+    placeholder: "e.g. AI/HR Tech domain, Ecosystem-led sales, PLG experience, International expansion",
+    rows: 3,
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors resize-none"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs text-gray-600 mt-1"
+  }, "Comma-separated. Bonus points for these.")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "graduation-cap",
+    className: "w-3 h-3"
+  }), "Education Preference"), /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm.educationPreference,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      educationPreference: e.target.value
+    }),
+    placeholder: "e.g. MBA preferred, Tier 1/2 B-school, Any degree",
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "badge-check",
+    className: "w-3 h-3"
+  }), "Certifications / Methodologies"), /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm.certifications,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      certifications: e.target.value
+    }),
+    placeholder: "e.g. MEDDIC, Challenger Sale, Sandler, AWS Certified",
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "mb-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 mb-3"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "linkedin",
+    className: "w-4 h-4 text-sky-400"
+  }), /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-sky-400 uppercase tracking-wide"
+  }, "Benchmark LinkedIn Profile")), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-800/50 border border-sky-900/50 rounded-xl p-4"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-gray-500 mb-3"
+  }, "Provide a LinkedIn profile of someone who's a great fit for this role. We'll analyze their background to calibrate our scoring."), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-2 gap-4"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "link",
+    className: "w-3 h-3"
+  }), "LinkedIn Profile URL"), /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm.benchmarkLinkedinUrl,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      benchmarkLinkedinUrl: e.target.value
+    }),
+    placeholder: "https://www.linkedin.com/in/profile-name",
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-sky-400 transition-colors"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "user",
+    className: "w-3 h-3"
+  }), "Benchmark Person Name"), /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm.benchmarkName,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      benchmarkName: e.target.value
+    }),
+    placeholder: "e.g. Debdeep Nandy",
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-sky-400 transition-colors"
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "mb-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 mb-3"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "settings",
+    className: "w-4 h-4 text-gray-400"
+  }), /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-400 uppercase tracking-wide"
+  }, "Additional Preferences")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-3 gap-4"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "flame",
+    className: "w-3 h-3"
+  }), "Hiring Urgency"), /*#__PURE__*/React.createElement("select", {
+    value: newSearchForm.hiringUrgency,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      hiringUrgency: e.target.value
+    }),
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+  }, ["Low (3+ months)", "Normal (1-2 months)", "High (2-4 weeks)", "Critical (ASAP)"].map(o => /*#__PURE__*/React.createElement("option", {
+    key: o,
+    value: o
+  }, o)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "target",
+    className: "w-3 h-3"
+  }), "Deal Size Experience"), /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm.dealSizeExperience,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      dealSizeExperience: e.target.value
+    }),
+    placeholder: "e.g. $100K+ ACV, $1M+ enterprise",
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "book-open",
+    className: "w-3 h-3"
+  }), "Preferred Sales Methodology"), /*#__PURE__*/React.createElement("input", {
+    value: newSearchForm.salesMethodology,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      salesMethodology: e.target.value
+    }),
+    placeholder: "e.g. MEDDIC, Solution Selling, Challenger",
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "md:col-span-3"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "text-xs text-gray-400 block mb-1.5 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "message-square",
+    className: "w-3 h-3"
+  }), "Additional Notes"), /*#__PURE__*/React.createElement("textarea", {
+    value: newSearchForm.notes,
+    onChange: e => setNewSearchForm({
+      ...newSearchForm,
+      notes: e.target.value
+    }),
+    placeholder: "Any other context that would help us find the perfect candidate... e.g. 'We need someone who can build a sales team from scratch', 'Must have startup experience', 'Open to remote candidates from Bangalore as well'",
+    rows: 2,
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors resize-none"
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between pt-4 border-t border-gray-800"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-600 flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "info",
+    className: "w-3 h-3"
+  }), " Fields marked * are required. More details = better results."), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowNewSearch(false),
+    className: "text-sm text-gray-400 hover:text-white px-4 py-2 rounded-lg transition-colors"
+  }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => {
+      const missing = [];
+      if (!newSearchForm.role) missing.push("Role Title");
+      if (!newSearchForm.company) missing.push("Company Name");
+      if (!newSearchForm.location) missing.push("Job Location");
+      if (!newSearchForm.experience) missing.push("Experience Range");
+      if (!newSearchForm.mustHaveSkills) missing.push("Must-Have Skills");
+      if (missing.length > 0) {
+        alert("Please fill in required fields:\n\n• " + missing.join("\n• "));
+        return;
+      }
+      const newParams = {
+        role: newSearchForm.role,
+        company: newSearchForm.company,
+        location: newSearchForm.location,
+        experience: newSearchForm.experience,
+        industry: newSearchForm.industry || "Not specified",
+        mustHave: newSearchForm.mustHaveSkills,
+        niceToHave: newSearchForm.niceToHaveSkills || "—",
+        benchmark: newSearchForm.benchmarkName ? newSearchForm.benchmarkName + " — " + newSearchForm.benchmarkLinkedinUrl : "Not provided",
+        priceBand: newSearchForm.priceBandMin ? newSearchForm.priceBandCurrency + " " + newSearchForm.priceBandMin + " – " + newSearchForm.priceBandMax : "Market rate",
+        scope: newSearchForm.scope
+      };
+      setSearchParams(newParams);
+      setShowNewSearch(false);
+      setRefreshing(true);
+      setTimeout(() => {
+        const newCandidates = generateCandidates(newSearchForm);
+        const newStrings = generateSearchStrings(newSearchForm);
+        const newId = Date.now();
+        const newSearchEntry = {
+          id: newId,
+          date: new Date().toISOString().slice(0, 10),
+          role: newSearchForm.role,
+          company: newSearchForm.company,
+          location: newSearchForm.location,
+          experience: newSearchForm.experience,
+          industry: newSearchForm.industry || "General",
+          status: "Active",
+          candidates: newCandidates,
+          searchStrings: newStrings,
+          params: newParams
+        };
+        setSearchHistory(prev => prev.map(s => ({
+          ...s,
+          status: "Saved"
+        })).concat([newSearchEntry]));
+        setActiveCandidates(newCandidates);
+        setActiveSearchStrings(newStrings);
+        setActiveSearchId(newId);
+        setRefreshing(false);
+        setTab("candidates");
+        setLastRefresh(new Date().toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit"
+        }));
+        setExpandedId(null);
+        setFilterRating("ALL");
+        // Reset form
+        setNewSearchForm({
+          role: "",
+          company: "",
+          location: "",
+          experience: "",
+          industry: "",
+          mustHaveSkills: "",
+          niceToHaveSkills: "",
+          priceBandMin: "",
+          priceBandMax: "",
+          priceBandCurrency: "INR",
+          benchmarkLinkedinUrl: "",
+          benchmarkName: "",
+          roleType: "Full-Time",
+          seniorityLevel: "Manager",
+          scope: "India",
+          companySize: "",
+          companyStage: "",
+          companyDescription: "",
+          hiringUrgency: "Normal",
+          teamSize: "",
+          reportingTo: "",
+          educationPreference: "",
+          certifications: "",
+          dealSizeExperience: "",
+          salesMethodology: "",
+          notes: ""
+        });
+      }, 3000);
+    },
+    className: "flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-gray-950 text-sm font-bold px-6 py-2.5 rounded-lg transition-colors shadow-lg shadow-amber-500/20"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "zap",
+    className: "w-4 h-4"
+  }), " Launch Radar Search")))), tab === "dashboard" && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-6 fade-in"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 md:grid-cols-5 gap-3"
+  }, [{
+    label: "Total Pool",
+    value: "19,500+",
+    icon: "users",
+    color: "text-blue-400"
+  }, {
+    label: "Strong Fit",
+    value: activeCandidates.filter(c => c.rating === "STRONG_FIT").length,
+    icon: "target",
+    color: "text-emerald-400"
+  }, {
+    label: "Good Fit",
+    value: activeCandidates.filter(c => c.rating === "GOOD_FIT").length,
+    icon: "thumbs-up",
+    color: "text-yellow-400"
+  }, {
+    label: "Partial Fit",
+    value: activeCandidates.filter(c => c.rating === "PARTIAL_FIT").length,
+    icon: "minus-circle",
+    color: "text-orange-400"
+  }, {
+    label: "Portals Scanned",
+    value: "30+",
+    icon: "globe",
+    color: "text-purple-400"
+  }].map((s, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "bg-gray-800 border border-gray-700 rounded-xl p-3 flex items-center gap-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `p-2 rounded-lg bg-gray-900 ${s.color}`
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: s.icon,
+    className: "w-5 h-5"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-xl font-bold text-white"
+  }, s.value), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-400"
+  }, s.label))))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-3 gap-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "md:col-span-2 bg-gray-900 border border-gray-800 rounded-xl p-5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-3 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "settings",
+    className: "w-4 h-4 text-amber-400"
+  }), " Search Parameters", /*#__PURE__*/React.createElement("span", {
+    className: "text-xs font-normal text-gray-500 ml-1"
+  }, "(click to edit)")), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2"
+  }, /*#__PURE__*/React.createElement(EditField, {
+    label: "Role",
+    field: "role"
+  }), /*#__PURE__*/React.createElement(EditField, {
+    label: "Company",
+    field: "company"
+  }), /*#__PURE__*/React.createElement(EditField, {
+    label: "Location",
+    field: "location"
+  }), /*#__PURE__*/React.createElement(EditField, {
+    label: "Experience",
+    field: "experience"
+  }), /*#__PURE__*/React.createElement(EditField, {
+    label: "Industry",
+    field: "industry"
+  }), /*#__PURE__*/React.createElement(EditField, {
+    label: "Must-Haves",
+    field: "mustHave"
+  }), /*#__PURE__*/React.createElement(EditField, {
+    label: "Nice-to-Have",
+    field: "niceToHave"
+  }), /*#__PURE__*/React.createElement(EditField, {
+    label: "Price Band",
+    field: "priceBand"
+  }), /*#__PURE__*/React.createElement(EditField, {
+    label: "Benchmark",
+    field: "benchmark"
+  }), /*#__PURE__*/React.createElement(EditField, {
+    label: "Scope",
+    field: "scope"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-4 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "pie-chart",
+    className: "w-4 h-4 text-amber-400"
+  }), " Rating Breakdown"), /*#__PURE__*/React.createElement(RatingPieChart, { candidates: activeCandidates }), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 pt-3 border-t border-gray-800 text-xs text-gray-500"
+  }, /*#__PURE__*/React.createElement("div", null, "Avg Score: ", /*#__PURE__*/React.createElement("span", {
+    className: "text-white font-bold"
+  }, (activeCandidates.reduce((s, c) => s + c.score, 0) / activeCandidates.length).toFixed(2))), /*#__PURE__*/React.createElement("div", null, "Highest: ", /*#__PURE__*/React.createElement("span", {
+    className: "text-emerald-400 font-bold"
+  }, Math.max(...activeCandidates.map(c => c.score)).toFixed(2))), /*#__PURE__*/React.createElement("div", null, "Lowest: ", /*#__PURE__*/React.createElement("span", {
+    className: "text-orange-400 font-bold"
+  }, Math.min(...activeCandidates.map(c => c.score)).toFixed(2)))))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
+  }, /*#__PURE__*/React.createElement(ScoreChart, {
+    candidates: activeCandidates,
+    onScoreChange: handleScoreChange
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-1 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "history",
+    className: "w-4 h-4 text-amber-400"
+  }), " Search History"), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-gray-600 mb-3"
+  }, "Click any row to load that search and its candidates."), /*#__PURE__*/React.createElement("div", {
+    className: "overflow-x-auto"
+  }, /*#__PURE__*/React.createElement("table", {
+    className: "w-full text-sm"
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
+    className: "text-xs text-gray-500 uppercase border-b border-gray-800"
+  }, /*#__PURE__*/React.createElement("th", {
+    className: "text-left py-2 pr-3"
+  }, "Date"), /*#__PURE__*/React.createElement("th", {
+    className: "text-left py-2 pr-3"
+  }, "Role"), /*#__PURE__*/React.createElement("th", {
+    className: "text-left py-2 pr-3"
+  }, "Company"), /*#__PURE__*/React.createElement("th", {
+    className: "text-left py-2 pr-3"
+  }, "Location"), /*#__PURE__*/React.createElement("th", {
+    className: "text-center py-2 pr-3"
+  }, "Total"), /*#__PURE__*/React.createElement("th", {
+    className: "text-center py-2 pr-3"
+  }, "Strong"), /*#__PURE__*/React.createElement("th", {
+    className: "text-center py-2 pr-3"
+  }, "Good"), /*#__PURE__*/React.createElement("th", {
+    className: "text-center py-2 pr-3"
+  }, "Partial"), /*#__PURE__*/React.createElement("th", {
+    className: "text-left py-2"
+  }, "Status"))), /*#__PURE__*/React.createElement("tbody", null, searchHistory.map(s => {
+    const strong = s.candidates.filter(c => c.rating === "STRONG_FIT").length;
+    const good = s.candidates.filter(c => c.rating === "GOOD_FIT").length;
+    const partial = s.candidates.filter(c => c.rating === "PARTIAL_FIT").length;
+    const isActive = s.id === activeSearchId;
+    return /*#__PURE__*/React.createElement("tr", {
+      key: s.id,
+      onClick: () => loadSearch(s.id),
+      className: `border-b border-gray-800/50 cursor-pointer transition-colors ${isActive ? "bg-amber-500/5 hover:bg-amber-500/10" : "hover:bg-gray-800/50"}`
+    }, /*#__PURE__*/React.createElement("td", {
+      className: "py-2.5 pr-3 text-gray-400"
+    }, s.date), /*#__PURE__*/React.createElement("td", {
+      className: "py-2.5 pr-3 text-white font-medium flex items-center gap-1.5"
+    }, isActive && /*#__PURE__*/React.createElement("span", {
+      className: "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"
+    }), s.role), /*#__PURE__*/React.createElement("td", {
+      className: "py-2.5 pr-3 text-gray-300"
+    }, s.company), /*#__PURE__*/React.createElement("td", {
+      className: "py-2.5 pr-3 text-gray-400"
+    }, s.location), /*#__PURE__*/React.createElement("td", {
+      className: "py-2.5 pr-3 text-center text-white font-bold"
+    }, s.candidates.length), /*#__PURE__*/React.createElement("td", {
+      className: "py-2.5 pr-3 text-center text-emerald-400 font-bold"
+    }, strong), /*#__PURE__*/React.createElement("td", {
+      className: "py-2.5 pr-3 text-center text-yellow-400 font-bold"
+    }, good), /*#__PURE__*/React.createElement("td", {
+      className: "py-2.5 pr-3 text-center text-orange-400 font-bold"
+    }, partial), /*#__PURE__*/React.createElement("td", {
+      className: "py-2.5"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: `text-xs px-2 py-0.5 rounded-full border ${s.status === "Active" ? "bg-green-900/50 text-green-400 border-green-800" : "bg-gray-800 text-gray-400 border-gray-700"}`
+    }, s.status)));
+  })))), searchHistory.length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "text-center text-gray-600 text-sm py-6"
+  }, "No searches yet. Click \"New Search\" to get started."))), tab === "candidates" && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4 fade-in"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3 flex-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "relative flex-1 min-w-48"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute left-3 top-1/2 -translate-y-1/2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "search",
+    className: "w-4 h-4 text-gray-500"
+  })), /*#__PURE__*/React.createElement("input", {
+    value: searchQuery,
+    onChange: e => setSearchQuery(e.target.value),
+    placeholder: "Search by name, company, title, industry...",
+    className: "w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-1 bg-gray-800 border border-gray-700 rounded-lg p-0.5"
+  }, ["ALL", "STRONG_FIT", "GOOD_FIT", "PARTIAL_FIT"].map(r => /*#__PURE__*/React.createElement("button", {
+    key: r,
+    onClick: () => setFilterRating(r),
+    className: `text-xs px-2.5 py-1.5 rounded-md transition-colors ${filterRating === r ? "bg-amber-500 text-gray-950 font-semibold" : "text-gray-400 hover:text-white"}`
+  }, r === "ALL" ? "All" : r.replace(/_/g, " "))))), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-500"
+  }, filteredCandidates.length, " candidates shown"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, filteredCandidates.map(c => /*#__PURE__*/React.createElement(CandidateCard, {
+    key: c.id,
+    candidate: c,
+    expanded: expandedId === c.id,
+    onToggle: () => setExpandedId(expandedId === c.id ? null : c.id),
+    notes: candidateNotes[c.id] || [],
+    onAddNote: addNote
+  })))), tab === "kanban" && /*#__PURE__*/React.createElement("div", {
+    className: "fade-in"
+  }, /*#__PURE__*/React.createElement(KanbanBoard, {
+    candidates: activeCandidates
+  })), tab === "search" && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4 fade-in"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-4"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-2 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "globe",
+    className: "w-4 h-4 text-amber-400"
+  }), " Global Job Portal Search Strings"), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-gray-500"
+  }, "Copy-paste into Google. X-Ray searches find hidden profiles across platforms.")), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2"
+  }, activeSearchStrings.map((ss, i) => {
+    const colors = {
+      LinkedIn: "bg-blue-900 text-blue-300",
+      "Google X-Ray": "bg-red-900 text-red-300",
+      Naukri: "bg-purple-900 text-purple-300",
+      IIMJobs: "bg-indigo-900 text-indigo-300",
+      Instahyre: "bg-teal-900 text-teal-300",
+      Hirist: "bg-cyan-900 text-cyan-300",
+      Indeed: "bg-violet-900 text-violet-300",
+      Cutshort: "bg-pink-900 text-pink-300",
+      Glassdoor: "bg-green-900 text-green-300",
+      GitHub: "bg-gray-800 text-gray-300",
+      Crunchbase: "bg-orange-900 text-orange-300"
+    };
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "flex items-center gap-3 bg-gray-800 border border-gray-700 rounded-lg p-3 hover:border-gray-600"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: `text-xs font-semibold px-2 py-1 rounded whitespace-nowrap ${colors[ss.platform] || "bg-gray-700 text-gray-300"}`
+    }, ss.platform), /*#__PURE__*/React.createElement("div", {
+      className: "flex-1 min-w-0"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "text-sm text-gray-200 font-mono truncate"
+    }, ss.query), /*#__PURE__*/React.createElement("div", {
+      className: "text-xs text-gray-500 mt-0.5"
+    }, ss.region, " \u2014 ", ss.type)), /*#__PURE__*/React.createElement(CopyBtn, {
+      text: ss.query
+    }));
+  }))), tab === "outreach" && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4 fade-in"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-4"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-1 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "send",
+    className: "w-4 h-4 text-amber-400"
+  }), " Personalized Outreach Templates"), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-gray-500"
+  }, "Click copy to grab full email with greeting + angle + CTA.")), activeCandidates.map((c, i) => /*#__PURE__*/React.createElement("div", {
+    key: c.id,
+    className: "bg-gray-800 border border-gray-700 rounded-xl p-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 flex-wrap mb-3"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-amber-400 font-bold text-sm"
+  }, "#", i + 1), /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-white"
+  }, c.name), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs text-gray-500"
+  }, "\u2014 ", c.title, " at ", c.company), /*#__PURE__*/React.createElement(ScoreBadge, {
+    score: c.score
+  }), /*#__PURE__*/React.createElement(RatingBadge, {
+    rating: c.rating
+  }), /*#__PURE__*/React.createElement("a", {
+    href: c.linkedin,
+    target: "_blank",
+    className: "text-blue-400 hover:text-blue-300 text-xs flex items-center gap-0.5 ml-auto"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "linkedin",
+    className: "w-3 h-3"
+  }), " LinkedIn")), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 rounded-lg p-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-xs font-semibold text-blue-400 uppercase"
+  }, "Email / InMail Template"), /*#__PURE__*/React.createElement(CopyBtn, {
+    text: `Hi ${c.name.split(" ")[0]},\n\n${c.outreach}\n\nWould love to chat about this opportunity. Are you open to a quick call this week?\n\nBest,\nIshank\nTheHireHub.AI`
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "text-sm text-gray-300 space-y-1.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-gray-500 text-xs"
+  }, "Subject: Exciting ", searchParams.role, " opportunity at ", searchParams.company), /*#__PURE__*/React.createElement("div", null, "Hi ", c.name.split(" ")[0], ","), /*#__PURE__*/React.createElement("div", null, c.outreach), /*#__PURE__*/React.createElement("div", null, "Would love to chat about this opportunity. Are you open to a quick call this week?"), /*#__PURE__*/React.createElement("div", {
+    className: "text-gray-500"
+  }, "Best,", /*#__PURE__*/React.createElement("br", null), "Ishank", /*#__PURE__*/React.createElement("br", null), searchParams.company)))))), tab === "market" && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4 fade-in"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-3 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "trending-up",
+    className: "w-4 h-4 text-amber-400"
+  }), " Talent Pool Breakdown"), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 md:grid-cols-4 gap-3"
+  }, [{
+    label: "Sales Managers (6-7yr, SaaS/AI, NCR)",
+    value: "~19,500"
+  }, {
+    label: "HR Tech-specific sales (NCR)",
+    value: "~50-80"
+  }, {
+    label: "AI company sales managers (NCR)",
+    value: "~150"
+  }, {
+    label: "Recruitment tech sales (direct match)",
+    value: "~30"
+  }].map((s, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "bg-gray-800 rounded-lg p-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xl font-bold text-amber-400"
+  }, s.value), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-400 mt-0.5"
+  }, s.label))))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-2 gap-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-3 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "building-2",
+    className: "w-4 h-4 text-amber-400"
+  }), " Competitor Talent Map"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2"
+  }, [{
+    company: "PeopleStrong",
+    note: "India's leading HCM — strong HR Tech sellers",
+    growth: "+8%",
+    candidates: 1
+  }, {
+    company: "LinkedIn Talent Solutions",
+    note: "World-class sales training pipeline",
+    growth: "Stable",
+    candidates: 2
+  }, {
+    company: "Zeko AI",
+    note: "Direct AI recruitment competitor",
+    growth: "+15%",
+    candidates: 1
+  }, {
+    company: "SaaS Labs",
+    note: "$42.7M revenue B2B SaaS powerhouse",
+    growth: "+12%",
+    candidates: 1
+  }, {
+    company: "BrowserStack",
+    note: "Unicorn SaaS sales methodology",
+    growth: "+10%",
+    candidates: 1
+  }, {
+    company: "Freshworks",
+    note: "Unicorn with strong SaaS fundamentals",
+    growth: "+6%",
+    candidates: 1
+  }, {
+    company: "Darwinbox",
+    note: "India's top HCM unicorn",
+    growth: "+20%",
+    candidates: 1
+  }, {
+    company: "Zoho",
+    note: "Massive HR Tech portfolio (Zoho Recruit)",
+    growth: "Stable",
+    candidates: 1
+  }].map((c, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "flex items-center gap-3 bg-gray-800 rounded-lg px-3 py-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-sm font-medium text-white"
+  }, c.company), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-500"
+  }, c.note)), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs text-gray-400"
+  }, c.candidates, " candidate", c.candidates > 1 ? "s" : ""), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs font-semibold text-green-400 bg-green-900/50 px-2 py-0.5 rounded"
+  }, c.growth))))), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-3 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "dollar-sign",
+    className: "w-4 h-4 text-amber-400"
+  }), " Compensation Benchmarks"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2 text-sm"
+  }, [["Sales Mgr (SaaS startup, 6-7yr)", "₹18L-30L + variable + equity"], ["Head of Sales (AI startup)", "₹25L-40L CTC + equity"], ["Lead AE (Unicorn tier)", "₹20L-35L CTC"], ["Sr AE (LinkedIn/PeopleStrong)", "₹18L-30L + benefits"]].map(([r, c], i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "flex justify-between bg-gray-800 rounded-lg px-3 py-2 gap-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-gray-300"
+  }, r), /*#__PURE__*/React.createElement("span", {
+    className: "text-amber-400 font-semibold whitespace-nowrap"
+  }, c))))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-3 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "sparkles",
+    className: "w-4 h-4 text-amber-400"
+  }), " Key Insights"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2"
+  }, ["6-7yr experience is the sweet spot for Head of Sales at early-stage AI startups", "HR Tech sales talent is scarce — only ~50-80 direct matches in Gurgaon", "BrowserStack/SaaS Labs alumni bring elite SaaS methodology even without HR domain", "Startup equity + title step-up is the key draw for mid-career candidates", "AI recruitment is growing 40%+ YoY — strong narrative for attracting talent"].map((s, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "flex items-start gap-2 text-sm text-gray-300"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "arrow-up-right",
+    className: "w-4 h-4 text-amber-400 flex-shrink-0"
+  }), s))))))))));
+}
+ReactDOM.render(/*#__PURE__*/React.createElement(HiringRadarApp, null), document.getElementById("root"));
+  </script>
+</body>
+</html>
