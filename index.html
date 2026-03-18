@@ -2361,192 +2361,137 @@ function HiringRadarApp() {
   })), /*#__PURE__*/React.createElement("div", {
     className: "md:col-span-2 bg-gray-900 border border-gray-800 rounded-xl p-5"
   },
-  // Sourcing Intelligence — unified clean widget
-  /*#__PURE__*/React.createElement("h3", {
-    className: "text-sm font-bold text-gray-300 uppercase mb-4 flex items-center gap-2"
-  }, /*#__PURE__*/React.createElement(Icon, {name: "bar-chart-3", className: "w-4 h-4 text-amber-400"}), " Sourcing Intelligence"),
-  // Source cards row
-  /*#__PURE__*/React.createElement("div", {className: "grid grid-cols-4 gap-2 mb-4"},
-    (function() {
-      var srcData = [
-        {label: "LinkedIn", key: "LinkedIn", icon: "linkedin", gradient: "from-blue-900/60 to-blue-800/30", border: "border-blue-700/40", accent: "text-blue-400"},
-        {label: "Apollo", key: "Apollo", icon: "database", gradient: "from-emerald-900/60 to-emerald-800/30", border: "border-emerald-700/40", accent: "text-emerald-400"},
-        {label: "Google X-Ray", key: "Google X-Ray", icon: "search", gradient: "from-amber-900/60 to-amber-800/30", border: "border-amber-700/40", accent: "text-amber-400"},
-        {label: "Total", key: "_total", icon: "users", gradient: "from-purple-900/60 to-purple-800/30", border: "border-purple-700/40", accent: "text-purple-400"}
-      ];
-      return srcData.map(function(s, i) {
-        var count = s.key === "_total" ? activeCandidates.length : activeCandidates.filter(function(c){return c.source === s.key}).length;
-        var avg = s.key === "_total" ? (activeCandidates.reduce(function(a,c){return a+c.score},0)/activeCandidates.length).toFixed(1) : (function(){var items=activeCandidates.filter(function(c){return c.source===s.key}); return items.length ? (items.reduce(function(a,c){return a+c.score},0)/items.length).toFixed(1) : "0";})();
-        return /*#__PURE__*/React.createElement("div", {
-          key: i,
-          className: "bg-gradient-to-br " + s.gradient + " border " + s.border + " rounded-xl p-3 transition-all cursor-default hover:scale-105 hover:shadow-lg",
-          style: {transition: "transform 0.2s ease, box-shadow 0.2s ease"}
-        },
-          /*#__PURE__*/React.createElement("div", {className: "flex items-center gap-1.5 mb-2"},
-            /*#__PURE__*/React.createElement(Icon, {name: s.icon, className: "w-3.5 h-3.5 " + s.accent}),
-            /*#__PURE__*/React.createElement("span", {className: "text-xs font-medium text-gray-400"}, s.label)
-          ),
-          /*#__PURE__*/React.createElement("div", {className: "text-xl font-bold text-white"}, count),
-          /*#__PURE__*/React.createElement("div", {className: "text-xs text-gray-500 mt-0.5"}, "Avg ", /*#__PURE__*/React.createElement("span", {className: s.accent + " font-semibold"}, avg))
-        );
-      });
-    })()
-  ),
-  // Two column: Source bars + Scrollable companies
-  /*#__PURE__*/React.createElement("div", {className: "grid grid-cols-2 gap-4"},
-    // Source Effectiveness bars
-    /*#__PURE__*/React.createElement("div", null,
-      /*#__PURE__*/React.createElement("div", {className: "text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2.5"}, "Source Effectiveness"),
-      /*#__PURE__*/React.createElement("div", {className: "space-y-3"},
-        (function() {
-          var sources = {};
-          activeCandidates.forEach(function(c) {
-            var s = c.source || "Other";
-            if (!sources[s]) sources[s] = {total: 0, scoreSum: 0};
-            sources[s].total++;
-            sources[s].scoreSum += c.score;
-          });
-          var sourceStyles = {"LinkedIn": {color: "bg-blue-500", hover: "hover:bg-blue-400"}, "Google X-Ray": {color: "bg-amber-500", hover: "hover:bg-amber-400"}, "Apollo": {color: "bg-emerald-500", hover: "hover:bg-emerald-400"}};
-          return Object.keys(sources).sort(function(a,b){return sources[b].total - sources[a].total}).map(function(key, i) {
-            var avg = (sources[key].scoreSum / sources[key].total).toFixed(1);
-            var pct = Math.round((sources[key].total / activeCandidates.length) * 100);
-            var style = sourceStyles[key] || {color: "bg-gray-600", hover: "hover:bg-gray-500"};
-            return /*#__PURE__*/React.createElement("div", {key: i, className: "group cursor-default"},
-              /*#__PURE__*/React.createElement("div", {className: "flex justify-between text-xs mb-1"},
-                /*#__PURE__*/React.createElement("span", {className: "text-gray-300 font-medium group-hover:text-white transition-colors"}, key),
-                /*#__PURE__*/React.createElement("span", {className: "text-gray-500 group-hover:text-gray-300 transition-colors"}, sources[key].total, " profiles \xB7 Avg ", avg)
-              ),
-              /*#__PURE__*/React.createElement("div", {className: "w-full bg-gray-800/80 rounded-full h-2.5 overflow-hidden"},
-                /*#__PURE__*/React.createElement("div", {
-                  className: style.color + " h-2.5 rounded-full transition-all duration-500 " + style.hover,
-                  style: {width: pct + "%"}
+  // ── Sourcing Intelligence — clean, concise ──
+  (function() {
+    // Compute data once
+    var sources = {};
+    var companies = {};
+    var totalScore = 0;
+    activeCandidates.forEach(function(c) {
+      var s = c.source || "Other";
+      if (!sources[s]) sources[s] = { total: 0, scoreSum: 0, strong: 0 };
+      sources[s].total++;
+      sources[s].scoreSum += c.score;
+      if (c.rating === "STRONG_FIT") sources[s].strong++;
+      totalScore += c.score;
+      var comp = c.company || "Unknown";
+      companies[comp] = (companies[comp] || 0) + 1;
+    });
+    var srcKeys = Object.keys(sources).sort(function(a, b) { return sources[b].total - sources[a].total; });
+    var compKeys = Object.keys(companies).sort(function(a, b) { return companies[b] - companies[a]; });
+    var maxSrc = sources[srcKeys[0]] ? sources[srcKeys[0]].total : 1;
+    var maxComp = companies[compKeys[0]] || 1;
+    var srcColors = { "LinkedIn": "#3b82f6", "Apollo": "#10b981", "Google X-Ray": "#f59e0b", "Other": "#6b7280" };
+    var strongCount = activeCandidates.filter(function(c) { return c.rating === "STRONG_FIT"; }).length;
+    var linkedinCount = activeCandidates.filter(function(c) { return c.linkedin && c.linkedin.includes("linkedin.com"); }).length;
+
+    return React.createElement("div", { className: "space-y-4" },
+      // Header row with key stats inline
+      React.createElement("div", { className: "flex items-center justify-between" },
+        React.createElement("h3", { className: "text-sm font-bold text-gray-300 uppercase flex items-center gap-2" },
+          React.createElement(Icon, { name: "bar-chart-3", className: "w-4 h-4 text-amber-400" }),
+          "Sourcing Intelligence"
+        ),
+        React.createElement("div", { className: "flex items-center gap-3 text-xs text-gray-500" },
+          React.createElement("span", null, activeCandidates.length, " profiles"),
+          React.createElement("span", { className: "text-gray-700" }, "\xB7"),
+          React.createElement("span", null, "Avg ", React.createElement("span", { className: "text-white font-semibold" }, (totalScore / activeCandidates.length).toFixed(1))),
+          React.createElement("span", { className: "text-gray-700" }, "\xB7"),
+          React.createElement("span", null, React.createElement("span", { className: "text-emerald-400 font-semibold" }, strongCount), " strong")
+        )
+      ),
+      // Source distribution — horizontal stacked bar
+      React.createElement("div", { className: "space-y-2" },
+        React.createElement("div", { className: "text-xs text-gray-500 font-medium" }, "Source Distribution"),
+        // Stacked bar
+        React.createElement("div", { className: "flex h-8 rounded-lg overflow-hidden gap-0.5" },
+          srcKeys.map(function(key, i) {
+            var pct = (sources[key].total / activeCandidates.length) * 100;
+            var color = srcColors[key] || "#6b7280";
+            return React.createElement("div", {
+              key: i,
+              className: "relative group cursor-default flex items-center justify-center transition-all",
+              style: { width: pct + "%", backgroundColor: color, minWidth: pct > 5 ? "0" : "20px", opacity: 0.85, transition: "opacity 0.2s ease" },
+              onMouseEnter: function(e) { e.currentTarget.style.opacity = "1"; },
+              onMouseLeave: function(e) { e.currentTarget.style.opacity = "0.85"; }
+            },
+              pct > 12 && React.createElement("span", { className: "text-xs font-bold text-white/90" }, Math.round(pct) + "%"),
+              // Hover tooltip
+              React.createElement("div", {
+                className: "absolute z-50 bottom-full mb-2 left-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 shadow-xl hidden group-hover:block whitespace-nowrap",
+                style: { transform: "translateX(-50%)" }
+              },
+                React.createElement("div", { className: "text-xs font-bold text-white mb-0.5" }, key),
+                React.createElement("div", { className: "text-xs text-gray-400" }, sources[key].total, " profiles \xB7 Avg ", (sources[key].scoreSum / sources[key].total).toFixed(1)),
+                sources[key].strong > 0 && React.createElement("div", { className: "text-xs text-emerald-400" }, sources[key].strong, " strong fit", sources[key].strong > 1 ? "s" : ""),
+                React.createElement("div", {
+                  className: "absolute top-full left-1/2 w-2 h-2 bg-gray-900 border-r border-b border-gray-700",
+                  style: { transform: "translateX(-50%) rotate(45deg)", marginTop: "-4px" }
                 })
               )
             );
-          });
-        })()
-      )
-    ),
-    // Top Companies - scrollable
-    /*#__PURE__*/React.createElement("div", {className: "flex flex-col"},
-      /*#__PURE__*/React.createElement("div", {className: "text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2.5"}, "Top Companies"),
-      /*#__PURE__*/React.createElement("div", {className: "flex-1 overflow-y-auto space-y-1", style: {maxHeight: "140px"}},
-        (function() {
-          var companies = {};
-          activeCandidates.forEach(function(c) {
-            var comp = c.company || "Unknown";
-            companies[comp] = (companies[comp] || 0) + 1;
-          });
-          var sorted = Object.keys(companies).sort(function(a,b){return companies[b]-companies[a]});
-          var maxCount = companies[sorted[0]] || 1;
-          return sorted.map(function(comp, i) {
-            var pct = Math.round((companies[comp] / maxCount) * 100);
-            return /*#__PURE__*/React.createElement("div", {
-              key: i,
-              className: "flex items-center gap-2 px-2 py-1.5 rounded-lg group cursor-default hover:bg-gray-800/60 transition-colors"
-            },
-              /*#__PURE__*/React.createElement("span", {className: "text-xs text-gray-300 truncate flex-1 group-hover:text-white transition-colors"}, comp),
-              /*#__PURE__*/React.createElement("div", {className: "w-16 bg-gray-800 rounded-full h-1.5 overflow-hidden flex-shrink-0"},
-                /*#__PURE__*/React.createElement("div", {className: "bg-amber-500/60 h-1.5 rounded-full group-hover:bg-amber-400 transition-colors", style: {width: pct + "%"}})
-              ),
-              /*#__PURE__*/React.createElement("span", {className: "text-xs font-mono text-amber-400/80 w-5 text-right flex-shrink-0 group-hover:text-amber-300 transition-colors"}, companies[comp])
-            );
-          });
-        })()
-      )
-    )
-  ),
-  // Pipeline stats row
-  /*#__PURE__*/React.createElement("div", {className: "mt-4 pt-3 border-t border-gray-800/60 grid grid-cols-4 gap-2"},
-    [{
-      icon: "target", label: "Strong Fits", value: activeCandidates.filter(function(c){return c.rating === "STRONG_FIT"}).length, accent: "text-emerald-400", bg: "bg-emerald-900/20"
-    }, {
-      icon: "linkedin", label: "LinkedIn Verified", value: activeCandidates.filter(function(c){return c.linkedin && c.linkedin.includes("linkedin.com")}).length, accent: "text-blue-400", bg: "bg-blue-900/20"
-    }, {
-      icon: "map-pin", label: "Locations", value: (function(){var locs={}; activeCandidates.forEach(function(c){var l=c.location||""; var city=l.split(",")[0].trim(); if(city) locs[city]=(locs[city]||0)+1;}); return Object.keys(locs).length;})(), accent: "text-amber-400", bg: "bg-amber-900/20"
-    }, {
-      icon: "briefcase", label: "In India", value: activeCandidates.filter(function(c){return c.location && c.location.includes("India")}).length, accent: "text-cyan-400", bg: "bg-cyan-900/20"
-    }].map(function(stat, i) {
-      return /*#__PURE__*/React.createElement("div", {
-        key: i,
-        className: stat.bg + " rounded-lg p-2.5 text-center cursor-default hover:scale-105 transition-all",
-        style: {transition: "transform 0.2s ease"}
-      },
-        /*#__PURE__*/React.createElement("div", {className: "flex justify-center mb-1"},
-          /*#__PURE__*/React.createElement(Icon, {name: stat.icon, className: "w-3.5 h-3.5 " + stat.accent})
+          })
         ),
-        /*#__PURE__*/React.createElement("div", {className: "text-lg font-bold " + stat.accent}, stat.value),
-        /*#__PURE__*/React.createElement("div", {className: "text-xs text-gray-500"}, stat.label)
-      );
-    })
-  )))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
-  }, /*#__PURE__*/React.createElement("h3", {
-    className: "text-sm font-bold text-gray-300 uppercase mb-1 flex items-center gap-2"
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "history",
-    className: "w-4 h-4 text-amber-400"
-  }), " Search History"), /*#__PURE__*/React.createElement("p", {
-    className: "text-xs text-gray-600 mb-3"
-  }, "Click any row to load that search and its candidates."), /*#__PURE__*/React.createElement("div", {
-    className: "overflow-x-auto"
-  }, /*#__PURE__*/React.createElement("table", {
-    className: "w-full text-sm"
-  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
-    className: "text-xs text-gray-500 uppercase border-b border-gray-800"
-  }, /*#__PURE__*/React.createElement("th", {
-    className: "text-left py-2 pr-3"
-  }, "Date"), /*#__PURE__*/React.createElement("th", {
-    className: "text-left py-2 pr-3"
-  }, "Role"), /*#__PURE__*/React.createElement("th", {
-    className: "text-left py-2 pr-3"
-  }, "Company"), /*#__PURE__*/React.createElement("th", {
-    className: "text-left py-2 pr-3"
-  }, "Location"), /*#__PURE__*/React.createElement("th", {
-    className: "text-center py-2 pr-3"
-  }, "Total"), /*#__PURE__*/React.createElement("th", {
-    className: "text-center py-2 pr-3"
-  }, "Strong"), /*#__PURE__*/React.createElement("th", {
-    className: "text-center py-2 pr-3"
-  }, "Good"), /*#__PURE__*/React.createElement("th", {
-    className: "text-center py-2 pr-3"
-  }, "Partial"), /*#__PURE__*/React.createElement("th", {
-    className: "text-left py-2"
-  }, "Status"))), /*#__PURE__*/React.createElement("tbody", null, searchHistory.map(s => {
-    const strong = s.candidates.filter(c => c.rating === "STRONG_FIT").length;
-    const good = s.candidates.filter(c => c.rating === "GOOD_FIT").length;
-    const partial = s.candidates.filter(c => c.rating === "PARTIAL_FIT").length;
-    const isActive = s.id === activeSearchId;
-    return /*#__PURE__*/React.createElement("tr", {
-      key: s.id,
-      onClick: () => loadSearch(s.id),
-      className: `border-b border-gray-800/50 cursor-pointer transition-colors ${isActive ? "bg-amber-500/5 hover:bg-amber-500/10" : "hover:bg-gray-800/50"}`
-    }, /*#__PURE__*/React.createElement("td", {
-      className: "py-2.5 pr-3 text-gray-400"
-    }, s.date), /*#__PURE__*/React.createElement("td", {
-      className: "py-2.5 pr-3 text-white font-medium flex items-center gap-1.5"
-    }, isActive && /*#__PURE__*/React.createElement("span", {
-      className: "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"
-    }), s.role), /*#__PURE__*/React.createElement("td", {
-      className: "py-2.5 pr-3 text-gray-300"
-    }, s.company), /*#__PURE__*/React.createElement("td", {
-      className: "py-2.5 pr-3 text-gray-400"
-    }, s.location), /*#__PURE__*/React.createElement("td", {
-      className: "py-2.5 pr-3 text-center text-white font-bold"
-    }, s.candidates.length), /*#__PURE__*/React.createElement("td", {
-      className: "py-2.5 pr-3 text-center text-emerald-400 font-bold"
-    }, strong), /*#__PURE__*/React.createElement("td", {
-      className: "py-2.5 pr-3 text-center text-yellow-400 font-bold"
-    }, good), /*#__PURE__*/React.createElement("td", {
-      className: "py-2.5 pr-3 text-center text-orange-400 font-bold"
-    }, partial), /*#__PURE__*/React.createElement("td", {
-      className: "py-2.5"
-    }, /*#__PURE__*/React.createElement("span", {
-      className: `text-xs px-2 py-0.5 rounded-full border ${s.status === "Active" ? "bg-green-900/50 text-green-400 border-green-800" : "bg-gray-800 text-gray-400 border-gray-700"}`
-    }, s.status)));
-  })))), searchHistory.length === 0 && /*#__PURE__*/React.createElement("div", {
-    className: "text-center text-gray-600 text-sm py-6"
-  }, "No searches yet. Click \"New Search\" to get started."))), tab === "candidates" && /*#__PURE__*/React.createElement("div", {
+        // Legend row
+        React.createElement("div", { className: "flex items-center gap-4" },
+          srcKeys.map(function(key, i) {
+            var color = srcColors[key] || "#6b7280";
+            return React.createElement("div", { key: i, className: "flex items-center gap-1.5 text-xs text-gray-400" },
+              React.createElement("span", { className: "w-2 h-2 rounded-full flex-shrink-0", style: { backgroundColor: color } }),
+              key, " (", sources[key].total, ")"
+            );
+          })
+        )
+      ),
+      // Bottom row: Top Companies (compact) + Quick stats
+      React.createElement("div", { className: "grid grid-cols-2 gap-4 pt-2 border-t border-gray-800/50" },
+        // Top companies — clean list, scrollable on hover
+        React.createElement("div", null,
+          React.createElement("div", { className: "text-xs text-gray-500 font-medium mb-2" }, "Top Companies"),
+          React.createElement("div", { className: "space-y-0.5 overflow-y-auto", style: { maxHeight: "100px" } },
+            compKeys.slice(0, 8).map(function(comp, i) {
+              var pct = Math.round((companies[comp] / maxComp) * 100);
+              return React.createElement("div", {
+                key: i,
+                className: "flex items-center gap-2 py-1 px-1.5 rounded group cursor-default hover:bg-gray-800/50 transition-colors"
+              },
+                React.createElement("span", { className: "text-xs text-gray-400 w-3 text-right flex-shrink-0 font-mono" }, i + 1),
+                React.createElement("span", { className: "text-xs text-gray-300 truncate flex-1 group-hover:text-white transition-colors" }, comp),
+                React.createElement("div", { className: "w-12 bg-gray-800 rounded-full h-1 overflow-hidden flex-shrink-0" },
+                  React.createElement("div", { className: "bg-amber-500/50 h-1 rounded-full group-hover:bg-amber-400 transition-all", style: { width: pct + "%" } })
+                ),
+                React.createElement("span", { className: "text-xs font-mono text-gray-500 w-4 text-right flex-shrink-0 group-hover:text-amber-400 transition-colors" }, companies[comp])
+              );
+            })
+          )
+        ),
+        // Quick stats — vertical compact
+        React.createElement("div", null,
+          React.createElement("div", { className: "text-xs text-gray-500 font-medium mb-2" }, "Pipeline"),
+          React.createElement("div", { className: "space-y-2" },
+            [
+              { label: "Strong Fits", value: strongCount, accent: "text-emerald-400", icon: "target" },
+              { label: "LinkedIn Verified", value: linkedinCount, accent: "text-blue-400", icon: "check-circle" },
+              { label: "Unique Locations", value: (function() { var l = {}; activeCandidates.forEach(function(c) { var loc = (c.location || "").split(",")[0].trim(); if (loc) l[loc] = 1; }); return Object.keys(l).length; })(), accent: "text-amber-400", icon: "map-pin" }
+            ].map(function(stat, i) {
+              return React.createElement("div", {
+                key: i,
+                className: "flex items-center gap-2.5 group cursor-default"
+              },
+                React.createElement("div", { className: "w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center group-hover:bg-gray-700 transition-colors" },
+                  React.createElement(Icon, { name: stat.icon, className: "w-3.5 h-3.5 " + stat.accent })
+                ),
+                React.createElement("div", null,
+                  React.createElement("div", { className: "text-sm font-bold " + stat.accent }, stat.value),
+                  React.createElement("div", { className: "text-xs text-gray-500" }, stat.label)
+                )
+              );
+            })
+          )
+        )
+      )
+    );
+  })()), tab === "candidates" && /*#__PURE__*/React.createElement("div", {
     className: "fade-in flex flex-col",
     style: {height: "calc(100vh - 180px)", minHeight: 0}
   }, /*#__PURE__*/React.createElement("div", {
@@ -2804,7 +2749,7 @@ function HiringRadarApp() {
   }, /*#__PURE__*/React.createElement(Icon, {
     name: "arrow-up-right",
     className: "w-4 h-4 text-amber-400 flex-shrink-0"
-  }), s))))))))));
+  }), s)))))))))))));
 }
 ReactDOM.render(/*#__PURE__*/React.createElement(HiringRadarApp, null), document.getElementById("root"));
   </script>
