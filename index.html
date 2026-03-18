@@ -767,6 +767,81 @@ async function ingestGoogleXRay(searchParams, searchId, existingCandidates, prog
   };
 }
 
+// ── LinkedIn Search Text Parser — paste raw LinkedIn search results text ──
+function parseLinkedInSearchText(rawText, searchParams, searchId) {
+  // Split by profile pattern: "Name • 1st/2nd/3rd+"
+  var blocks = rawText.split(/(?=\n?[A-Z][a-zA-Z\s\.\-]+(?:\u00B7|\u2022|\xB7|\·)\s*(?:1st|2nd|3rd\+?))/);
+  var candidates = [];
+  var idCounter = 0;
+  blocks.forEach(function(block) {
+    block = block.trim();
+    if (block.length < 20) return;
+    // Extract name (first line before bullet/dot separator)
+    var nameMatch = block.match(/^([A-Z][a-zA-Z\s\.\-]+?)(?:\s*[\u00B7\u2022\xB7\·]\s*(?:1st|2nd|3rd\+?))/);
+    if (!nameMatch) return;
+    var name = nameMatch[1].trim();
+    if (name.length < 3 || name.length > 50) return;
+    // Extract title (line after name, before location)
+    var lines = block.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+    var title = lines.length > 1 ? lines[1] : "";
+    // Extract location (look for "City, State, Country" pattern)
+    var location = "";
+    var locationMatch = block.match(/([A-Z][a-zA-Z\s]+,\s*(?:Haryana|Delhi|Uttar Pradesh|Maharashtra|Karnataka|Tamil Nadu|Telangana|Gujarat|Rajasthan|Punjab|West Bengal|Bihar|Madhya Pradesh|Kerala|Andhra Pradesh|Assam|Odisha|Jharkhand|Chhattisgarh|Goa|Uttarakhand|Himachal Pradesh|Jammu and Kashmir|Manipur|Meghalaya|Mizoram|Nagaland|Sikkim|Tripura|Arunachal Pradesh|Ontario|California|New York|Texas|London|Paris|Singapore|Dubai|UAE|India)[,\s]*(?:India|USA|UK|Canada|Singapore|UAE|France|Germany|Australia)?)/i);
+    if (locationMatch) location = locationMatch[1].trim();
+    // Extract company from "Current:" line
+    var company = "";
+    var currentMatch = block.match(/Current:\s*(.+?)(?:\s+at\s+(.+?))?(?:\n|$)/);
+    if (currentMatch) {
+      company = currentMatch[2] || currentMatch[1];
+      if (!title && currentMatch[1]) title = currentMatch[1];
+    }
+    // Skip if we couldn't extract enough data
+    if (!name || (!title && !company)) return;
+    // Clean up title
+    title = title.replace(/[\u00B7\u2022\xB7\·]\s*(?:1st|2nd|3rd\+?)$/, "").trim();
+    if (title.length > 120) title = title.substring(0, 120) + "...";
+    idCounter++;
+    var candidateId = searchId + "_li" + idCounter;
+    // Score based on title/role match
+    var roleWords = (searchParams.role || "").toLowerCase().split(/\s+/);
+    var titleLower = (title + " " + company).toLowerCase();
+    var roleScore = 0;
+    roleWords.forEach(function(w) { if (w.length > 2 && titleLower.includes(w)) roleScore += 0.5; });
+    var baseScore = Math.min(4.5, 3.0 + roleScore);
+    if (titleLower.includes("chro") || titleLower.includes("chief")) baseScore = Math.min(4.8, baseScore + 0.5);
+    if (titleLower.includes("head") || titleLower.includes("vp") || titleLower.includes("director")) baseScore = Math.min(4.6, baseScore + 0.3);
+    baseScore = Math.round(baseScore * 100) / 100;
+    var rating = baseScore >= 4.0 ? "STRONG_FIT" : baseScore >= 3.5 ? "GOOD_FIT" : "PARTIAL_FIT";
+    // Extract skills from title
+    var skills = title.split(/[|,\u00B7\u2022]/).map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 2 && s.length < 40; }).slice(0, 6);
+    if (skills.length === 0) skills = [title.split(/\s+/).slice(0, 3).join(" ")];
+    candidates.push({
+      id: candidateId,
+      _searchId: searchId,
+      name: name,
+      title: title,
+      company: company || "See LinkedIn",
+      location: location || "India",
+      experience: "\u2014",
+      industry: searchParams.industry || "General",
+      score: baseScore,
+      rating: rating,
+      skills: skills,
+      email: "Enrichment needed",
+      phone: "Enrichment needed",
+      source: "LinkedIn Search (Pasted)",
+      linkedin: "",
+      linkedinDirect: "",
+      sourceLinks: { linkedin: "", google: "https://www.google.com/search?q=" + encodeURIComponent('"' + name + '" "' + (company || title) + '"') },
+      strengths: ["Sourced from LinkedIn People search", location ? location + " based" : "Location pending", title],
+      concerns: ["LinkedIn URL not captured \u2014 manual verification needed"],
+      outreach: "Your profile as " + title + " caught our attention in our search for " + (searchParams.role || "this role") + ".",
+      scores: { role: Math.min(5, Math.round(baseScore)), skills: 4, industry: 3, company: 4, trajectory: 4, location: location.toLowerCase().includes("gurgaon") || location.toLowerCase().includes("gurugram") || location.toLowerCase().includes("delhi") ? 5 : 3, comp: 4, stability: 4 }
+    });
+  });
+  return candidates;
+}
+
 // ── Live Search Engine — Google X-Ray via Serper.dev ──
 // Uniqueness: each search uses its own searchId to tag candidates, ensuring no overlap
 var _globalSearchCounter = 0;
@@ -1176,15 +1251,36 @@ var HR_LINKEDIN_CANDIDATES = [
   { id: 8016, name: "Supriya Sharma", title: "HRMS / HRIS Specialist | SaaS", company: "Interarch Building Products", location: "Noida, India", experience: "6+ yrs", industry: "HR Tech / SaaS / HRMS", score: 3.65, rating: "GOOD_FIT", skills: ["HRMS","HRIS","SaaS","HR Process Automation","Hire to Retire","HROne"], email: "Enrichment needed", phone: "Enrichment needed", source: "Google X-Ray", linkedin: "https://in.linkedin.com/in/supriya-sharma-54285420b", linkedinDirect: "https://in.linkedin.com/in/supriya-sharma-54285420b", sourceLinks: { linkedin: "https://in.linkedin.com/in/supriya-sharma-54285420b", google: "https://www.google.com/search?q=%22Supriya+Sharma%22+%22HRMS%22+%22SaaS%22+%22Noida%22" }, strengths: ["HRMS/HRIS specialist — deep HR tech systems expertise","SaaS and HR Process Automation experience","Noida-based — Delhi NCR region"], concerns: ["More HRIS admin than HR leadership","May need to grow into people management role"], outreach: "Your HRMS and HRIS specialization in SaaS, including Hire-to-Retire automation, is highly relevant for this role.", scores: { role:3, skills:4, industry:5, company:3, trajectory:3, location:5, comp:4, stability:4 } }
 ];
 
+// CHRO / Chief HR Officer candidates — scraped from LinkedIn "CHRO" AND "SAAS" AND "Gurgaon" (Mar 2026)
+var CHRO_LINKEDIN_CANDIDATES = [
+  { id: 9001, name: "Pravin Kutty", title: "Group CHRO @ AceVector | People & Culture, Change Management, HR Strategy", company: "AceVector (Snapdeal, Stellaro Brands, Unicommerce)", location: "Gurgaon, Haryana, India", experience: "18+ yrs", industry: "E-commerce / SaaS / Retail Tech", score: 4.80, rating: "STRONG_FIT", skills: ["Group CHRO","People & Culture","Change Management","HR Strategy","SaaS","E-commerce HR"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/pravinkutty/", linkedinDirect: "https://www.linkedin.com/in/pravinkutty/", sourceLinks: { linkedin: "https://www.linkedin.com/in/pravinkutty/", google: "https://www.google.com/search?q=%22Pravin+Kutty%22+%22CHRO%22+%22AceVector%22" }, strengths: ["Group CHRO at AceVector (Snapdeal, Unicommerce) \u2014 multi-entity SaaS/e-commerce group","People & Culture, Change Management, HR Strategy expertise","Gurgaon-based \u2014 no relocation needed"], concerns: ["Currently Group CHRO \u2014 may need compelling pull to move","Managing multiple brands \u2014 verify availability"], outreach: "Your leadership as Group CHRO across AceVector's portfolio including Unicommerce (SaaS) and Snapdeal demonstrates exactly the multi-entity HR transformation expertise we value.", scores: { role:5, skills:5, industry:5, company:5, trajectory:5, location:5, comp:4, stability:4 } },
+  { id: 9002, name: "Manish Wadhwa", title: "CHRO-CarDekho Group (India & SE Asia) and Business Head - Insurance, SE Asia", company: "CarDekho Group", location: "Gurgaon, Haryana, India", experience: "20+ yrs", industry: "Tech / Automotive / SaaS", score: 4.75, rating: "STRONG_FIT", skills: ["CHRO","Business Head","India & SE Asia","P&L Leadership","SaaS","Insurance"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/manish-wadhwa-b79a0213/", linkedinDirect: "https://www.linkedin.com/in/manish-wadhwa-b79a0213/", sourceLinks: { linkedin: "https://www.linkedin.com/in/manish-wadhwa-b79a0213/", google: "https://www.google.com/search?q=%22Manish+Wadhwa%22+%22CHRO%22+%22CarDekho%22" }, strengths: ["CHRO + Business Head dual role \u2014 rare P&L + People combo","12K LinkedIn followers \u2014 strong executive brand","CarDekho Group \u2014 major tech unicorn, India & SE Asia scope"], concerns: ["Dual CHRO + Business Head \u2014 may want broader role than pure HR","Very senior \u2014 verify comp band alignment"], outreach: "Your unique dual role as CHRO and Business Head at CarDekho Group, spanning India & SE Asia, shows the kind of strategic business-HR leadership we're seeking.", scores: { role:5, skills:5, industry:4, company:5, trajectory:5, location:5, comp:3, stability:4 } },
+  { id: 9003, name: "Karan Sandhu", title: "Ex-CHRO, Jindal Steel & Power | Ex-CLO, IndiGo | Ex-Amrop | People, Culture, Learning & AI Transformation", company: "Independent (Ex-JSP, IndiGo, GE)", location: "Gurugram, Haryana, India", experience: "22+ yrs", industry: "Steel / Aviation / Consulting / AI", score: 4.65, rating: "STRONG_FIT", skills: ["Ex-CHRO","Chief Learning Officer","Executive Search","AI Transformation","Culture Building","Leadership Development"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/karan-sandhu-1638b512/", linkedinDirect: "https://www.linkedin.com/in/karan-sandhu-1638b512/", sourceLinks: { linkedin: "https://www.linkedin.com/in/karan-sandhu-1638b512/", google: "https://www.google.com/search?q=%22Karan+Sandhu%22+%22CHRO%22+%22Jindal%22" }, strengths: ["Ex-CHRO at Jindal Steel & Power \u2014 large-scale HR transformation","Ex-CLO at IndiGo + Ex-Amrop executive search partner","AI Transformation + Culture Building at India/US/China scale"], concerns: ["Currently independent \u2014 may prefer advisory/consulting","Very senior pedigree (GE, IndiGo, JSP) \u2014 high comp expectations"], outreach: "Your CHRO experience at Jindal Steel, Chief Learning Officer role at IndiGo, and executive search background at Amrop create an extraordinary combination of strategic HR leadership.", scores: { role:5, skills:5, industry:3, company:5, trajectory:5, location:5, comp:3, stability:3 } },
+  { id: 9004, name: "Dr. Sukhpreet Swaran Sandhu", title: "Global HR & Strategy Leader | Fractional CHRO & Advisor | 40under40 | Fortune Asia's 100 Power Leaders", company: "Independent (Fractional CHRO)", location: "Gurugram, Haryana, India", experience: "15+ yrs", industry: "HR Strategy / Consulting / Wellness", score: 4.55, rating: "STRONG_FIT", skills: ["Fractional CHRO","Global HR Strategy","MDI Gurgaon","40under40","Fortune Asia 100","Wellness Coach"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/dr-sukhpreet-swaran-sandhu/", linkedinDirect: "https://www.linkedin.com/in/dr-sukhpreet-swaran-sandhu/", sourceLinks: { linkedin: "https://www.linkedin.com/in/dr-sukhpreet-swaran-sandhu/", google: "https://www.google.com/search?q=%22Dr+Sukhpreet+Swaran+Sandhu%22+%22CHRO%22" }, strengths: ["Fractional CHRO & Advisor \u2014 available for new full-time role","Fortune Asia's 100 Power Leaders + 40under40 \u2014 top HR recognition","12K LinkedIn followers \u2014 strong thought leadership"], concerns: ["Currently fractional/advisory \u2014 may prefer flexibility over full-time","Wellness Coach angle \u2014 verify interest in operational CHRO role"], outreach: "As a Fortune Asia 100 Power Leader and 40under40 honoree, your fractional CHRO experience and global HR strategy expertise make you an exceptional candidate.", scores: { role:5, skills:5, industry:4, company:4, trajectory:5, location:5, comp:4, stability:3 } },
+  { id: 9005, name: "Khalid Raza", title: "Talent Acquisition Leader - Risk Advisory, Tech Consulting and GCC at KPMG India", company: "KPMG India (Ex-PeopleStrong)", location: "Gurgaon, Haryana, India", experience: "14+ yrs", industry: "Consulting / SaaS HCM / GCC", score: 4.35, rating: "STRONG_FIT", skills: ["Talent Acquisition","KPMG","PeopleStrong SaaS","Risk Advisory","Tech Consulting","GCC Hiring"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/khalidraza9/", linkedinDirect: "https://www.linkedin.com/in/khalidraza9/", sourceLinks: { linkedin: "https://www.linkedin.com/in/khalidraza9/", google: "https://www.google.com/search?q=%22Khalid+Raza%22+%22KPMG%22+%22Talent+Acquisition%22" }, strengths: ["43K LinkedIn followers \u2014 massive TA influencer brand","KPMG India TA Leader + Ex-PeopleStrong (SaaS HCM platform)","Gurgaon-based \u2014 deep Delhi NCR TA network"], concerns: ["TA-focused rather than full CHRO scope","At connection limit \u2014 may need InMail approach"], outreach: "With 43K followers and your TA leadership at KPMG plus SaaS HCM experience at PeopleStrong, you bring incredible talent acquisition depth to any HR leadership role.", scores: { role:4, skills:4, industry:5, company:5, trajectory:4, location:5, comp:4, stability:4 } },
+  { id: 9006, name: "Haider Abbas", title: "AVP | HR Digital Transformation | HR Operations & HR Shared Services", company: "Ex-PeopleStrong (SaaS HCM)", location: "Gurgaon, Haryana, India", experience: "15+ yrs", industry: "SaaS HCM / HR Tech / HR Ops", score: 4.25, rating: "STRONG_FIT", skills: ["HR Digital Transformation","HR Operations","HR Shared Services","SaaS HCM","PeopleStrong","India SEA Middle East"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/haider-abbas-38757313/", linkedinDirect: "https://www.linkedin.com/in/haider-abbas-38757313/", sourceLinks: { linkedin: "https://www.linkedin.com/in/haider-abbas-38757313/", google: "https://www.google.com/search?q=%22Haider+Abbas%22+%22HR+Digital+Transformation%22+%22PeopleStrong%22" }, strengths: ["AVP-level HR Digital Transformation \u2014 SaaS HCM expertise at PeopleStrong","India, SEA and Middle East regional HR operations scope","Gurgaon-based \u2014 no relocation needed"], concerns: ["AVP level \u2014 may need step-up to CHRO","More HR Ops/Shared Services than strategic HR"], outreach: "Your HR Digital Transformation leadership and SaaS HCM expertise from PeopleStrong, spanning India, SEA and Middle East, is highly valuable.", scores: { role:4, skills:4, industry:5, company:4, trajectory:4, location:5, comp:4, stability:4 } },
+  { id: 9007, name: "Megha Sharma", title: "SaaS | HRTech 4.0", company: "HR Tech / SaaS", location: "Gurgaon, Haryana, India", experience: "10+ yrs", industry: "SaaS / HR Tech", score: 4.10, rating: "STRONG_FIT", skills: ["SaaS","HRTech 4.0","Business Development","CEO Forum","CHRO Forum","Delhi NCR"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/megha-sharma-6ab89981/", linkedinDirect: "https://www.linkedin.com/in/megha-sharma-6ab89981/", sourceLinks: { linkedin: "https://www.linkedin.com/in/megha-sharma-6ab89981/", google: "https://www.google.com/search?q=%22Megha+Sharma%22+%22SaaS%22+%22HRTech%22+%22Gurgaon%22" }, strengths: ["SaaS + HRTech 4.0 domain expertise","IMA India CEO/CHRO Forum experience \u2014 C-suite network","Gurgaon-based \u2014 no relocation needed"], concerns: ["More BD/Sales side of HR Tech than HR leadership","Verify if interested in HR leadership vs HR Tech sales"], outreach: "Your deep SaaS and HRTech 4.0 expertise, combined with your CHRO forum network from IMA India, positions you uniquely in the HR Tech landscape.", scores: { role:3, skills:4, industry:5, company:3, trajectory:4, location:5, comp:4, stability:4 } },
+  { id: 9008, name: "Sumit Singla", title: "People & Culture Consultant | Fractional CHRO | Writer | Part-time HR Head", company: "HR+ (Founder)", location: "South Delhi, India", experience: "12+ yrs", industry: "HR Consulting / People & Culture", score: 4.40, rating: "STRONG_FIT", skills: ["Fractional CHRO","People & Culture","HR Consulting","Writer","Leadership Development","People Decisions"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/sumitsingla/", linkedinDirect: "https://www.linkedin.com/in/sumitsingla/", sourceLinks: { linkedin: "https://www.linkedin.com/in/sumitsingla/", google: "https://www.google.com/search?q=%22Sumit+Singla%22+%22Fractional+CHRO%22+%22HR%2B%22" }, strengths: ["Fractional CHRO & Founder of HR+ \u2014 available for full-time roles","20K LinkedIn followers \u2014 major HR thought leader and writer","South Delhi-based \u2014 Delhi NCR region"], concerns: ["Currently consulting/fractional \u2014 may prefer independence","Writer/thought leader \u2014 verify interest in operational role"], outreach: "As the founder of HR+ with 20K followers and your mission to help leaders make better people decisions, your fractional CHRO expertise is exactly the kind of people-first leadership we need.", scores: { role:5, skills:5, industry:4, company:4, trajectory:4, location:5, comp:4, stability:3 } },
+  { id: 9009, name: "Subhasish C.", title: "CFO/CIO/CHRO Advisor | Value Creator | Operating Model & Organization Re-design", company: "Ex-PwC Director", location: "Mumbai, India", experience: "20+ yrs", industry: "Consulting / Transformation / AI", score: 4.05, rating: "STRONG_FIT", skills: ["CHRO Advisor","Organization Re-design","GBS & Outsourcing","AI at Scale","Functional Transformation","PwC"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/subhasishstategicadvisor/", linkedinDirect: "https://www.linkedin.com/in/subhasishstategicadvisor/", sourceLinks: { linkedin: "https://www.linkedin.com/in/subhasishstategicadvisor/", google: "https://www.google.com/search?q=%22Subhasish%22+%22CHRO+Advisor%22+%22PwC%22" }, strengths: ["CFO/CIO/CHRO Advisor \u2014 cross-functional CxO transformation","Ex-PwC Director \u2014 Big 4 consulting pedigree","AI at Scale + Organization Re-design expertise"], concerns: ["Mumbai-based \u2014 would need relocation or remote","Advisory role \u2014 may prefer consulting over operational CHRO"], outreach: "Your experience as a CFO/CIO/CHRO Advisor at PwC, driving organization re-design and AI transformation at scale, brings a rare strategic perspective.", scores: { role:4, skills:4, industry:4, company:5, trajectory:4, location:3, comp:3, stability:3 } },
+  { id: 9010, name: "Nikunj Maheshwari", title: "Partner - Lagrange Point | Ex-PageGroup | Ex-Google | Young India Fellow", company: "Lagrange Point (Ex-Page Executive, Google)", location: "Gurgaon, Haryana, India", experience: "10+ yrs", industry: "Executive Search / Tech / Consulting", score: 4.15, rating: "STRONG_FIT", skills: ["Executive Search","Page Executive","Google","Young India Fellow","CXO Hiring","Leadership Advisory"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/nikunjlp/", linkedinDirect: "https://www.linkedin.com/in/nikunjlp/", sourceLinks: { linkedin: "https://www.linkedin.com/in/nikunjlp/", google: "https://www.google.com/search?q=%22Nikunj+Maheshwari%22+%22Lagrange+Point%22+%22Page+Executive%22" }, strengths: ["Partner at executive search firm \u2014 deep CXO talent network","Ex-Google + Ex-PageGroup \u2014 blue-chip pedigree","10K LinkedIn followers + Young India Fellow \u2014 strong brand"], concerns: ["Executive search partner \u2014 may not want in-house HR role","More recruitment/search than HR operations"], outreach: "Your executive search partnership at Lagrange Point, combined with Google and PageGroup experience, gives you unparalleled insight into what makes great HR leadership.", scores: { role:3, skills:4, industry:4, company:5, trajectory:5, location:5, comp:4, stability:3 } },
+  { id: 9011, name: "Himanshu Goel", title: "Global Talent Acquisition & Strategic HR Leader | MDI Gurgaon", company: "Ex-Airtel (UAE-based)", location: "UAE (Ex-Gurgaon, MDI)", experience: "12+ yrs", industry: "Real Estate / FMCG / Telecom / E-comm", score: 3.85, rating: "GOOD_FIT", skills: ["Global TA","Strategic HR","MDI Gurgaon","AI-Enabled Recruitment","Leadership Hiring","Digital Transformation"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/himanshu-goel-3935842a/", linkedinDirect: "https://www.linkedin.com/in/himanshu-goel-3935842a/", sourceLinks: { linkedin: "https://www.linkedin.com/in/himanshu-goel-3935842a/", google: "https://www.google.com/search?q=%22Himanshu+Goel%22+%22Global+Talent+Acquisition%22+%22MDI%22" }, strengths: ["Global TA & Strategic HR across multiple industries","MDI Gurgaon alumni \u2014 strong India network","AI-Enabled Recruitment & Digital Transformation focus"], concerns: ["Currently UAE-based \u2014 would need relocation","More TA than full CHRO scope"], outreach: "Your global talent acquisition leadership across Real Estate, FMCG, Telecom and E-commerce, combined with your MDI Gurgaon network, makes you a compelling candidate.", scores: { role:4, skills:4, industry:3, company:4, trajectory:4, location:2, comp:4, stability:4 } },
+  { id: 9012, name: "Anupama K.", title: "CHRO at RRP Group | Driving People Strategy, Developing Processes & Building Culture", company: "RRP Group (Ex-Wipro BPO)", location: "Navi Mumbai, India", experience: "14+ yrs", industry: "Conglomerate / BPO / HR", score: 4.00, rating: "STRONG_FIT", skills: ["CHRO","People Strategy","Process Development","Culture Building","Leadership Development","Talent Development"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn Search", linkedin: "https://www.linkedin.com/in/anupama-k-84a99a25/", linkedinDirect: "https://www.linkedin.com/in/anupama-k-84a99a25/", sourceLinks: { linkedin: "https://www.linkedin.com/in/anupama-k-84a99a25/", google: "https://www.google.com/search?q=%22Anupama+K%22+%22CHRO%22+%22RRP+Group%22" }, strengths: ["Current CHRO at RRP Group \u2014 proven People Strategy leadership","4K LinkedIn followers \u2014 active HR community presence","Culture Building + Leadership Development focus"], concerns: ["Navi Mumbai-based \u2014 would need relocation to Gurgaon","BPO/conglomerate background \u2014 verify SaaS interest"], outreach: "Your CHRO leadership at RRP Group, driving people strategy, process development and culture building, demonstrates the holistic HR leadership approach we value.", scores: { role:5, skills:5, industry:3, company:4, trajectory:4, location:2, comp:4, stability:4 } }
+];
+enrichCandidatesWithExperience(CHRO_LINKEDIN_CANDIDATES);
+
 // Function to get pre-scraped candidates based on search keywords
 function getPreScrapedCandidates(searchParams) {
   var role = (searchParams.role || "").toLowerCase();
   var industry = (searchParams.industry || "").toLowerCase();
   var mustHave = (searchParams.mustHave || searchParams.mustHaveSkills || "").toLowerCase();
   var allText = role + " " + industry + " " + mustHave;
+  // Check for CHRO-specific searches (higher seniority)
+  if (allText.includes("chro") || allText.includes("chief human resource") || allText.includes("chief people officer") || allText.includes("vp hr") || allText.includes("head of people") || allText.includes("fractional chro")) {
+    return CHRO_LINKEDIN_CANDIDATES.concat(HR_LINKEDIN_CANDIDATES).slice();
+  }
   // Check for HR-related searches
-  if (allText.includes("hr") || allText.includes("human resource") || allText.includes("people") || allText.includes("chro") || allText.includes("talent") || allText.includes("hrbp")) {
-    return HR_LINKEDIN_CANDIDATES.slice();
+  if (allText.includes("hr") || allText.includes("human resource") || allText.includes("people") || allText.includes("talent") || allText.includes("hrbp")) {
+    return HR_LINKEDIN_CANDIDATES.concat(CHRO_LINKEDIN_CANDIDATES).slice();
   }
   // Check for Sales-related searches
   if (allText.includes("sales") || allText.includes("revenue") || allText.includes("business development") || allText.includes("cro")) {
@@ -2513,6 +2609,8 @@ function HiringRadarApp() {
   const [activeSearchId, setActiveSearchId] = useState(initialActiveId);
   const [searchHistory, setSearchHistory] = useState(initialSearches);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showPasteModal, setShowPasteModal] = useState(false);
+  const [pasteText, setPasteText] = useState("");
 
   // ── Persist searchHistory to localStorage on every change ──
   useEffect(function() {
@@ -3971,7 +4069,66 @@ function HiringRadarApp() {
     className: filterRating === r ? "text-xs px-2.5 py-1.5 rounded-md bg-amber-500 text-gray-950 font-semibold transition-colors" : "text-xs px-2.5 py-1.5 rounded-md text-gray-400 hover:text-white transition-colors"
   }, r === "ALL" ? "All" : r.replace(/_/g, " ")); })), /*#__PURE__*/React.createElement("span", {
     className: "text-xs text-gray-500"
-  }, filteredCandidates.length, " of ", activeCandidates.length, " candidates"))), /*#__PURE__*/React.createElement("div", {
+  }, filteredCandidates.length, " of ", activeCandidates.length, " candidates"),
+    /*#__PURE__*/React.createElement("button", {
+      onClick: function() { setShowPasteModal(true); setPasteText(""); },
+      className: "ml-auto text-xs flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-700/40 hover:bg-blue-600/30 transition-colors"
+    }, /*#__PURE__*/React.createElement(Icon, { name: "clipboard-paste", className: "w-3 h-3" }), " Import from LinkedIn")
+  )),
+  // Paste Modal
+  showPasteModal && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4",
+    onClick: function() { setShowPasteModal(false); }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-700 rounded-xl w-full max-w-xl p-5 space-y-4",
+    onClick: function(e) { e.stopPropagation(); }
+  },
+    /*#__PURE__*/React.createElement("div", { className: "flex items-center justify-between" },
+      /*#__PURE__*/React.createElement("div", { className: "flex items-center gap-2" },
+        /*#__PURE__*/React.createElement(Icon, { name: "clipboard-paste", className: "w-5 h-5 text-blue-400" }),
+        /*#__PURE__*/React.createElement("span", { className: "text-sm font-bold text-white" }, "Import LinkedIn Search Results")
+      ),
+      /*#__PURE__*/React.createElement("button", {
+        onClick: function() { setShowPasteModal(false); },
+        className: "text-gray-500 hover:text-white"
+      }, /*#__PURE__*/React.createElement(Icon, { name: "x", className: "w-4 h-4" }))
+    ),
+    /*#__PURE__*/React.createElement("p", { className: "text-xs text-gray-400" }, "Copy all text from a LinkedIn People search results page (Ctrl+A, Ctrl+C) and paste it below. Candidate names, titles, companies, and locations will be extracted automatically."),
+    /*#__PURE__*/React.createElement("textarea", {
+      value: pasteText,
+      onChange: function(e) { setPasteText(e.target.value); },
+      placeholder: "Paste LinkedIn search results here...\n\nExample:\nPravin Kutty \u00B7 2nd\nGroup CHRO @ AceVector | People & Culture\nGurgaon, Haryana, India\nCurrent: Group CHRO at AceVector...",
+      rows: 10,
+      className: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 resize-none font-mono"
+    }),
+    /*#__PURE__*/React.createElement("div", { className: "flex items-center justify-between" },
+      /*#__PURE__*/React.createElement("span", { className: "text-xs text-gray-500" }, pasteText.length > 0 ? pasteText.split("\n").length + " lines pasted" : "Waiting for paste..."),
+      /*#__PURE__*/React.createElement("button", {
+        onClick: function() {
+          if (!pasteText.trim()) return;
+          var parsed = parseLinkedInSearchText(pasteText, searchParams, activeSearchId);
+          if (parsed.length === 0) { showToast("Could not extract any candidates from pasted text", "warning"); return; }
+          // Deduplicate against existing
+          var existing = activeCandidates.map(function(c) { return c.name.toLowerCase(); });
+          var newOnes = parsed.filter(function(c) { return existing.indexOf(c.name.toLowerCase()) === -1; });
+          var dupes = parsed.length - newOnes.length;
+          if (newOnes.length > 0) {
+            var merged = activeCandidates.concat(newOnes);
+            setActiveCandidates(merged);
+            syncActiveToHistory(merged);
+            showToast(newOnes.length + " candidates imported" + (dupes > 0 ? " \u00B7 " + dupes + " duplicates skipped" : ""), "success");
+          } else {
+            showToast("All " + parsed.length + " candidates already exist in this search", "warning");
+          }
+          setShowPasteModal(false);
+          setPasteText("");
+        },
+        disabled: !pasteText.trim(),
+        className: pasteText.trim() ? "flex items-center gap-1 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors" : "flex items-center gap-1 px-4 py-2 rounded-lg bg-gray-700 text-gray-500 text-sm font-semibold cursor-not-allowed"
+      }, /*#__PURE__*/React.createElement(Icon, { name: "download", className: "w-4 h-4" }), " Import Candidates")
+    )
+  )),
+  /*#__PURE__*/React.createElement("div", {
     className: "flex-1 overflow-y-auto space-y-4",
     style: {minHeight: 0}
   }, filteredCandidates.map(function(c) { return /*#__PURE__*/React.createElement(CandidateCard, {
