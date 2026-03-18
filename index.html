@@ -842,6 +842,177 @@ function parseLinkedInSearchText(rawText, searchParams, searchId) {
   return candidates;
 }
 
+// ═══════════════════════════════════════════════════
+// 3-SIGNAL EVALUATION ENGINE
+// Auto-assesses Domain Relevance, Location/Availability, Seniority Fit
+// ═══════════════════════════════════════════════════
+
+// Domain keyword maps for industry matching
+var DOMAIN_KEYWORDS = {
+  "hr tech": ["hr tech","hrtech","hris","hrms","hcm","peoplestrong","darwinbox","keka","zoho people","bamboohr","workday","successfactors"],
+  "saas": ["saas","software as a service","cloud","subscription","recurring revenue","arr","mrr"],
+  "b2b": ["b2b","enterprise","business to business","corporate sales","enterprise sales"],
+  "fintech": ["fintech","financial technology","payments","lending","neobank","banking tech"],
+  "edtech": ["edtech","education technology","learning","e-learning","lms"],
+  "healthtech": ["healthtech","health tech","telemedicine","digital health"],
+  "e-commerce": ["e-commerce","ecommerce","marketplace","d2c","direct to consumer","retail tech"],
+  "ai": ["ai","artificial intelligence","machine learning","ml","deep learning","generative ai","llm"],
+  "consulting": ["consulting","advisory","strategy","management consulting","big 4"],
+  "recruitment": ["recruitment","talent acquisition","staffing","executive search","headhunting"]
+};
+
+// Seniority tier mapping from title keywords
+var SENIORITY_TIERS = {
+  "C-Suite": ["ceo","cto","cfo","coo","cpo","cmo","chro","cio","chief","founder","co-founder","managing director"],
+  "VP": ["vp","vice president","svp","evp","avp","head of","global head"],
+  "Director": ["director","senior director","associate director","group director"],
+  "Manager": ["manager","senior manager","lead","team lead","principal","group manager"],
+  "IC": ["analyst","associate","executive","specialist","coordinator","consultant","engineer","developer","individual contributor"]
+};
+
+function evaluateCandidate(candidate, searchParams) {
+  var signals = {
+    domain: { name: "Domain Relevance", rating: "Weak", reason: "", checked: false },
+    location: { name: "Location / Availability", rating: "Weak", reason: "", checked: false },
+    seniority: { name: "Seniority vs Role Fit", rating: "Weak", reason: "", checked: false }
+  };
+
+  // ── Signal 1: Domain Relevance ──
+  var targetDomain = ((searchParams.industry || "") + " " + (searchParams.mustHave || searchParams.mustHaveSkills || "")).toLowerCase();
+  var candidateText = ((candidate.title || "") + " " + (candidate.company || "") + " " + (candidate.industry || "") + " " + (candidate.skills || []).join(" ")).toLowerCase();
+
+  // Find which domain keywords the target search mentions
+  var targetDomains = [];
+  Object.keys(DOMAIN_KEYWORDS).forEach(function(domain) {
+    DOMAIN_KEYWORDS[domain].forEach(function(kw) {
+      if (targetDomain.includes(kw) && targetDomains.indexOf(domain) === -1) targetDomains.push(domain);
+    });
+  });
+
+  // Count how many domain matches the candidate has
+  var domainHits = 0;
+  var matchedDomains = [];
+  targetDomains.forEach(function(domain) {
+    DOMAIN_KEYWORDS[domain].forEach(function(kw) {
+      if (candidateText.includes(kw) && matchedDomains.indexOf(domain) === -1) {
+        domainHits++;
+        matchedDomains.push(domain);
+      }
+    });
+  });
+
+  // Also check direct role title overlap
+  var roleWords = (searchParams.role || "").toLowerCase().split(/[\s,|\/]+/).filter(function(w) { return w.length > 3; });
+  var titleHits = 0;
+  roleWords.forEach(function(w) { if (candidateText.includes(w)) titleHits++; });
+
+  if (domainHits >= 2 || (domainHits >= 1 && titleHits >= 2)) {
+    signals.domain.rating = "Strong";
+    signals.domain.reason = "Direct experience in " + matchedDomains.join(", ") + (titleHits > 0 ? " + role title match" : "");
+  } else if (domainHits >= 1 || titleHits >= 2) {
+    signals.domain.rating = "Moderate";
+    signals.domain.reason = "Adjacent domain: " + (matchedDomains.length > 0 ? matchedDomains.join(", ") : "partial title match");
+  } else if (titleHits >= 1) {
+    signals.domain.rating = "Moderate";
+    signals.domain.reason = "Some role keyword overlap but different industry";
+  } else {
+    signals.domain.rating = "Weak";
+    signals.domain.reason = "No domain overlap with " + (targetDomains.length > 0 ? targetDomains.join("/") : "target industry");
+  }
+
+  // ── Signal 2: Location / Availability ──
+  var targetLocation = (searchParams.location || "").toLowerCase();
+  var candidateLocation = (candidate.location || "").toLowerCase();
+
+  // Extract city names for matching
+  var targetCity = targetLocation.split(",")[0].trim().replace(/\s+/g, " ");
+  var candidateCity = candidateLocation.split(",")[0].trim().replace(/\s+/g, " ");
+
+  // NCR equivalence map
+  var ncrCities = ["gurgaon","gurugram","delhi","new delhi","noida","faridabad","ghaziabad","south delhi","north delhi","east delhi","west delhi","delhi ncr","ncr"];
+  var isTargetNCR = ncrCities.some(function(c) { return targetLocation.includes(c); });
+  var isCandidateNCR = ncrCities.some(function(c) { return candidateLocation.includes(c); });
+
+  // Bangalore equivalence
+  var bangaloreCities = ["bangalore","bengaluru","bengalore"];
+  var isTargetBangalore = bangaloreCities.some(function(c) { return targetLocation.includes(c); });
+  var isCandidateBangalore = bangaloreCities.some(function(c) { return candidateLocation.includes(c); });
+
+  // Mumbai equivalence
+  var mumbaiCities = ["mumbai","navi mumbai","thane"];
+  var isTargetMumbai = mumbaiCities.some(function(c) { return targetLocation.includes(c); });
+  var isCandidateMumbai = mumbaiCities.some(function(c) { return candidateLocation.includes(c); });
+
+  if (candidateCity === targetCity || (isTargetNCR && isCandidateNCR) || (isTargetBangalore && isCandidateBangalore) || (isTargetMumbai && isCandidateMumbai)) {
+    signals.location.rating = "Strong";
+    signals.location.reason = "Exact location match: " + (candidate.location || "same city");
+  } else if (candidateLocation.includes("india") && targetLocation.includes("india")) {
+    signals.location.rating = "Moderate";
+    signals.location.reason = "Same country, different city (" + (candidateCity || "India") + ")";
+  } else if (candidateLocation.includes("remote") || candidateText.includes("remote") || candidateText.includes("open to relocation")) {
+    signals.location.rating = "Moderate";
+    signals.location.reason = "Remote-friendly or open to relocation";
+  } else if (!candidateLocation || candidateLocation === "india") {
+    signals.location.rating = "Moderate";
+    signals.location.reason = "Location not specified — needs verification";
+  } else {
+    signals.location.rating = "Weak";
+    signals.location.reason = "Different location: " + (candidate.location || "unknown") + " vs " + (searchParams.location || "target");
+  }
+
+  // ── Signal 3: Seniority vs Role Fit ──
+  var targetTitle = (searchParams.role || "").toLowerCase();
+  var candidateTitleLower = (candidate.title || "").toLowerCase();
+
+  // Detect seniority tier
+  function detectTier(titleStr) {
+    var tiers = ["C-Suite","VP","Director","Manager","IC"];
+    for (var ti = 0; ti < tiers.length; ti++) {
+      var tier = tiers[ti];
+      var keywords = SENIORITY_TIERS[tier];
+      for (var ki = 0; ki < keywords.length; ki++) {
+        if (titleStr.includes(keywords[ki])) return { tier: tier, level: ti };
+      }
+    }
+    return { tier: "Unknown", level: -1 };
+  }
+
+  var targetTier = detectTier(targetTitle);
+  var candidateTier = detectTier(candidateTitleLower);
+
+  if (candidateTier.level === -1 || targetTier.level === -1) {
+    signals.seniority.rating = "Moderate";
+    signals.seniority.reason = "Seniority unclear — manual review needed (candidate: " + (candidateTier.tier) + ")";
+  } else {
+    var levelDiff = Math.abs(candidateTier.level - targetTier.level);
+    if (levelDiff === 0) {
+      signals.seniority.rating = "Strong";
+      signals.seniority.reason = "Exact level match: " + candidateTier.tier + " \u2192 " + targetTier.tier;
+    } else if (levelDiff === 1) {
+      var direction = candidateTier.level > targetTier.level ? "growing into" : "stepping down to";
+      signals.seniority.rating = "Moderate";
+      signals.seniority.reason = candidateTier.tier + " " + direction + " " + targetTier.tier + " role";
+    } else {
+      signals.seniority.rating = "Weak";
+      signals.seniority.reason = "Level gap: " + candidateTier.tier + " vs " + targetTier.tier + " (" + levelDiff + " levels off)";
+    }
+  }
+
+  // ── Overall Fit: weakest link logic ──
+  var ratingOrder = { "Strong": 3, "Moderate": 2, "Weak": 1 };
+  var lowestRating = "Strong";
+  ["domain","location","seniority"].forEach(function(key) {
+    if (ratingOrder[signals[key].rating] < ratingOrder[lowestRating]) {
+      lowestRating = signals[key].rating;
+    }
+  });
+
+  return {
+    signals: signals,
+    overallFit: lowestRating + " Fit"
+  };
+}
+
 // ── Live Search Engine — Google X-Ray via Serper.dev ──
 // Uniqueness: each search uses its own searchId to tag candidates, ensuring no overlap
 var _globalSearchCounter = 0;
@@ -1301,6 +1472,23 @@ function enrichCandidatesWithExperience(candidates) {
 }
 enrichCandidatesWithExperience(REAL_LINKEDIN_CANDIDATES);
 enrichCandidatesWithExperience(HR_LINKEDIN_CANDIDATES);
+
+// Evaluate initial candidates
+REAL_LINKEDIN_CANDIDATES.forEach(function(c) {
+  var evalResult = evaluateCandidate(c, { role: "Head of Sales", industry: "SaaS / AI / HR Tech", location: "Gurgaon, India", mustHave: "B2B SaaS Sales, Revenue Growth, GTM Strategy, Team Building" });
+  c._evalSignals = evalResult.signals;
+  c._evalOverallFit = evalResult.overallFit;
+});
+HR_LINKEDIN_CANDIDATES.forEach(function(c) {
+  var evalResult = evaluateCandidate(c, { role: "HR Manager", industry: "SaaS / HR Tech", location: "Gurgaon, India", mustHave: "HR, People Operations, SaaS" });
+  c._evalSignals = evalResult.signals;
+  c._evalOverallFit = evalResult.overallFit;
+});
+CHRO_LINKEDIN_CANDIDATES.forEach(function(c) {
+  var evalResult = evaluateCandidate(c, { role: "CHRO", industry: "SaaS / HR Tech", location: "Gurgaon, India", mustHave: "CHRO, People Strategy, SaaS" });
+  c._evalSignals = evalResult.signals;
+  c._evalOverallFit = evalResult.overallFit;
+});
 
 // Initial search data — only real sourced candidates (no fake/generated ones)
 const INITIAL_CANDIDATES = REAL_LINKEDIN_CANDIDATES.slice().sort(function(a,b){return b.score - a.score;});
@@ -1903,7 +2091,9 @@ function KanbanBoard({ candidates }) {
       init["Fresh"].push(Object.assign({}, c, {
         lastAction: null,
         lastActionTime: null,
-        movedAt: Date.now()
+        movedAt: Date.now(),
+        _evalSignals: c._evalSignals || null,
+        _evalOverallFit: c._evalOverallFit || null
       }));
     });
     return init;
@@ -1911,6 +2101,56 @@ function KanbanBoard({ candidates }) {
   var [dragging, setDragging] = useState(null);
   var [dragOver, setDragOver] = useState(null);
   var [hoveredCard, setHoveredCard] = useState(null);
+  var [gateTooltip, setGateTooltip] = useState(null);
+
+  // Evaluation signal toggle handler
+  var toggleEvalCheck = function(candidateId, signalKey) {
+    setKanban(function(prev) {
+      var next = {};
+      Object.keys(prev).forEach(function(k) {
+        next[k] = prev[k].map(function(c) {
+          if (c.id === candidateId && c._evalSignals) {
+            var updated = Object.assign({}, c);
+            updated._evalSignals = Object.assign({}, c._evalSignals);
+            updated._evalSignals[signalKey] = Object.assign({}, c._evalSignals[signalKey]);
+            updated._evalSignals[signalKey].checked = !c._evalSignals[signalKey].checked;
+            return updated;
+          }
+          return c;
+        });
+      });
+      return next;
+    });
+  };
+
+  // Evaluation signal override handler (cycle Strong -> Moderate -> Weak)
+  var cycleEvalRating = function(candidateId, signalKey) {
+    var cycle = { "Strong": "Moderate", "Moderate": "Weak", "Weak": "Strong" };
+    setKanban(function(prev) {
+      var next = {};
+      Object.keys(prev).forEach(function(k) {
+        next[k] = prev[k].map(function(c) {
+          if (c.id === candidateId && c._evalSignals) {
+            var updated = Object.assign({}, c);
+            updated._evalSignals = Object.assign({}, c._evalSignals);
+            updated._evalSignals[signalKey] = Object.assign({}, c._evalSignals[signalKey]);
+            updated._evalSignals[signalKey].rating = cycle[c._evalSignals[signalKey].rating] || "Strong";
+            updated._evalSignals[signalKey].reason = "Manually overridden to " + updated._evalSignals[signalKey].rating;
+            // Recalculate overall fit
+            var ratingOrder = { "Strong": 3, "Moderate": 2, "Weak": 1 };
+            var lowest = "Strong";
+            ["domain","location","seniority"].forEach(function(sk) {
+              if (ratingOrder[updated._evalSignals[sk].rating] < ratingOrder[lowest]) lowest = updated._evalSignals[sk].rating;
+            });
+            updated._evalOverallFit = lowest + " Fit";
+            return updated;
+          }
+          return c;
+        });
+      });
+      return next;
+    });
+  };
 
   // ── Stage theming ──
   var stageTheme = {
@@ -1955,6 +2195,21 @@ function KanbanBoard({ candidates }) {
     e.preventDefault();
     if (!dragging) return;
     var fromStage = dragging.from;
+    // GATE LOGIC: Fresh -> Shortlisted/On Hold requires all 3 signals checked
+    if (fromStage === "Fresh" && (toStage === "Shortlisted" || toStage === "On Hold")) {
+      var gatedCard = null;
+      kanban[fromStage].forEach(function(c) { if (c.id === dragging.id) gatedCard = c; });
+      if (gatedCard && gatedCard._evalSignals) {
+        var allChecked = gatedCard._evalSignals.domain.checked && gatedCard._evalSignals.location.checked && gatedCard._evalSignals.seniority.checked;
+        if (!allChecked) {
+          setGateTooltip({ id: gatedCard.id, message: "Complete evaluation before shortlisting" });
+          setTimeout(function() { setGateTooltip(null); }, 3000);
+          setDragging(null);
+          setDragOver(null);
+          return;
+        }
+      }
+    }
     setKanban(function(prev) {
       var next = {};
       Object.keys(prev).forEach(function(k) { next[k] = prev[k].slice(); });
@@ -2193,6 +2448,37 @@ function KanbanBoard({ candidates }) {
                     React.createElement("div", { className: matchColor + " h-1.5 rounded-full transition-all", style: { width: matchPct + "%" } })
                   )
                 ),
+                // Evaluation board (3 signals) — only for Fresh cards with eval data
+                c._evalSignals && stage === "Fresh" && React.createElement("div", { className: "mt-1.5 pt-1.5 border-t border-gray-700/50 space-y-1" },
+                  ["domain","location","seniority"].map(function(sk) {
+                    var sig = c._evalSignals[sk];
+                    var rColor = sig.rating === "Strong" ? "text-emerald-400" : sig.rating === "Moderate" ? "text-amber-400" : "text-red-400";
+                    var rBg = sig.rating === "Strong" ? "bg-emerald-900/40" : sig.rating === "Moderate" ? "bg-amber-900/40" : "bg-red-900/40";
+                    return React.createElement("div", { key: sk, className: "flex items-center gap-1.5" },
+                      React.createElement("button", {
+                        onClick: function(ev) { ev.stopPropagation(); toggleEvalCheck(c.id, sk); },
+                        className: "w-3.5 h-3.5 rounded border flex-shrink-0 flex items-center justify-center " + (sig.checked ? "bg-emerald-500 border-emerald-400" : "border-gray-600 hover:border-gray-400")
+                      }, sig.checked && React.createElement(Icon, { name: "check", className: "w-2.5 h-2.5 text-white" })),
+                      React.createElement("span", { className: "text-xs text-gray-400 truncate", style: { minWidth: "50px" } }, sig.name.split(" ")[0]),
+                      React.createElement("button", {
+                        onClick: function(ev) { ev.stopPropagation(); cycleEvalRating(c.id, sk); },
+                        className: "text-xs px-1 py-0.5 rounded " + rBg + " " + rColor + " cursor-pointer hover:opacity-80",
+                        title: sig.reason
+                      }, sig.rating)
+                    );
+                  })
+                ),
+                // Overall fit badge
+                c._evalOverallFit && React.createElement("div", {
+                  className: "flex items-center gap-1 mt-1 " + (c._evalOverallFit === "Strong Fit" ? "text-emerald-400" : c._evalOverallFit === "Moderate Fit" ? "text-amber-400" : "text-red-400")
+                },
+                  React.createElement(Icon, { name: c._evalOverallFit === "Strong Fit" ? "shield-check" : c._evalOverallFit === "Moderate Fit" ? "shield-alert" : "shield-x", className: "w-3 h-3" }),
+                  React.createElement("span", { className: "text-xs font-semibold" }, c._evalOverallFit)
+                ),
+                // Gate tooltip
+                gateTooltip && gateTooltip.id === c.id && React.createElement("div", {
+                  className: "absolute z-50 left-0 right-0 top-full mt-1 bg-red-900/90 border border-red-700 rounded-lg p-2 text-xs text-red-200 text-center shadow-lg"
+                }, gateTooltip.message),
                 // Last action line (the single event line)
                 React.createElement("div", { className: "flex items-center gap-1 pt-1.5 border-t border-gray-700/50" },
                   React.createElement(Icon, { name: actionIcon, className: "w-3 h-3 " + actionColor }),
@@ -3654,6 +3940,12 @@ function HiringRadarApp() {
         }
 
         // ── Save previous search data into history before switching ──
+        // Evaluate all candidates with 3-signal engine
+        newCandidates.forEach(function(c) {
+          var evalResult = evaluateCandidate(c, newParams);
+          c._evalSignals = evalResult.signals;
+          c._evalOverallFit = evalResult.overallFit;
+        });
         // Deep clone all candidates for isolation
         var clonedNewCandidates = deepCloneCandidates(newCandidates);
         var newSearchEntry = {
