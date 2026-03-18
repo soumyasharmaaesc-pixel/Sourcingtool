@@ -41,6 +41,11 @@
     ::-webkit-scrollbar-thumb:hover { background: #6a6a8a; }
     /* Card hover glow */
     .candidate-glow:hover { box-shadow: 0 0 15px rgba(245, 158, 11, 0.08); }
+    /* Toast notification */
+    @keyframes toastSlideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes toastSlideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+    .toast-enter { animation: toastSlideIn 0.35s ease forwards; }
+    .toast-exit { animation: toastSlideOut 0.35s ease forwards; }
   </style>
 </head>
 <body>
@@ -148,6 +153,280 @@ function generateSearchStrings(params) {
     region: "Global",
     type: "X-Ray (Exec)"
   }];
+}
+
+// ═══════════════════════════════════════════════════
+// INGEST LAYER — Scrape Google X-Ray → Candidate Cards
+// ═══════════════════════════════════════════════════
+
+// CORS proxies — try multiple to maximize reliability
+var CORS_PROXIES = [
+  function(url) { return "https://api.allorigins.win/raw?url=" + encodeURIComponent(url); },
+  function(url) { return "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(url); },
+  function(url) { return "https://corsproxy.io/?" + encodeURIComponent(url); }
+];
+
+// Scrape a Google search results page via CORS proxy and extract LinkedIn profiles
+async function scrapeGoogleXRay(query, progressCallback) {
+  var googleUrl = "https://www.google.com/search?q=" + encodeURIComponent(query) + "&num=20";
+  var html = null;
+
+  // Try each proxy until one works
+  for (var pi = 0; pi < CORS_PROXIES.length; pi++) {
+    try {
+      var proxyUrl = CORS_PROXIES[pi](googleUrl);
+      if (progressCallback) progressCallback("Trying proxy " + (pi + 1) + "/" + CORS_PROXIES.length + "...");
+      var resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
+      if (resp.ok) {
+        var text = await resp.text();
+        // Verify we got actual Google HTML (not a block page)
+        if (text.includes("linkedin.com/in/") && text.length > 5000) {
+          html = text;
+          break;
+        }
+      }
+    } catch(e) {
+      // proxy failed, try next
+    }
+  }
+
+  if (!html) return [];
+
+  var profiles = [];
+  var seenUrls = {};
+
+  // Strategy 1: Parse <a> tags pointing to LinkedIn profiles
+  var linkRegex = /href="(https?:\/\/[a-z]{2,3}\.linkedin\.com\/in\/[^"?&]+)/gi;
+  var linkMatch;
+  while ((linkMatch = linkRegex.exec(html)) !== null) {
+    var url = linkMatch[1].split("?")[0].split("&")[0];
+    if (!url.endsWith("/")) url += "/";
+    if (!seenUrls[url]) { seenUrls[url] = true; profiles.push({ url: url }); }
+  }
+
+  // Strategy 2: Loose URL matching for linkedin.com/in/ (catches encoded variants)
+  var looseRegex = /https?:\/\/[a-z]{2,3}\.linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?/gi;
+  var looseMatch;
+  while ((looseMatch = looseRegex.exec(html)) !== null) {
+    var lUrl = looseMatch[0].split("?")[0].split("&")[0];
+    if (!lUrl.endsWith("/")) lUrl += "/";
+    if (!seenUrls[lUrl]) { seenUrls[lUrl] = true; profiles.push({ url: lUrl }); }
+  }
+
+  // Now extract titles and snippets from the HTML for each profile
+  // Google result blocks typically have <h3> before the link and snippet text after
+  var h3Regex = /<h3[^>]*>(.*?)<\/h3>/gi;
+  var h3Titles = [];
+  var h3m;
+  while ((h3m = h3Regex.exec(html)) !== null) {
+    h3Titles.push(h3m[1].replace(/<[^>]+>/g, "").trim());
+  }
+
+  // Map titles to profiles (same order)
+  profiles.forEach(function(p, idx) {
+    p.rawTitle = h3Titles[idx] || "";
+  });
+
+  return profiles;
+}
+
+// Parse a raw Google result into a structured candidate object
+function parseGoogleProfileToCandidate(profile, searchParams, searchId, index) {
+  var rawTitle = (profile.rawTitle || "").replace(/ \| LinkedIn$/i, "").replace(/ - LinkedIn$/i, "").replace(/\.\.\./g, "").trim();
+  var url = profile.url || "";
+
+  // Parse name and title from Google result titles
+  // Common patterns: "Name - Title - Company" or "Name - Title | Company"
+  var segments = rawTitle.split(/\s*[-–|]\s*/).map(function(s) { return s.trim(); }).filter(Boolean);
+  var name = segments[0] || "";
+  var title = segments[1] || searchParams.role || "";
+  var company = segments[2] || "";
+
+  // Clean up the name — remove "Dr.", trailing letters, LinkedIn noise
+  name = name.replace(/^(Dr\.?\s*|Mr\.?\s*|Ms\.?\s*)/i, "").trim();
+  // If name is too long or looks like a title, try to fix
+  if (name.length > 40) name = name.split(",")[0].trim();
+  // If name is empty, derive from LinkedIn slug
+  if (!name || name.length < 2) {
+    var slug = url.replace(/.*\/in\//, "").replace(/\/$/, "").replace(/-/g, " ");
+    name = slug.split(" ").map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(" ");
+  }
+
+  // Location extraction from rawTitle
+  var locationFromTitle = "";
+  var locPatterns = ["Gurgaon", "Gurugram", "Delhi", "Noida", "Mumbai", "Bangalore", "Bengaluru", "Hyderabad", "Pune", "Chennai", "Kolkata", "Ahmedabad", "Jaipur", "India"];
+  locPatterns.forEach(function(loc) {
+    if (rawTitle.toLowerCase().includes(loc.toLowerCase())) locationFromTitle = loc;
+  });
+  var location = locationFromTitle || (searchParams.location || "").split(",")[0].trim();
+
+  // Score based on keyword matching
+  var score = 3.0;
+  var strengths = [];
+  var allText = (rawTitle + " " + title).toLowerCase();
+  var targetRole = (searchParams.role || "").toLowerCase();
+  var targetIndustry = ((searchParams.industry || "").split("/")[0] || "").trim().toLowerCase();
+  var targetMustHave = (searchParams.mustHave || searchParams.mustHaveSkills || "").toLowerCase();
+
+  // Title match
+  if (targetRole && allText.includes(targetRole)) { score += 0.8; strengths.push("Title match: " + searchParams.role); }
+  // Partial title match (individual words)
+  else {
+    var roleWords = targetRole.split(/\s+/).filter(function(w) { return w.length > 3; });
+    var matchedWords = roleWords.filter(function(w) { return allText.includes(w); });
+    if (matchedWords.length >= 2) { score += 0.5; strengths.push("Partial title match: " + matchedWords.join(", ")); }
+  }
+
+  // Industry match
+  if (targetIndustry && allText.includes(targetIndustry)) { score += 0.4; strengths.push("Industry: " + targetIndustry); }
+
+  // Must-have skills match
+  if (targetMustHave) {
+    var skillTokens = targetMustHave.split(",").map(function(s) { return s.trim().toLowerCase(); }).filter(Boolean);
+    var matchedSkills = skillTokens.filter(function(sk) { return allText.includes(sk); });
+    if (matchedSkills.length > 0) { score += 0.3 * Math.min(matchedSkills.length, 3); strengths.push("Skills: " + matchedSkills.join(", ")); }
+  }
+
+  // Location match
+  if (locationFromTitle) { score += 0.3; strengths.push("Location: " + locationFromTitle); }
+
+  score = Math.min(score, 5.0);
+  score = Math.round(score * 100) / 100;
+  if (strengths.length === 0) strengths.push("Found via X-Ray search");
+
+  var rating = score >= 4.0 ? "STRONG_FIT" : score >= 3.3 ? "GOOD_FIT" : "PARTIAL_FIT";
+  var skills = (searchParams.mustHave || searchParams.mustHaveSkills || "").split(",").map(function(s) { return s.trim(); }).filter(Boolean).slice(0, 5);
+  if (skills.length === 0) skills = [searchParams.role || "General"];
+
+  return {
+    id: searchId + index + Math.floor(Math.random() * 100000),
+    _searchId: searchId,
+    name: name,
+    title: title,
+    company: company,
+    location: location,
+    experience: "—",
+    industry: searchParams.industry || "—",
+    score: score,
+    rating: rating,
+    skills: skills,
+    email: "Enrichment needed",
+    phone: "Enrichment needed",
+    source: "X-Ray / Google",
+    linkedin: url,
+    linkedinDirect: url,
+    sourceLinks: {
+      linkedin: url,
+      linkedinDirect: url,
+      google: "https://www.google.com/search?q=" + encodeURIComponent('"' + name + '" "' + (searchParams.role || "") + '"')
+    },
+    strengths: strengths,
+    concerns: ["Verify profile — enrichment needed"],
+    outreach: "Your profile appeared in our search for " + (searchParams.role || "this role") + " in " + location + " — we'd love to connect.",
+    scores: {
+      role: allText.includes(targetRole) ? 5 : 3,
+      skills: 3,
+      industry: targetIndustry && allText.includes(targetIndustry) ? 4 : 3,
+      company: 3,
+      trajectory: 3,
+      location: locationFromTitle ? 5 : 3,
+      comp: 3,
+      stability: 3
+    },
+    lastAction: "Not reviewed",
+    lastActionTime: Date.now()
+  };
+}
+
+// Deduplicate candidates: skip if LinkedIn URL already exists in the pipeline
+function deduplicateCandidates(newCandidates, existingCandidates) {
+  var existingUrls = {};
+  existingCandidates.forEach(function(c) {
+    var url = (c.linkedin || c.linkedinDirect || "").toLowerCase().replace(/\/$/, "");
+    if (url) existingUrls[url] = true;
+  });
+
+  var imported = [];
+  var duplicates = [];
+
+  newCandidates.forEach(function(c) {
+    var url = (c.linkedin || c.linkedinDirect || "").toLowerCase().replace(/\/$/, "");
+    if (url && existingUrls[url]) {
+      duplicates.push(c);
+    } else {
+      imported.push(c);
+      if (url) existingUrls[url] = true; // prevent intra-batch dupes too
+    }
+  });
+
+  return { imported: imported, duplicates: duplicates };
+}
+
+// Full ingest pipeline: scrape → parse → deduplicate → return results
+async function ingestGoogleXRay(searchParams, searchId, existingCandidates, progressCallback) {
+  var role = searchParams.role || "Head of Sales";
+  var location = (searchParams.location || "India").split(",")[0].trim();
+  var industry = (searchParams.industry || "SaaS").split("/")[0].trim();
+  var mustHave = searchParams.mustHave || searchParams.mustHaveSkills || "";
+
+  // Build 2-3 X-Ray queries for maximum coverage
+  var queries = [
+    'site:linkedin.com/in/ "' + role + '" "' + industry + '" "' + location + '"',
+    'site:linkedin.com/in/ "' + role + '" "' + location + '"'
+  ];
+  // Add a skills-focused query if skills provided
+  var topSkill = mustHave.split(",")[0].trim();
+  if (topSkill && topSkill.length > 2) {
+    queries.push('site:linkedin.com/in/ "' + role + '" "' + topSkill + '" "' + location + '"');
+  }
+
+  var allRawProfiles = [];
+  var seenUrls = {};
+
+  for (var qi = 0; qi < queries.length; qi++) {
+    if (progressCallback) progressCallback("Scraping X-Ray query " + (qi + 1) + "/" + queries.length + "...");
+    try {
+      var profiles = await scrapeGoogleXRay(queries[qi], progressCallback);
+      profiles.forEach(function(p) {
+        var clean = (p.url || "").toLowerCase().replace(/\/$/, "");
+        if (clean && !seenUrls[clean]) {
+          seenUrls[clean] = true;
+          allRawProfiles.push(p);
+        }
+      });
+    } catch(e) {
+      console.warn("X-Ray query " + (qi + 1) + " failed:", e);
+    }
+    // Small delay between queries to avoid rate limiting
+    if (qi < queries.length - 1) {
+      await new Promise(function(r) { setTimeout(r, 2000); });
+    }
+  }
+
+  if (progressCallback) progressCallback("Parsing " + allRawProfiles.length + " LinkedIn profiles...");
+
+  // Parse each profile into a candidate object
+  var parsedCandidates = allRawProfiles.map(function(p, idx) {
+    return parseGoogleProfileToCandidate(p, searchParams, searchId, idx);
+  });
+
+  // Filter out profiles with empty names or clearly invalid entries
+  parsedCandidates = parsedCandidates.filter(function(c) {
+    return c.name && c.name.length > 1 && c.linkedin && c.linkedin.includes("/in/");
+  });
+
+  // Deduplicate against existing pipeline
+  if (progressCallback) progressCallback("Deduplicating against existing pipeline...");
+  var deduped = deduplicateCandidates(parsedCandidates, existingCandidates);
+
+  // Sort by score descending
+  deduped.imported.sort(function(a, b) { return b.score - a.score; });
+
+  return {
+    candidates: deduped.imported,
+    duplicates: deduped.duplicates,
+    totalScraped: allRawProfiles.length
+  };
 }
 
 // ── Live Search Engine — Google X-Ray via Serper.dev ──
@@ -1778,6 +2057,17 @@ function HiringRadarApp() {
   const [serperApiKey, setSerperApiKey] = useState(function() { try { return localStorage.getItem("hireintel_serper_key") || ""; } catch(e) { return ""; } });
   const saveApiKey = function(key) { setSerperApiKey(key); try { localStorage.setItem("hireintel_serper_key", key); } catch(e) {} };
   const [lastRefresh, setLastRefresh] = useState("Just now");
+  const [toasts, setToasts] = useState([]);
+  var showToast = function(message, type) {
+    var id = Date.now() + Math.random();
+    setToasts(function(prev) { return prev.concat([{ id: id, message: message, type: type || "info", exiting: false }]); });
+    setTimeout(function() {
+      setToasts(function(prev) { return prev.map(function(t) { return t.id === id ? Object.assign({}, t, { exiting: true }) : t; }); });
+      setTimeout(function() {
+        setToasts(function(prev) { return prev.filter(function(t) { return t.id !== id; }); });
+      }, 400);
+    }, 5000);
+  };
   const [viewStatuses, setViewStatuses] = useState({});
   const markViewed = function(candidateId) {
     setViewStatuses(function(prev) {
@@ -2054,7 +2344,8 @@ function HiringRadarApp() {
     }),
     className: "editable-field flex-1 text-sm text-gray-200 bg-transparent border-b border-gray-700 px-1 py-0.5 rounded transition-all focus:border-amber-500"
   }));
-  return /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null,
+  React.createElement("div", {
     className: "flex h-screen bg-gray-950 text-white overflow-hidden"
   }, chatOpen && /*#__PURE__*/React.createElement("div", {
     className: "w-80 flex-shrink-0 flex flex-col border-r border-gray-800 relative"
@@ -2744,46 +3035,31 @@ function HiringRadarApp() {
             }
           }
         } else {
-          // No API key — use DuckDuckGo lite as free fallback + open LinkedIn tabs
-          setSearchProgress("Step 1/4: Generating X-Ray search queries...");
-          await new Promise(function(r) { setTimeout(r, 2000); });
+          // ── No API key — INGEST PIPELINE: scrape Google X-Ray via CORS proxies ──
+          setSearchProgress("Step 1/5: Generating X-Ray search queries...");
+          await new Promise(function(r) { setTimeout(r, 1500); });
 
-          // Try free search via DuckDuckGo HTML (no API key needed)
-          setSearchProgress("Step 2/4: Searching Google X-Ray for LinkedIn profiles (free mode)...");
-          var freeQueries = [
-            'site:linkedin.com/in/ "' + newSearchForm.role + '" "' + (newSearchForm.industry || "").split("/")[0].trim() + '" "' + newSearchForm.location.split(",")[0].trim() + '"',
-            'site:linkedin.com/in/ "' + newSearchForm.role + '" "' + newSearchForm.location.split(",")[0].trim() + '"'
-          ];
-          var freeResults = [];
-          var freeSeenUrls = {};
-          for (var fqi = 0; fqi < freeQueries.length; fqi++) {
-            try {
-              var freeResp = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent("https://www.google.com/search?q=" + encodeURIComponent(freeQueries[fqi]) + "&num=20"));
-              if (freeResp.ok) {
-                var html = await freeResp.text();
-                // Parse LinkedIn URLs from Google results HTML
-                var liRegex = /https?:\/\/[a-z]{2,3}\.linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?/g;
-                var liMatches = html.match(liRegex) || [];
-                // Parse titles: look for patterns before LinkedIn URLs
-                var titleRegex = /<h3[^>]*>(.*?)<\/h3>/gi;
-                var titles = [];
-                var tm;
-                while ((tm = titleRegex.exec(html)) !== null) { titles.push(tm[1].replace(/<[^>]+>/g, "")); }
-
-                liMatches.forEach(function(url, mi) {
-                  var cleanUrl = url.split("?")[0].split("&")[0];
-                  if (!cleanUrl.endsWith("/")) cleanUrl += "/";
-                  if (!freeSeenUrls[cleanUrl] && cleanUrl.includes("/in/")) {
-                    freeSeenUrls[cleanUrl] = true;
-                    freeResults.push({ link: cleanUrl, title: titles[mi] || "", snippet: "" });
-                  }
-                });
-              }
-            } catch(fe) { console.warn("Free search attempt failed:", fe); }
-            await new Promise(function(r) { setTimeout(r, 1500); });
+          // Phase 2: Run the full ingest pipeline (scrape → parse → deduplicate)
+          setSearchProgress("Step 2/5: Scraping Google X-Ray for LinkedIn profiles...");
+          var ingestResult = null;
+          try {
+            ingestResult = await ingestGoogleXRay(
+              {
+                role: newSearchForm.role,
+                location: newSearchForm.location,
+                industry: newSearchForm.industry,
+                mustHave: newSearchForm.mustHaveSkills
+              },
+              newId,
+              activeCandidates, // existing pipeline for dedup
+              function(msg) { setSearchProgress("Step 2/5: " + msg); }
+            );
+          } catch(ingestErr) {
+            console.warn("Ingest pipeline error:", ingestErr);
           }
 
-          setSearchProgress("Step 3/4: Opening LinkedIn search with boolean queries...");
+          // Phase 3: LinkedIn boolean search (open tabs)
+          setSearchProgress("Step 3/5: Opening LinkedIn search with boolean queries...");
           var liBooleans = buildLinkedInBooleans({
             role: newSearchForm.role,
             location: newSearchForm.location,
@@ -2795,67 +3071,37 @@ function HiringRadarApp() {
               window.open("https://www.linkedin.com/search/results/people/?keywords=" + encodeURIComponent(bool) + "&origin=GLOBAL_SEARCH_HEADER", "_blank");
             }, (idx + 2) * 1000);
           });
-          await new Promise(function(r) { setTimeout(r, 4000); });
+          await new Promise(function(r) { setTimeout(r, 3000); });
 
-          // Parse free results into candidates
-          if (freeResults.length > 0) {
-            setSearchProgress("Step 4/4: Parsing " + freeResults.length + " LinkedIn profiles found...");
-            var locCity = newSearchForm.location.split(",")[0].trim();
-            freeResults.forEach(function(fr, fri) {
-              var tp = (fr.title || "").replace(/ \| LinkedIn$/i, "").replace(/ - LinkedIn$/i, "");
-              var segs = tp.split(" - ").map(function(s) { return s.trim(); });
-              var nm = segs[0] || "Profile " + (fri + 1);
-              var jt = segs[1] || newSearchForm.role;
-              var co = segs[2] || "";
-              var slug = fr.link.replace(/.*\/in\//, "").replace(/\/$/, "");
+          // Phase 4: Process ingest results
+          if (ingestResult && ingestResult.candidates.length > 0) {
+            setSearchProgress("Step 4/5: Scoring " + ingestResult.candidates.length + " candidates (scraped " + ingestResult.totalScraped + " profiles, " + ingestResult.duplicates.length + " duplicates skipped)...");
+            newCandidates = ingestResult.candidates;
+            await new Promise(function(r) { setTimeout(r, 3000); });
 
-              // Basic scoring
-              var sc = 3.0;
-              var reasons = [];
-              var jtLower = (jt + " " + tp).toLowerCase();
-              if (jtLower.includes(newSearchForm.role.toLowerCase())) { sc += 1.0; reasons.push("Title match: " + newSearchForm.role); }
-              if (newSearchForm.industry && jtLower.includes(newSearchForm.industry.split("/")[0].trim().toLowerCase())) { sc += 0.4; reasons.push("Industry match"); }
-              sc = Math.min(sc, 5.0);
-              sc = Math.round(sc * 100) / 100;
+            // Phase 5: Build cards
+            setSearchProgress("Step 5/5: Building " + newCandidates.length + " candidate cards...");
+            await new Promise(function(r) { setTimeout(r, 2000); });
 
-              newCandidates.push({
-                id: Date.now() + fri + Math.floor(Math.random() * 10000),
-                name: nm,
-                title: jt,
-                company: co,
-                location: locCity,
-                experience: "—",
-                industry: newSearchForm.industry || "—",
-                score: sc,
-                rating: sc >= 4.0 ? "STRONG_FIT" : sc >= 3.3 ? "GOOD_FIT" : "PARTIAL_FIT",
-                skills: (newSearchForm.mustHaveSkills || "").split(",").map(function(s){ return s.trim(); }).filter(Boolean).slice(0, 4),
-                email: "Enrichment needed",
-                phone: "Enrichment needed",
-                source: "Google X-Ray (free)",
-                linkedin: fr.link,
-                linkedinDirect: fr.link,
-                sourceLinks: { linkedin: fr.link, linkedinDirect: fr.link, google: "https://www.google.com/search?q=" + encodeURIComponent('"' + nm + '" "' + newSearchForm.role + '"') },
-                strengths: reasons.length > 0 ? reasons : ["Found via X-Ray search"],
-                concerns: ["Verify profile — enrichment needed"],
-                outreach: "Your profile came up in our search for " + newSearchForm.role + " candidates in " + locCity + " — we'd love to connect.",
-                scores: { role: jtLower.includes(newSearchForm.role.toLowerCase()) ? 5 : 3, skills: 3, industry: 3, company: 3, trajectory: 3, location: 4, comp: 3, stability: 3 }
-              });
-            });
-            newCandidates.sort(function(a, b) { return b.score - a.score; });
+            // Show toast
+            showToast(newCandidates.length + " candidates imported \u00B7 " + ingestResult.duplicates.length + " duplicates skipped", "success");
           } else {
-            // Try pre-scraped candidate database as fallback
+            // Ingest failed or returned 0 — fall back to pre-scraped database
+            setSearchProgress("Step 4/5: Live scraping returned limited results — checking pre-sourced database...");
+            await new Promise(function(r) { setTimeout(r, 1500); });
             var preScraped = getPreScrapedCandidates(newSearchForm);
             if (preScraped.length > 0) {
-              setSearchProgress("Loading " + preScraped.length + " pre-sourced candidates from database...");
-              // Tag each candidate with unique search ID
+              setSearchProgress("Step 5/5: Loading " + preScraped.length + " pre-sourced candidates...");
               preScraped.forEach(function(c, ci) { c._searchId = newId; c.id = newId + ci + 1; });
               newCandidates = preScraped;
+              showToast(preScraped.length + " pre-sourced candidates loaded", "info");
             } else {
-              setSearchProgress("No pre-sourced data available. Opening Google X-Ray tabs...");
+              setSearchProgress("Step 5/5: Opening Google X-Ray tabs for manual review...");
               openXRayTabs(newSearchForm);
+              showToast("No candidates auto-imported — X-Ray tabs opened for manual review", "warning");
             }
+            await new Promise(function(r) { setTimeout(r, 2000); });
           }
-          await new Promise(function(r) { setTimeout(r, 3000); });
         }
 
         // ── Save previous search data into history before switching ──
@@ -3355,7 +3601,29 @@ function HiringRadarApp() {
     className: "text-gray-500 text-xs"
   }, "Subject: Exciting ", searchParams.role, " opportunity at ", searchParams.company), /*#__PURE__*/React.createElement("div", null, "Hi ", c.name.split(" ")[0], ","), /*#__PURE__*/React.createElement("div", null, c.outreach), /*#__PURE__*/React.createElement("div", null, "I'd love to connect and share more about this role. Would you be open to a quick 15-min call this week?"), /*#__PURE__*/React.createElement("div", {
     className: "text-gray-500"
-  }, "Looking forward,", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma | Athena Executive Search & Consulting"))))))))  );
+  }, "Looking forward,", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma | Athena Executive Search & Consulting"))))))))  ),
+  // ── Toast Notification Overlay ──
+  toasts.length > 0 && React.createElement("div", {
+    style: { position: "fixed", top: "16px", right: "16px", zIndex: 9999, display: "flex", flexDirection: "column", gap: "8px" }
+  }, toasts.map(function(t) {
+    var bgColor = t.type === "success" ? "rgba(16,185,129,0.95)" : t.type === "warning" ? "rgba(245,158,11,0.95)" : t.type === "error" ? "rgba(239,68,68,0.95)" : "rgba(59,130,246,0.95)";
+    return React.createElement("div", {
+      key: t.id,
+      className: t.exiting ? "toast-exit" : "toast-enter",
+      style: {
+        background: bgColor,
+        color: "#fff",
+        padding: "12px 20px",
+        borderRadius: "8px",
+        fontSize: "14px",
+        fontWeight: "500",
+        boxShadow: "0 8px 30px rgba(0,0,0,0.4)",
+        maxWidth: "380px",
+        backdropFilter: "blur(8px)"
+      }
+    }, t.message);
+  }))
+  );
 }
 ReactDOM.render(/*#__PURE__*/React.createElement(HiringRadarApp, null), document.getElementById("root"));
   </script>
