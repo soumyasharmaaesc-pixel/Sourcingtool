@@ -46,6 +46,10 @@
     @keyframes toastSlideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
     .toast-enter { animation: toastSlideIn 0.35s ease forwards; }
     .toast-exit { animation: toastSlideOut 0.35s ease forwards; }
+    /* Experience tooltip positioning */
+    .exp-tooltip-wrap { position: relative; }
+    .exp-tooltip-wrap:hover .exp-tooltip { display: block; }
+    .exp-tooltip { display: none; }
   </style>
 </head>
 <body>
@@ -86,6 +90,325 @@ function Icon({
     className: "inline-flex items-center",
     style: style
   });
+}
+
+// ═══════════════════════════════════════════════════
+// EXPERIENCE CALCULATOR ENGINE
+// ═══════════════════════════════════════════════════
+
+// Parse a date string like "Jan 2020", "Mar 2018", "Present" into a Date object
+function parseRoleDate(dateStr) {
+  if (!dateStr) return null;
+  var s = dateStr.trim();
+  if (/present|current|now/i.test(s)) return new Date();
+  // Handle "Jan 2020", "January 2020", "2020"
+  var months = { jan:0,january:0,feb:1,february:1,mar:2,march:2,apr:3,april:3,may:4,jun:5,june:5,jul:6,july:6,aug:7,august:7,sep:8,sept:8,september:8,oct:9,october:9,nov:10,november:10,dec:11,december:11 };
+  var m = s.match(/^([a-z]+)\s*(\d{4})$/i);
+  if (m) {
+    var mon = months[m[1].toLowerCase()];
+    if (mon !== undefined) return new Date(parseInt(m[2]), mon, 1);
+  }
+  // Just a year
+  var ym = s.match(/^(\d{4})$/);
+  if (ym) return new Date(parseInt(ym[1]), 0, 1);
+  return null;
+}
+
+// Calculate months between two dates
+function monthsBetween(startDate, endDate) {
+  if (!startDate || !endDate) return 0;
+  var months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + (endDate.getMonth() - startDate.getMonth());
+  return Math.max(0, months);
+}
+
+// Merge overlapping date intervals into non-overlapping spans
+// intervals: [{ start: Date, end: Date }, ...]
+// Returns total months of non-overlapping work
+function mergeIntervals(intervals) {
+  if (!intervals || intervals.length === 0) return 0;
+  // Sort by start date
+  var sorted = intervals.slice().sort(function(a, b) { return a.start.getTime() - b.start.getTime(); });
+  var merged = [{ start: sorted[0].start, end: sorted[0].end }];
+  for (var i = 1; i < sorted.length; i++) {
+    var last = merged[merged.length - 1];
+    if (sorted[i].start <= last.end) {
+      // Overlapping — extend the end if needed
+      if (sorted[i].end > last.end) last.end = sorted[i].end;
+    } else {
+      merged.push({ start: sorted[i].start, end: sorted[i].end });
+    }
+  }
+  // Sum all merged interval durations in months
+  var totalMonths = 0;
+  merged.forEach(function(span) {
+    totalMonths += monthsBetween(span.start, span.end);
+  });
+  return { totalMonths: totalMonths, mergedSpans: merged };
+}
+
+// Calculate experience from an array of role objects
+// Each role: { company, title, startDate, endDate, startStr, endStr }
+// Returns: { totalYears, totalMonths, formatted, roles[], flags: { jobHopping: [], careerGaps: [] } }
+function calculateExperience(roles) {
+  if (!roles || roles.length === 0) return null;
+
+  var intervals = [];
+  var parsedRoles = [];
+
+  roles.forEach(function(role) {
+    var start = parseRoleDate(role.startStr || role.startDate);
+    var end = parseRoleDate(role.endStr || role.endDate);
+    if (!start) return;
+    if (!end) end = new Date(); // assume current if no end date
+
+    var durationMonths = monthsBetween(start, end);
+    intervals.push({ start: start, end: end });
+
+    parsedRoles.push({
+      company: role.company || "Unknown",
+      title: role.title || "Unknown Role",
+      startStr: role.startStr || "",
+      endStr: role.endStr || "Present",
+      startDate: start,
+      endDate: end,
+      durationMonths: durationMonths,
+      durationFormatted: durationMonths >= 12
+        ? Math.floor(durationMonths / 12) + " yr" + (Math.floor(durationMonths / 12) > 1 ? "s" : "") + (durationMonths % 12 > 0 ? " " + (durationMonths % 12) + " mo" : "")
+        : durationMonths + " mo",
+      isShortStint: durationMonths < 12
+    });
+  });
+
+  // Merge overlapping intervals and compute total
+  var result = mergeIntervals(intervals);
+  var totalMonths = result.totalMonths;
+  var years = Math.floor(totalMonths / 12);
+  var months = totalMonths % 12;
+  var formatted = years > 0
+    ? years + " yr" + (years > 1 ? "s" : "") + (months > 0 ? " " + months + " mo" : "") + " total experience"
+    : totalMonths + " mo total experience";
+
+  // Detect job hopping (roles < 12 months)
+  var jobHopping = parsedRoles.filter(function(r) { return r.isShortStint; });
+
+  // Detect career gaps > 6 months
+  var careerGaps = [];
+  // Sort roles by start date
+  var sortedRoles = parsedRoles.slice().sort(function(a, b) { return a.startDate.getTime() - b.startDate.getTime(); });
+  for (var i = 0; i < sortedRoles.length - 1; i++) {
+    var gapMonths = monthsBetween(sortedRoles[i].endDate, sortedRoles[i + 1].startDate);
+    if (gapMonths > 6) {
+      careerGaps.push({
+        afterRole: sortedRoles[i].title + " at " + sortedRoles[i].company,
+        beforeRole: sortedRoles[i + 1].title + " at " + sortedRoles[i + 1].company,
+        gapMonths: gapMonths,
+        gapFormatted: gapMonths >= 12
+          ? Math.floor(gapMonths / 12) + " yr" + (gapMonths % 12 > 0 ? " " + (gapMonths % 12) + " mo" : "")
+          : gapMonths + " mo"
+      });
+    }
+  }
+
+  return {
+    totalMonths: totalMonths,
+    totalYears: years,
+    remainderMonths: months,
+    formatted: formatted,
+    shortFormatted: years > 0 ? years + " yr" + (years > 1 ? "s" : "") + (months > 0 ? " " + months + " mo" : "") : totalMonths + " mo",
+    roles: parsedRoles,
+    flags: {
+      jobHopping: jobHopping,
+      careerGaps: careerGaps
+    }
+  };
+}
+
+// Parse experience section from LinkedIn profile HTML
+// Returns array of role objects: [{ company, title, startStr, endStr }]
+function parseLinkedInExperienceHTML(html) {
+  if (!html) return [];
+  var roles = [];
+
+  // LinkedIn experience entries typically have patterns like:
+  // "Title\nCompany · Full-time\nJan 2020 - Present · 4 yrs 2 mos"
+  // "Title\nCompany\nSep 2017 - Dec 2019 · 2 yrs 4 mos"
+
+  // Strategy 1: look for date range patterns and extract surrounding context
+  var dateRangeRegex = /((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})\s*[-–]\s*((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4}|Present)/gi;
+  var match;
+  while ((match = dateRangeRegex.exec(html)) !== null) {
+    var startStr = match[1].trim();
+    var endStr = match[2].trim();
+
+    // Look backward from the match to find title and company
+    var before = html.substring(Math.max(0, match.index - 300), match.index);
+    var lines = before.split(/[\n\r]+/).map(function(l) { return l.replace(/<[^>]+>/g, "").trim(); }).filter(function(l) { return l.length > 1 && l.length < 100; });
+
+    // Last 2-3 non-empty lines before the date are typically title and company
+    var title = lines.length >= 2 ? lines[lines.length - 2] : lines[lines.length - 1] || "";
+    var company = lines.length >= 2 ? lines[lines.length - 1] : "";
+    // Clean up company: remove "· Full-time", "· Part-time" etc.
+    company = company.replace(/\s*[·•]\s*(Full-time|Part-time|Contract|Freelance|Internship|Self-employed).*$/i, "").trim();
+
+    if (title || company) {
+      roles.push({
+        title: title,
+        company: company,
+        startStr: startStr,
+        endStr: endStr
+      });
+    }
+  }
+
+  // Strategy 2: Look for LinkedIn duration patterns like "2 yrs 4 mos", "1 yr 8 mos"
+  // and reverse-engineer if no date ranges found
+  if (roles.length === 0) {
+    var durRegex = /(\d+)\s*(?:yr|year)s?\s*(?:(\d+)\s*(?:mo|month)s?)?/gi;
+    var durMatch;
+    while ((durMatch = durRegex.exec(html)) !== null) {
+      var yrs = parseInt(durMatch[1]);
+      var mos = durMatch[2] ? parseInt(durMatch[2]) : 0;
+      var totalMo = yrs * 12 + mos;
+      // Estimate date range from duration
+      var endDate = new Date();
+      var startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - totalMo);
+      var before2 = html.substring(Math.max(0, durMatch.index - 200), durMatch.index);
+      var lines2 = before2.split(/[\n\r]+/).map(function(l) { return l.replace(/<[^>]+>/g, "").trim(); }).filter(function(l) { return l.length > 1; });
+      var t = lines2.length >= 2 ? lines2[lines2.length - 2] : "";
+      var c = lines2.length >= 1 ? lines2[lines2.length - 1] : "";
+      if (t || c) {
+        roles.push({
+          title: t,
+          company: c.replace(/\s*[·•]\s*(Full-time|Part-time|Contract).*$/i, "").trim(),
+          startStr: startDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+          endStr: "Present"
+        });
+      }
+    }
+  }
+
+  return roles;
+}
+
+// Scrape a LinkedIn profile page for experience data via CORS proxy
+// Returns a promise resolving to { roles: [...], experience: calculatedResult }
+async function scrapeLinkedInExperience(linkedinUrl) {
+  if (!linkedinUrl || !linkedinUrl.includes("linkedin.com/in/")) return null;
+
+  // Try fetching the profile via CORS proxy
+  for (var pi = 0; pi < CORS_PROXIES.length; pi++) {
+    try {
+      var proxyUrl = CORS_PROXIES[pi](linkedinUrl);
+      var resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+      if (resp.ok) {
+        var html = await resp.text();
+        if (html.length > 3000) {
+          var roles = parseLinkedInExperienceHTML(html);
+          if (roles.length > 0) {
+            var exp = calculateExperience(roles);
+            return { roles: roles, experience: exp };
+          }
+        }
+      }
+    } catch(e) { /* proxy failed, try next */ }
+  }
+
+  // Fallback: try to extract from Google snippet cache
+  return null;
+}
+
+// Build experience data from Google snippet (when LinkedIn scraping not possible)
+// Parses patterns like "15+ yrs", "10-14 yrs" from the existing experience field
+function buildExperienceFromSnippet(experienceStr, title, company) {
+  if (!experienceStr || experienceStr === "\u2014") return null;
+  var yrsMatch = experienceStr.match(/(\d+)/);
+  if (!yrsMatch) return null;
+  var yrs = parseInt(yrsMatch[1]);
+  // Create a synthetic single-role entry
+  var endDate = new Date();
+  var startDate = new Date();
+  startDate.setFullYear(startDate.getFullYear() - yrs);
+  return calculateExperience([{
+    title: title || "Current Role",
+    company: company || "—",
+    startStr: startDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+    endStr: "Present"
+  }]);
+}
+
+// ═══════════════════════════════════════════════════
+// EXPERIENCE TOOLTIP COMPONENT
+// ═══════════════════════════════════════════════════
+function ExperienceTooltip({ candidate }) {
+  var [hovered, setHovered] = useState(false);
+  var expData = candidate._experienceData;
+  var displayText = expData ? expData.shortFormatted : (candidate.experience || "\u2014");
+
+  return React.createElement("span", {
+    className: "flex items-center gap-1 relative group cursor-default",
+    onMouseEnter: function() { setHovered(true); },
+    onMouseLeave: function() { setHovered(false); }
+  },
+    React.createElement(Icon, { name: "clock", className: "w-3 h-3" }),
+    React.createElement("span", {
+      className: expData ? "text-emerald-400 font-medium" : null
+    }, displayText),
+    // Signal badges inline
+    expData && expData.flags && expData.flags.jobHopping.length > 0 && React.createElement("span", {
+      className: "text-amber-400 ml-0.5",
+      title: "Job hopping detected"
+    }, "\u26A0"),
+    expData && expData.flags && expData.flags.careerGaps.length > 0 && React.createElement("span", {
+      className: "text-orange-400 ml-0.5",
+      title: "Career gap detected"
+    }, "\u23F8"),
+    // Hover tooltip
+    hovered && expData && expData.roles && expData.roles.length > 0 && React.createElement("div", {
+      className: "absolute z-50 bottom-full left-0 mb-2 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl p-3",
+      style: { minWidth: "280px", maxWidth: "380px" }
+    },
+      // Header
+      React.createElement("div", { className: "text-xs font-semibold text-white mb-2 pb-1 border-b border-gray-700" },
+        expData.formatted
+      ),
+      // Role breakdown
+      React.createElement("div", { className: "space-y-1.5" },
+        expData.roles.map(function(role, ri) {
+          return React.createElement("div", {
+            key: ri,
+            className: "flex items-start gap-2 text-xs"
+          },
+            React.createElement("div", {
+              className: "w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0",
+              style: { backgroundColor: role.isShortStint ? "#f59e0b" : "#10b981" }
+            }),
+            React.createElement("div", { className: "flex-1 min-w-0" },
+              React.createElement("div", { className: "text-gray-200 truncate" }, role.title),
+              React.createElement("div", { className: "text-gray-500 truncate" }, role.company),
+              React.createElement("div", { className: "text-gray-600" },
+                role.startStr, " \u2013 ", role.endStr, " \u00B7 ", role.durationFormatted,
+                role.isShortStint ? React.createElement("span", { className: "text-amber-400 ml-1" }, "\u26A0 < 1 yr") : null
+              )
+            )
+          );
+        })
+      ),
+      // Flags section
+      (expData.flags.jobHopping.length > 0 || expData.flags.careerGaps.length > 0) && React.createElement("div", {
+        className: "mt-2 pt-2 border-t border-gray-700 space-y-1"
+      },
+        expData.flags.jobHopping.length > 0 && React.createElement("div", { className: "text-xs text-amber-400 flex items-center gap-1" },
+          "\u26A0 ", expData.flags.jobHopping.length, " role", expData.flags.jobHopping.length > 1 ? "s" : "", " under 12 months (job hopping signal)"
+        ),
+        expData.flags.careerGaps.map(function(gap, gi) {
+          return React.createElement("div", { key: gi, className: "text-xs text-orange-400 flex items-center gap-1" },
+            "\u23F8 ", gap.gapFormatted, " gap after ", gap.afterRole
+          );
+        })
+      )
+    )
+  );
 }
 
 // ═══════════════════════════════════════════════════
@@ -334,7 +657,8 @@ function parseGoogleProfileToCandidate(profile, searchParams, searchId, index) {
       stability: 3
     },
     lastAction: "Not reviewed",
-    lastActionTime: Date.now()
+    lastActionTime: Date.now(),
+    _experienceData: buildExperienceFromSnippet(null, title, company)
   };
 }
 
@@ -421,6 +745,20 @@ async function ingestGoogleXRay(searchParams, searchId, existingCandidates, prog
 
   // Sort by score descending
   deduped.imported.sort(function(a, b) { return b.score - a.score; });
+
+  // Enrich top candidates with LinkedIn experience data (scrape up to 5 profiles)
+  if (progressCallback) progressCallback("Enriching top candidates with experience data...");
+  var enrichLimit = Math.min(deduped.imported.length, 5);
+  for (var ei = 0; ei < enrichLimit; ei++) {
+    try {
+      var enrichResult = await scrapeLinkedInExperience(deduped.imported[ei].linkedin);
+      if (enrichResult && enrichResult.experience) {
+        deduped.imported[ei]._experienceData = enrichResult.experience;
+        deduped.imported[ei].experience = enrichResult.experience.shortFormatted;
+        deduped.imported[ei]._experienceRoles = enrichResult.roles;
+      }
+    } catch(enrichErr) { /* scraping failed, keep existing experience */ }
+  }
 
   return {
     candidates: deduped.imported,
@@ -678,7 +1016,8 @@ async function liveXRaySearch(searchParams, apiKey, progressCallback) {
       strengths: matchReasons.length > 0 ? matchReasons : ["Found via Google X-Ray search"],
       concerns: candidateExpYears && targetExp && (candidateExpYears < targetExp.min || candidateExpYears > targetExp.max) ? ["Experience " + candidateExpYears + "yr is outside ideal " + targetExp.min + "-" + targetExp.max + "yr range (within ±1yr tolerance)"] : ["Verify profile details on LinkedIn"],
       outreach: "Your profile came up in our search for " + role + " candidates in " + locationCity + " — we'd love to connect about an exciting opportunity at " + company + ".",
-      scores: { role: titleLower.includes(roleLower) ? 5 : 3, skills: matchedSkills.length >= 2 ? 5 : 3, industry: (titleLower.includes(industryLower) || snippetLower.includes(industryLower)) ? 5 : 3, company: 3, trajectory: 4, location: locationFound ? 5 : 2, comp: 3, stability: 3 }
+      scores: { role: titleLower.includes(roleLower) ? 5 : 3, skills: matchedSkills.length >= 2 ? 5 : 3, industry: (titleLower.includes(industryLower) || snippetLower.includes(industryLower)) ? 5 : 3, company: 3, trajectory: 4, location: locationFound ? 5 : 2, comp: 3, stability: 3 },
+      _experienceData: candidateExpYears ? buildExperienceFromSnippet(candidateExpYears + " yrs", jobTitle || titleParts, companyName) : null
     });
   });
 
@@ -854,6 +1193,18 @@ function getPreScrapedCandidates(searchParams) {
   // Default — return empty, live search must populate
   return [];
 }
+
+// Enrich all pre-scraped candidates with _experienceData from their experience field
+function enrichCandidatesWithExperience(candidates) {
+  candidates.forEach(function(c) {
+    if (!c._experienceData && c.experience && c.experience !== "\u2014") {
+      c._experienceData = buildExperienceFromSnippet(c.experience, c.title, c.company);
+    }
+  });
+  return candidates;
+}
+enrichCandidatesWithExperience(REAL_LINKEDIN_CANDIDATES);
+enrichCandidatesWithExperience(HR_LINKEDIN_CANDIDATES);
 
 // Initial search data — only real sourced candidates (no fake/generated ones)
 const INITIAL_CANDIDATES = REAL_LINKEDIN_CANDIDATES.slice().sort(function(a,b){return b.score - a.score;});
@@ -1851,12 +2202,9 @@ function CandidateCard({
   }, /*#__PURE__*/React.createElement(Icon, {
     name: "map-pin",
     className: "w-3 h-3"
-  }), candidate.location), /*#__PURE__*/React.createElement("span", {
-    className: "flex items-center gap-1"
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "clock",
-    className: "w-3 h-3"
-  }), candidate.experience)), /*#__PURE__*/React.createElement("div", {
+  }), candidate.location), /*#__PURE__*/React.createElement(ExperienceTooltip, {
+    candidate: candidate
+  })), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-1.5 mt-2.5 flex-wrap"
   }, candidate.skills.map((sk, i) => /*#__PURE__*/React.createElement("span", {
     key: i,
