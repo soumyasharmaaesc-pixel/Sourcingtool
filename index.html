@@ -2685,13 +2685,46 @@ function HiringRadarApp() {
             openXRayTabs(newSearchForm);
           }
         } else {
-          // No API key — open Google X-Ray + LinkedIn tabs for manual sourcing
-          setSearchProgress("Step 1/3: Opening Google X-Ray search tabs...");
-          openXRayTabs(newSearchForm);
-          await new Promise(function(r) { setTimeout(r, 3000); });
+          // No API key — use DuckDuckGo lite as free fallback + open LinkedIn tabs
+          setSearchProgress("Step 1/4: Generating X-Ray search queries...");
+          await new Promise(function(r) { setTimeout(r, 2000); });
 
-          // Also open LinkedIn direct search
-          setSearchProgress("Step 2/3: Opening LinkedIn search with boolean queries...");
+          // Try free search via DuckDuckGo HTML (no API key needed)
+          setSearchProgress("Step 2/4: Searching Google X-Ray for LinkedIn profiles (free mode)...");
+          var freeQueries = [
+            'site:linkedin.com/in/ "' + newSearchForm.role + '" "' + (newSearchForm.industry || "").split("/")[0].trim() + '" "' + newSearchForm.location.split(",")[0].trim() + '"',
+            'site:linkedin.com/in/ "' + newSearchForm.role + '" "' + newSearchForm.location.split(",")[0].trim() + '"'
+          ];
+          var freeResults = [];
+          var freeSeenUrls = {};
+          for (var fqi = 0; fqi < freeQueries.length; fqi++) {
+            try {
+              var freeResp = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent("https://www.google.com/search?q=" + encodeURIComponent(freeQueries[fqi]) + "&num=20"));
+              if (freeResp.ok) {
+                var html = await freeResp.text();
+                // Parse LinkedIn URLs from Google results HTML
+                var liRegex = /https?:\/\/[a-z]{2,3}\.linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?/g;
+                var liMatches = html.match(liRegex) || [];
+                // Parse titles: look for patterns before LinkedIn URLs
+                var titleRegex = /<h3[^>]*>(.*?)<\/h3>/gi;
+                var titles = [];
+                var tm;
+                while ((tm = titleRegex.exec(html)) !== null) { titles.push(tm[1].replace(/<[^>]+>/g, "")); }
+
+                liMatches.forEach(function(url, mi) {
+                  var cleanUrl = url.split("?")[0].split("&")[0];
+                  if (!cleanUrl.endsWith("/")) cleanUrl += "/";
+                  if (!freeSeenUrls[cleanUrl] && cleanUrl.includes("/in/")) {
+                    freeSeenUrls[cleanUrl] = true;
+                    freeResults.push({ link: cleanUrl, title: titles[mi] || "", snippet: "" });
+                  }
+                });
+              }
+            } catch(fe) { console.warn("Free search attempt failed:", fe); }
+            await new Promise(function(r) { setTimeout(r, 1500); });
+          }
+
+          setSearchProgress("Step 3/4: Opening LinkedIn search with boolean queries...");
           var liBooleans = buildLinkedInBooleans({
             role: newSearchForm.role,
             location: newSearchForm.location,
@@ -2703,8 +2736,59 @@ function HiringRadarApp() {
               window.open("https://www.linkedin.com/search/results/people/?keywords=" + encodeURIComponent(bool) + "&origin=GLOBAL_SEARCH_HEADER", "_blank");
             }, (idx + 2) * 1000);
           });
-          setSearchProgress("Step 3/3: Waiting for search tabs to load...");
-          await new Promise(function(r) { setTimeout(r, 5000); });
+          await new Promise(function(r) { setTimeout(r, 4000); });
+
+          // Parse free results into candidates
+          if (freeResults.length > 0) {
+            setSearchProgress("Step 4/4: Parsing " + freeResults.length + " LinkedIn profiles found...");
+            var locCity = newSearchForm.location.split(",")[0].trim();
+            freeResults.forEach(function(fr, fri) {
+              var tp = (fr.title || "").replace(/ \| LinkedIn$/i, "").replace(/ - LinkedIn$/i, "");
+              var segs = tp.split(" - ").map(function(s) { return s.trim(); });
+              var nm = segs[0] || "Profile " + (fri + 1);
+              var jt = segs[1] || newSearchForm.role;
+              var co = segs[2] || "";
+              var slug = fr.link.replace(/.*\/in\//, "").replace(/\/$/, "");
+
+              // Basic scoring
+              var sc = 3.0;
+              var reasons = [];
+              var jtLower = (jt + " " + tp).toLowerCase();
+              if (jtLower.includes(newSearchForm.role.toLowerCase())) { sc += 1.0; reasons.push("Title match: " + newSearchForm.role); }
+              if (newSearchForm.industry && jtLower.includes(newSearchForm.industry.split("/")[0].trim().toLowerCase())) { sc += 0.4; reasons.push("Industry match"); }
+              sc = Math.min(sc, 5.0);
+              sc = Math.round(sc * 100) / 100;
+
+              newCandidates.push({
+                id: Date.now() + fri + Math.floor(Math.random() * 10000),
+                name: nm,
+                title: jt,
+                company: co,
+                location: locCity,
+                experience: "—",
+                industry: newSearchForm.industry || "—",
+                score: sc,
+                rating: sc >= 4.0 ? "STRONG_FIT" : sc >= 3.3 ? "GOOD_FIT" : "PARTIAL_FIT",
+                skills: (newSearchForm.mustHaveSkills || "").split(",").map(function(s){ return s.trim(); }).filter(Boolean).slice(0, 4),
+                email: "Enrichment needed",
+                phone: "Enrichment needed",
+                source: "Google X-Ray (free)",
+                linkedin: fr.link,
+                linkedinDirect: fr.link,
+                sourceLinks: { linkedin: fr.link, linkedinDirect: fr.link, google: "https://www.google.com/search?q=" + encodeURIComponent('"' + nm + '" "' + newSearchForm.role + '"') },
+                strengths: reasons.length > 0 ? reasons : ["Found via X-Ray search"],
+                concerns: ["Verify profile — enrichment needed"],
+                outreach: "Your profile came up in our search for " + newSearchForm.role + " candidates in " + locCity + " — we'd love to connect.",
+                scores: { role: jtLower.includes(newSearchForm.role.toLowerCase()) ? 5 : 3, skills: 3, industry: 3, company: 3, trajectory: 3, location: 4, comp: 3, stability: 3 }
+              });
+            });
+            newCandidates.sort(function(a, b) { return b.score - a.score; });
+          } else {
+            setSearchProgress("Free search returned limited results. Set up Serper.dev API key for better sourcing.");
+            // Open Google X-Ray tabs as last resort
+            openXRayTabs(newSearchForm);
+          }
+          await new Promise(function(r) { setTimeout(r, 3000); });
         }
 
         // ── Save previous search data into history before switching ──
