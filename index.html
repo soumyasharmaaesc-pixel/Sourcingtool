@@ -27,6 +27,19 @@
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
     .animate-pulse { animation: pulse 2s ease-in-out infinite; }
     .group:hover .group-hover\:block { display: block; }
+    .pt-8{padding-top:2rem}.pb-6{padding-bottom:1.5rem}
+    /* Improved ScoreChart colors */
+    .score-chart-bar { transition: all 0.3s ease; }
+    .score-chart-bar:hover { filter: brightness(1.2); }
+    /* Better kanban card shadows */
+    .kanban-col { transition: all 0.2s ease; }
+    /* Smooth scrollbar for dark theme */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #1a1a2e; }
+    ::-webkit-scrollbar-thumb { background: #4a4a6a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6a6a8a; }
+    /* Card hover glow */
+    .candidate-glow:hover { box-shadow: 0 0 15px rgba(245, 158, 11, 0.08); }
   </style>
 </head>
 <body>
@@ -74,136 +87,6 @@ function Icon({
 // ═══════════════════════════════════════════════════
 
 // Name pools for generating unique candidates
-const FIRST_NAMES = ["Aarav", "Aditi", "Ajay", "Akshay", "Alisha", "Amit", "Ananya", "Ankur", "Anubhav", "Arjun", "Arindam", "Azaan", "Bhavya", "Chirag", "Deepak", "Deepika", "Devika", "Dhruv", "Divya", "Gaurav", "Harshit", "Ishita", "Jaydeep", "Kabir", "Karan", "Kavya", "Kunal", "Lakshmi", "Manmeet", "Maya", "Medhavini", "Mohit", "Nandini", "Naveen", "Neha", "Nikhil", "Nisha", "Pallavi", "Pranav", "Priya", "Rahul", "Rajat", "Rashi", "Ravi", "Rhea", "Ritika", "Rohit", "Rohan", "Saanvi", "Sahil", "Sakshi", "Sameer", "Sandeep", "Sanya", "Shubham", "Shreya", "Simran", "Sneha", "Srishti", "Tanvi", "Varun", "Veer", "Vikram", "Vinay", "Vivek", "Yash", "Zara"];
-const LAST_NAMES = ["Agarwal", "Banerjee", "Bhat", "Chakraborty", "Choudhary", "Das", "Desai", "Dubey", "Garg", "Goyal", "Gupta", "Iyer", "Jain", "Joshi", "Kapoor", "Khan", "Kumar", "Malhotra", "Mehta", "Menon", "Mishra", "Mukherjee", "Nair", "Nanda", "Patel", "Pillai", "Rao", "Reddy", "Roy", "Saxena", "Sharma", "Shukla", "Singh", "Sinha", "Srivastava", "Thakur", "Tiwari", "Varma", "Verma", "Yadav"];
-const COMPANY_POOLS = {
-  "SaaS": ["BrowserStack", "Freshworks", "Chargebee", "Postman", "Zoho", "CleverTap", "WebEngage", "MoEngage", "Whatfix", "Sprinklr", "Druva", "Icertis", "Wingify", "RateGain", "LeadSquared"],
-  "HR Tech": ["PeopleStrong", "Darwinbox", "Keka HR", "HackerEarth", "Hyreo", "tapplent", "Zimyo", "Pocket HRMS", "greytHR", "Zoho Recruit", "HireX Inc", "Zeko AI"],
-  "AI": ["Zeko AI", "Darwix AI", "Yellow.ai", "Haptik", "Observe.AI", "Uniphore", "Avaamo", "Locus", "Netradyne", "Mindtickle", "Amagi", "Fractal"],
-  "FinTech": ["Razorpay", "PhonePe", "Paytm", "Pine Labs", "BharatPe", "Cred", "Jupiter", "Groww", "Zerodha", "Navi", "MobiKwik", "PolicyBazaar"],
-  "Enterprise": ["LinkedIn", "Microsoft", "Google", "Amazon", "Salesforce", "Oracle", "SAP", "ServiceNow", "Atlassian", "Confluent", "Databricks", "Snowflake"],
-  "Consulting": ["Deloitte", "McKinsey", "BCG", "Bain", "Accenture", "KPMG", "EY", "PwC", "Capgemini"],
-  "EdTech": ["upGrad", "Byju's", "Unacademy", "Vedantu", "Simplilearn", "Great Learning", "Scaler", "Masai School"],
-  "General": ["Infosys", "TCS", "Wipro", "HCL", "Tech Mahindra", "Cognizant", "Reliance Jio", "Swiggy", "Flipkart", "Myntra", "Ola", "Uber India"]
-};
-const TITLE_TEMPLATES = {
-  "Sales": ["Sr. Sales Manager", "Lead Account Executive", "Sales Manager", "Senior Account Executive", "Regional Sales Head", "Enterprise Sales Lead", "Inside Sales Manager", "Business Development Manager", "Sr. AE", "Sales Team Lead"],
-  "Engineering": ["Sr. Engineering Manager", "Principal Engineer", "Staff Engineer", "Engineering Lead", "Tech Lead", "VP Engineering", "Platform Architect", "Sr. Software Engineer", "Backend Lead", "Full-Stack Lead"],
-  "Product": ["Sr. Product Manager", "Product Lead", "Group PM", "Director of Product", "Principal PM", "Product Strategist", "Growth PM", "Platform PM", "Technical PM", "Head of Product"],
-  "Marketing": ["Sr. Marketing Manager", "Head of Growth", "Digital Marketing Lead", "Brand Manager", "Content Strategist", "Performance Marketing Manager", "CMO", "Marketing Director", "Demand Gen Lead", "Growth Marketing Manager"],
-  "Operations": ["Operations Manager", "Sr. Ops Lead", "Head of Operations", "COO", "Process Excellence Lead", "Supply Chain Manager", "Operations Director", "Program Manager"],
-  "Default": ["Sr. Manager", "Team Lead", "Director", "Head of Department", "Principal Consultant", "Strategy Lead", "Senior Specialist", "Program Director"]
-};
-const SKILL_POOLS = {
-  "Sales": ["B2B SaaS", "Enterprise Sales", "Revenue Growth", "GTM Strategy", "Pipeline Management", "Solution Selling", "Account Management", "Sales Leadership", "CRM", "Deal Negotiation", "Team Building", "Strategic Partnerships", "Channel Sales", "Customer Success", "Outbound Sales"],
-  "Engineering": ["System Design", "Microservices", "React", "Python", "AWS", "Kubernetes", "CI/CD", "API Design", "Database Optimization", "Machine Learning", "TypeScript", "Go", "Distributed Systems", "DevOps", "Security"],
-  "Product": ["Product Strategy", "Roadmapping", "User Research", "A/B Testing", "Agile", "Scrum", "Data Analytics", "PRD Writing", "Stakeholder Mgmt", "Market Analysis", "Prioritization", "OKRs", "Design Thinking", "Competitive Analysis"],
-  "Marketing": ["SEO/SEM", "Content Marketing", "Brand Strategy", "Analytics", "Social Media", "Email Marketing", "Growth Hacking", "Marketing Automation", "Demand Generation", "ABM", "PLG", "Community Building"],
-  "Default": ["Strategy", "Leadership", "Analytics", "Process Optimization", "Stakeholder Management", "Project Management", "Communication", "Problem Solving"]
-};
-const LOCATIONS_POOL = ["Gurgaon", "Bangalore", "Mumbai", "Delhi NCR", "Hyderabad", "Pune", "Chennai", "Noida", "San Francisco", "New York", "London", "Singapore", "Dubai", "Remote"];
-let globalIdCounter = 1000;
-function generateCandidates(params) {
-  const {
-    role = "",
-    company = "",
-    location = "",
-    experience = "",
-    industry = "",
-    mustHaveSkills = ""
-  } = params;
-  const roleCategory = role.toLowerCase().includes("sales") || role.toLowerCase().includes("revenue") || role.toLowerCase().includes("business dev") ? "Sales" : role.toLowerCase().includes("engineer") || role.toLowerCase().includes("tech") || role.toLowerCase().includes("developer") ? "Engineering" : role.toLowerCase().includes("product") || role.toLowerCase().includes("pm") ? "Product" : role.toLowerCase().includes("market") || role.toLowerCase().includes("growth") || role.toLowerCase().includes("brand") ? "Marketing" : role.toLowerCase().includes("ops") || role.toLowerCase().includes("operation") ? "Operations" : "Default";
-  const industryKey = industry.toLowerCase().includes("hr") || industry.toLowerCase().includes("recruit") ? "HR Tech" : industry.toLowerCase().includes("ai") || industry.toLowerCase().includes("ml") ? "AI" : industry.toLowerCase().includes("fintech") || industry.toLowerCase().includes("finance") || industry.toLowerCase().includes("payment") ? "FinTech" : industry.toLowerCase().includes("edtech") || industry.toLowerCase().includes("education") ? "EdTech" : industry.toLowerCase().includes("saas") || industry.toLowerCase().includes("software") ? "SaaS" : "General";
-  const companyPool = [...(COMPANY_POOLS[industryKey] || []), ...(COMPANY_POOLS["SaaS"] || []), ...(COMPANY_POOLS["Enterprise"] || [])];
-  const titles = TITLE_TEMPLATES[roleCategory] || TITLE_TEMPLATES["Default"];
-  const skills = SKILL_POOLS[roleCategory] || SKILL_POOLS["Default"];
-  const targetLoc = location.split(",")[0].trim() || "Gurgaon";
-  const usedNames = new Set();
-  const candidates = [];
-  const count = 12 + Math.floor(Math.random() * 5); // 12-16 candidates
-
-  for (let i = 0; i < count; i++) {
-    let firstName, lastName, fullName;
-    do {
-      firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
-      lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
-      fullName = firstName + " " + lastName;
-    } while (usedNames.has(fullName));
-    usedNames.add(fullName);
-    const comp = companyPool[Math.floor(Math.random() * companyPool.length)];
-    const title = titles[Math.floor(Math.random() * titles.length)];
-    const candidateSkills = [];
-    const usedSkillIdx = new Set();
-    const numSkills = 3 + Math.floor(Math.random() * 3);
-    for (let j = 0; j < numSkills; j++) {
-      let idx;
-      do {
-        idx = Math.floor(Math.random() * skills.length);
-      } while (usedSkillIdx.has(idx));
-      usedSkillIdx.add(idx);
-      candidateSkills.push(skills[idx]);
-    }
-    const isLocationMatch = Math.random() > 0.3;
-    const loc = isLocationMatch ? targetLoc : LOCATIONS_POOL[Math.floor(Math.random() * LOCATIONS_POOL.length)];
-    const expYrs = experience ? (parseFloat(experience) + (Math.random() * 3 - 1.5)).toFixed(1) : (4 + Math.random() * 6).toFixed(1);
-
-    // Generate scores
-    const roleScore = i < 3 ? 5 : i < 7 ? 4 + Math.floor(Math.random() * 2) : i < 11 ? 3 + Math.floor(Math.random() * 2) : 2 + Math.floor(Math.random() * 2);
-    const skillScore = Math.min(5, Math.max(2, roleScore + Math.floor(Math.random() * 3) - 1));
-    const industryScore = Math.min(5, Math.max(2, roleScore + Math.floor(Math.random() * 3) - 1));
-    const companyScore = 3 + Math.floor(Math.random() * 3);
-    const trajectoryScore = 3 + Math.floor(Math.random() * 3);
-    const locationScore = isLocationMatch ? 5 : 2 + Math.floor(Math.random() * 2);
-    const compScore = 3 + Math.floor(Math.random() * 3);
-    const stabilityScore = 3 + Math.floor(Math.random() * 3);
-    const weightedScore = roleScore * 0.25 + skillScore * 0.20 + industryScore * 0.15 + companyScore * 0.10 + trajectoryScore * 0.10 + locationScore * 0.10 + compScore * 0.05 + stabilityScore * 0.05;
-    const finalScore = Math.round(weightedScore * 100) / 100;
-    const rating = finalScore >= 4.0 ? "STRONG_FIT" : finalScore >= 3.5 ? "GOOD_FIT" : "PARTIAL_FIT";
-    const emailDomain = comp.toLowerCase().replace(/[^a-z]/g, "") + ".com";
-    const hasEmail = Math.random() > 0.3;
-    const hasPhone = Math.random() > 0.4;
-    const strengthPool = [`Strong ${roleCategory.toLowerCase()} experience at ${comp}`, `${candidateSkills[0]} expertise — direct match`, `${expYrs} years of relevant experience`, `${comp} pedigree — top-tier company`, `Proven ${roleCategory.toLowerCase()} leadership`, `Deep ${industryKey} domain knowledge`, `Located in ${loc} — no relocation needed`, `Track record of exceeding targets`];
-    const concernPool = [`Verify current compensation expectations`, `${comp} to startup transition risk`, `May need domain ramp-up for ${industry}`, `Confirm management experience level`, `Relocation may be needed from ${loc}`, `Counter-offer risk from current employer`];
-    candidates.push({
-      id: ++globalIdCounter,
-      name: fullName,
-      title: title,
-      company: comp,
-      location: loc,
-      experience: expYrs + " yrs",
-      industry: industryKey + " / " + roleCategory,
-      score: finalScore,
-      rating: rating,
-      skills: candidateSkills,
-      email: hasEmail ? `${firstName.toLowerCase()}.${lastName.charAt(0).toLowerCase()}@${emailDomain}` : "Enrichment needed",
-      phone: hasPhone ? `+91-${Math.floor(90000 + Math.random() * 10000)}-${Math.floor(10000 + Math.random() * 90000)}` : "Enrichment needed",
-      source: "AI Generated",
-      linkedin: "",
-      linkedinDirect: "",
-      sourceLinks: {
-        linkedin: "",
-        linkedinDirect: "",
-        naukri: "",
-        indeed: "",
-        google: `https://www.google.com/search?q=%22${encodeURIComponent(fullName)}%22+%22${encodeURIComponent(comp)}%22+%22${encodeURIComponent(title)}%22`
-      },
-      strengths: [strengthPool[Math.floor(Math.random() * strengthPool.length)], strengthPool[Math.floor(Math.random() * strengthPool.length)]].filter((v, i, a) => a.indexOf(v) === i),
-      concerns: [concernPool[Math.floor(Math.random() * concernPool.length)]],
-      outreach: `Your ${candidateSkills[0].toLowerCase()} expertise at ${comp} is exactly what ${company || "our client"} needs for the ${role || "role"} position.`,
-      scores: {
-        role: roleScore,
-        skills: skillScore,
-        industry: industryScore,
-        company: companyScore,
-        trajectory: trajectoryScore,
-        location: locationScore,
-        comp: compScore,
-        stability: stabilityScore
-      }
-    });
-  }
-  return candidates.sort((a, b) => b.score - a.score);
-}
 function generateSearchStrings(params) {
   const {
     role = "Head of Sales",
@@ -280,8 +163,37 @@ var REAL_LINKEDIN_CANDIDATES = [
   { id: 9011, name: "Anand Iyer", title: "Sales Leader | HR Tech AI Platform", company: "inFeedo AI", location: "India", experience: "10+ yrs", industry: "HR Tech / AI", score: 4.40, rating: "STRONG_FIT", skills: ["HR Tech AI","SaaS Sales","Employee Engagement","Enterprise Sales","Business Development"], email: "Enrichment needed", phone: "Enrichment needed", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/anand-iyer-infeedo/", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Anand+Iyer%22+%22inFeedo%22", sourceLinks: { linkedin: "https://www.google.com/search?q=site:linkedin.com/in+%22Anand+Iyer%22+%22inFeedo%22", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Anand+Iyer%22+%22inFeedo%22", naukri: "https://www.google.com/search?q=site:naukri.com+%22Anand+Iyer%22+%22inFeedo%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Anand+Iyer%22+%22inFeedo%22", google: "https://www.google.com/search?q=%22Anand+Iyer%22+%22inFeedo%22+%22Sales%22" }, strengths: ["inFeedo AI — leading HR Tech AI platform, direct competitor ecosystem","11.8K+ LinkedIn followers — major industry influencer"], concerns: ["Verify current role scope and willingness to move","inFeedo may counter-offer aggressively"], outreach: "Your experience at inFeedo AI — one of India's most exciting HR Tech AI platforms — makes you a perfect fit for the Head of Sales role at TheHireHub.AI.", scores: { role:5, skills:5, industry:5, company:5, trajectory:4, location:4, comp:4, stability:3 } },
   { id: 9012, name: "Hafeez M", title: "Head of Sales/Business Dev | Custom SaaS Solutions", company: "SaaS Company", location: "India", experience: "8+ yrs", industry: "SaaS / HR Tech", score: 4.05, rating: "STRONG_FIT", skills: ["Custom SaaS Solutions","Business Development","HR Tech","Sales Management","Lead Generation"], email: "Enrichment needed", phone: "Enrichment needed", source: "Google X-Ray", linkedin: "https://www.google.com/search?q=site:linkedin.com/in+%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22", sourceLinks: { linkedin: "https://www.google.com/search?q=site:linkedin.com/in+%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22", naukri: "https://www.google.com/search?q=site:naukri.com+%22Hafeez%22+%22Head+of+Sales%22+%22SaaS%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Hafeez%22+%22Head+of+Sales%22+%22SaaS%22", google: "https://www.google.com/search?q=%22Hafeez+M%22+%22Head+of+Sales%22+%22SaaS%22" }, strengths: ["Head of Sales title with custom SaaS solutions expertise","720+ followers — solid network in SaaS/HR Tech space"], concerns: ["Need to verify specific HR Tech domain depth","Company name unclear — verify current employer"], outreach: "Your expertise leading sales for custom SaaS solutions aligns well with what TheHireHub.AI is building in the AI recruitment space.", scores: { role:5, skills:4, industry:4, company:3, trajectory:4, location:4, comp:4, stability:3 } },
   { id: 9013, name: "Benaya Vikram", title: "Head of Sales | HR Tech SaaS | Business Development", company: "KernelSphere Technologies", location: "Hyderabad, India", experience: "9+ yrs", industry: "HR Tech / SaaS", score: 3.85, rating: "GOOD_FIT", skills: ["SaaS Sales","Business Analytics","HR Tech","Android Development","Business Development"], email: "Enrichment needed", phone: "Enrichment needed", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/benaya-vikram/", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Benaya+Vikram%22+%22Head+of+Sales%22", sourceLinks: { linkedin: "https://www.google.com/search?q=site:linkedin.com/in+%22Benaya+Vikram%22", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Benaya+Vikram%22", naukri: "https://www.google.com/search?q=site:naukri.com+%22Benaya+Vikram%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Benaya+Vikram%22", google: "https://www.google.com/search?q=%22Benaya+Vikram%22+%22Head+of+Sales%22+%22KernelSphere%22" }, strengths: ["7K+ LinkedIn followers — strong personal brand","3 years as Head of Sales at KernelSphere — proven tenure"], concerns: ["Hyderabad-based — relocation to Gurgaon needed","Verify depth of HR Tech SaaS experience vs general tech"], outreach: "Your Head of Sales track record and 7K+ following in the tech space caught our attention for TheHireHub.AI's sales leadership role.", scores: { role:5, skills:4, industry:4, company:3, trajectory:4, location:3, comp:4, stability:3 } },
-  { id: 9009, name: "Gaurav Dhawan", title: "Head of Sales & Operations | Founder Hault.in", company: "Punjab Roadlines", location: "New Delhi, India", experience: "6+ yrs", industry: "Logistics / Operations", score: 3.20, rating: "PARTIAL_FIT", skills: ["Sales Management","Operations","Logistics","Business Development","Founding"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", linkedinDirect: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", sourceLinks: { linkedin: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", linkedinDirect: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Gaurav+Dhawan%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Gaurav+Dhawan%22", google: "https://www.google.com/search?q=%22Gaurav+Dhawan%22+%22Head+of+Sales%22+%22Hault%22" }, strengths: ["Entrepreneurial — founded Hault.in","Delhi NCR-based — close proximity"], concerns: ["Logistics/Operations — not SaaS at all","No HR Tech or software sales background"], outreach: "Your entrepreneurial drive and sales leadership at Hault.in are impressive — we'd love to explore the Head of Sales opportunity at TheHireHub.AI.", scores: { role:4, skills:2, industry:2, company:2, trajectory:4, location:5, comp:3, stability:3 } }
-];
+  { id: 9009, name: "Gaurav Dhawan", title: "Head of Sales & Operations | Founder Hault.in", company: "Punjab Roadlines", location: "New Delhi, India", experience: "6+ yrs", industry: "Logistics / Operations", score: 3.20, rating: "PARTIAL_FIT", skills: ["Sales Management","Operations","Logistics","Business Development","Founding"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", linkedinDirect: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", sourceLinks: { linkedin: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", linkedinDirect: "https://www.linkedin.com/in/gaurav-dhawan-b50b89118/", naukri: "https://www.google.com/search?q=site:naukri.com+%22Gaurav+Dhawan%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22Gaurav+Dhawan%22", google: "https://www.google.com/search?q=%22Gaurav+Dhawan%22+%22Head+of+Sales%22+%22Hault%22" }, strengths: ["Entrepreneurial — founded Hault.in","Delhi NCR-based — close proximity"], concerns: ["Logistics/Operations — not SaaS at all","No HR Tech or software sales background"], outreach: "Your entrepreneurial drive and sales leadership at Hault.in are impressive — we'd love to explore the Head of Sales opportunity at TheHireHub.AI.", scores: { role:4, skills:2, industry:2, company:2, trajectory:4, location:5, comp:3, stability:3 } },
+  {id: 14, name: "Joe Augustine", title: "Senior Director Enterprise Sales", company: "Keka HR", location: "Mumbai, Maharashtra", experience: "14-20 yrs", industry: "HR Tech", score: 4.30, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/joe-augustin", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Joe+Augustine%22+%22Keka+HR%22", skills: ["Enterprise Sales", "SaaS Sales", "HR Tech", "B2B Sales", "Strategic Partnerships", "Team Leadership", "Revenue Growth", "Account Management"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Joe+Augustine%22+%22Keka+HR%22"}, scores: {role: 5, skills: 4.5, industry: 4, company: 4, education: 4, location: 4.2}},
+  {id: 15, name: "Jay Shah", title: "Enterprise Sales Director", company: "Darwinbox", location: "Mumbai, Maharashtra", experience: "12-18 yrs", industry: "HR Tech", score: 4.40, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/jay-shah-2956a025", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Jay+Shah%22+%22Darwinbox%22", skills: ["Enterprise Sales", "SaaS Sales", "HR Tech", "B2B Sales", "Account Management", "Pipeline Management", "Key Account Management", "Revenue Growth"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Jay+Shah%22+%22Darwinbox%22"}, scores: {role: 5, skills: 4.5, industry: 4.5, company: 4.5, education: 4, location: 4.2}},
+  {id: 16, name: "Siddhartha Sharma", title: "Sr. Sales Director (Enterprise)", company: "Darwinbox", location: "Bengaluru, Karnataka", experience: "14-20 yrs", industry: "HR Tech", score: 4.50, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/siddhartha-sharma-99160217", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Siddhartha+Sharma%22+%22Darwinbox%22", skills: ["Enterprise SaaS Sales", "Digital Transformation", "HR Tech", "B2B Sales", "Team Leadership", "Revenue Growth", "Strategic Planning"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Siddhartha+Sharma%22+%22Darwinbox%22"}, scores: {role: 5, skills: 4.5, industry: 4.5, company: 4.5, education: 4.2, location: 4.3}},
+  {id: 17, name: "Jitendra Nirwani", title: "Vice President Sales", company: "PeopleStrong", location: "Mumbai, Maharashtra", experience: "15-20+ yrs", industry: "HR Tech", score: 4.60, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/jitendra-nirwani-571aa514", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Jitendra+Nirwani%22+%22PeopleStrong%22", skills: ["VP Sales", "SaaS Sales", "HR Tech", "Growth Strategy", "B2B Sales", "Team Leadership", "Revenue Growth", "Scaling SaaS"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Jitendra+Nirwani%22+%22PeopleStrong%22"}, scores: {role: 5, skills: 4.5, industry: 4.5, company: 4.5, education: 4.3, location: 4.2}},
+  {id: 18, name: "Tarun Nagavarapu", title: "Sr. Director Enterprise Sales", company: "TurboHire", location: "Hyderabad, Telangana", experience: "14-20 yrs", industry: "HR Tech", score: 4.20, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/tarun-kumar-n", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Tarun+Nagavarapu%22+%22TurboHire%22", skills: ["Enterprise Sales", "HR Tech", "Recruitment Tech", "AI in Recruiting", "SaaS Sales", "B2B Sales", "Team Leadership"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Tarun+Nagavarapu%22+%22TurboHire%22"}, scores: {role: 5, skills: 4, industry: 4.5, company: 3.8, education: 4, location: 4.1}},
+  {id: 19, name: "Anitha S", title: "Director Enterprise Sales & Alliances", company: "ZingHR", location: "Bengaluru, Karnataka", experience: "12-18 yrs", industry: "HR Tech", score: 4.30, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/anitha-k-s-3b520b13", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Anitha+S%22+%22ZingHR%22", skills: ["Enterprise Sales", "HR Tech", "Strategic Partnerships", "B2B Sales", "Account Management", "Business Development", "Team Leadership"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Anitha+S%22+%22ZingHR%22"}, scores: {role: 5, skills: 4.2, industry: 4.5, company: 4, education: 4, location: 4.3}},
+  {id: 20, name: "Mayank Khanna", title: "Regional Sales Director MEA", company: "Leena AI", location: "Gurugram, Haryana", experience: "12-18 yrs", industry: "SaaS / AI", score: 4.00, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/khannam", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Mayank+Khanna%22+%22Leena+AI%22", skills: ["Regional Sales", "SaaS Sales", "Business Development", "B2B Sales", "AI Sales", "Team Leadership", "Revenue Growth"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Mayank+Khanna%22+%22Leena+AI%22"}, scores: {role: 4.5, skills: 4, industry: 3.8, company: 3.8, education: 4, location: 4}},
+  {id: 21, name: "Khushbu Tekchandani", title: "VP Business Development", company: "Kredily", location: "Bengaluru, Karnataka", experience: "12-18 yrs", industry: "HR Tech / SaaS", score: 4.10, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/khushbu-tekchandani-a27876a0", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Khushbu+Tekchandani%22+%22Kredily%22", skills: ["VP Business Development", "B2B Sales", "SaaS Sales", "Growth", "Customer Acquisition", "Account Management", "Pipeline Management"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Khushbu+Tekchandani%22+%22Kredily%22"}, scores: {role: 5, skills: 4, industry: 3.5, company: 3.5, education: 4, location: 4.3}},
+  {id: 22, name: "Soumabrata Chatterjee", title: "Chief Revenue Officer", company: "Springworks", location: "Pune, Maharashtra", experience: "15-20+ yrs", industry: "HR Tech / SaaS", score: 4.40, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/soumac", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Soumabrata+Chatterjee%22+%22Springworks%22", skills: ["CRO", "Sales Leadership", "CX Leadership", "SaaS Sales", "B2B Sales", "Team Leadership", "Revenue Growth", "Strategic Planning"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Soumabrata+Chatterjee%22+%22Springworks%22"}, scores: {role: 5, skills: 4.5, industry: 3.8, company: 4, education: 4.2, location: 4.1}},
+  {id: 23, name: "Priyanka Sharma", title: "SVP Business Development", company: "sumHR", location: "Mumbai, Maharashtra", experience: "12-18 yrs", industry: "HR Tech", score: 4.20, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/priyankasharma23", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Priyanka+Sharma%22+%22sumHR%22", skills: ["SVP Business Development", "HR Tech", "SaaS Sales", "B2B Sales", "Account Management", "Team Leadership", "Growth Strategy"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Priyanka+Sharma%22+%22sumHR%22"}, scores: {role: 5, skills: 4, industry: 4.5, company: 4, education: 4, location: 4.2}},
+  {id: 24, name: "Debalina Ray", title: "Enterprise Sales Director", company: "Darwinbox", location: "Mumbai, Maharashtra", experience: "12-18 yrs", industry: "HR Tech", score: 4.50, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/debalina-ray", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Debalina+Ray%22+%22Darwinbox%22", skills: ["Enterprise Sales", "HR Tech", "SaaS Sales", "B2B Sales", "Enterprise Software", "Team Leadership", "Revenue Growth"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Debalina+Ray%22+%22Darwinbox%22"}, scores: {role: 5, skills: 4.5, industry: 4.5, company: 4.5, education: 4, location: 4.2}},
+  {id: 25, name: "Rudraditya Bhattacharya", title: "Regional Sales Director", company: "Darwinbox", location: "Mumbai, Maharashtra", experience: "12-18 yrs", industry: "HR Tech", score: 4.40, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/rudraditya-bhattacharya-71764b22", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Rudraditya+Bhattacharya%22+%22Darwinbox%22", skills: ["Regional Sales", "HR Tech", "SaaS Sales", "B2B Sales", "Account Management", "Strategic Partnerships", "Revenue Growth"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Rudraditya+Bhattacharya%22+%22Darwinbox%22"}, scores: {role: 5, skills: 4.5, industry: 4.5, company: 4.5, education: 4, location: 4.2}},
+  {id: 26, name: "Abhishek Dey", title: "Regional Sales Director", company: "PeopleStrong", location: "Hyderabad, Telangana", experience: "12-18 yrs", industry: "HR Tech", score: 4.30, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/abhishek-dey-b315a15a", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Abhishek+Dey%22+%22PeopleStrong%22", skills: ["Regional Sales", "HR Tech", "HR Consultant", "Business Development", "Team Leadership", "Mentoring", "Digital Transformation"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Abhishek+Dey%22+%22PeopleStrong%22"}, scores: {role: 5, skills: 4.2, industry: 4.5, company: 4.5, education: 4, location: 4.1}},
+  {id: 27, name: "Aditya Malik", title: "Chief Revenue Officer", company: "Pazcare", location: "Bengaluru, Karnataka", experience: "15-20+ yrs", industry: "SaaS / InsurTech", score: 4.30, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/adityamalik", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Aditya+Malik%22+%22Pazcare%22", skills: ["CRO", "Sales Leadership", "B2B Sales", "SaaS Sales", "Strategic Planning", "Revenue Growth", "Business Strategy"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Aditya+Malik%22+%22Pazcare%22"}, scores: {role: 5, skills: 4.3, industry: 3.5, company: 4, education: 4.2, location: 4.3}},
+  {id: 28, name: "Rakesh Chaturvedi", title: "Sales Leader", company: "Disprz", location: "Mumbai, Maharashtra", experience: "10-15 yrs", industry: "SaaS / L&D Tech", score: 4.00, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/rakesh-chaturvedi-18a04b83", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Rakesh+Chaturvedi%22+%22Disprz%22", skills: ["Sales Leadership", "SaaS Sales", "AI Sales", "Account Management", "Team Leadership", "Pipeline Management", "Future of Work"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Rakesh+Chaturvedi%22+%22Disprz%22"}, scores: {role: 4.5, skills: 4, industry: 3.5, company: 3.8, education: 4, location: 4.2}},
+  {id: 29, name: "Lakshmi M", title: "Sales Leader", company: "Rippling", location: "Bengaluru, Karnataka", experience: "12-18 yrs", industry: "HR Tech / SaaS", score: 3.90, rating: "GOOD_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/k-m-lakshmi-soujanya", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Lakshmi+M%22+%22Rippling%22", skills: ["GTM Strategy", "Sales Operations", "B2B Sales", "SaaS Sales", "Team Leadership", "Product Strategy", "Enterprise Sales"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Lakshmi+M%22+%22Rippling%22"}, scores: {role: 4, skills: 4, industry: 3.5, company: 4, education: 4, location: 4.3}},
+  {id: 30, name: "Shylaja Gowda", title: "Account Director Enterprise Sales", company: "TeamLease", location: "Bengaluru, Karnataka", experience: "12-18 yrs", industry: "Staffing / HR Services", score: 3.80, rating: "GOOD_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/shylaja-p-gowda-34948822", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Shylaja+Gowda%22+%22TeamLease%22", skills: ["Account Director", "Enterprise Sales", "Strategic Partnerships", "Team Leadership", "Account Management", "Enterprise Growth"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Shylaja+Gowda%22+%22TeamLease%22"}, scores: {role: 4.5, skills: 4, industry: 3.8, company: 4, education: 4, location: 4.3}},
+  {id: 31, name: "Nandini Tiwari", title: "IT Sales Leader", company: "Spine Technologies", location: "Mumbai, Maharashtra", experience: "10-15 yrs", industry: "HR Tech", score: 3.60, rating: "GOOD_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/nandini-tiwari-17b41a177", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Nandini+Tiwari%22+%22Spine+Technologies%22", skills: ["Sales Leadership", "IT Sales", "B2B Sales", "Account Management", "Regional Management", "Pipeline Management", "Enterprise Sales"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Nandini+Tiwari%22+%22Spine+Technologies%22"}, scores: {role: 4, skills: 3.5, industry: 3.2, company: 3.5, education: 3.5, location: 4.2}},
+  {id: 32, name: "Vinita Chauhan", title: "Sales Leadership", company: "Darwinbox", location: "India", experience: "12-18 yrs", industry: "HR Tech", score: 4.20, rating: "STRONG_FIT", source: "Apollo", linkedin: "http://www.linkedin.com/in/vinitachauhan", linkedinDirect: "https://www.google.com/search?q=site:linkedin.com/in+%22Vinita+Chauhan%22+%22Darwinbox%22", skills: ["Sales Leadership", "HR Tech", "SaaS Sales", "B2B Sales", "Account Management", "Team Leadership", "Revenue Growth"], sourceLinks: {google: "https://www.google.com/search?q=site:linkedin.com/in+%22Vinita+Chauhan%22+%22Darwinbox%22"}, scores: {role: 5, skills: 4.2, industry: 4.5, company: 4.5, education: 4, location: 4}}
+,
+  {id: 9020, name: "Nehul Gupta", title: "Head of Sales", company: "Compport", location: "India", experience: "12-15 yrs", industry: "HR Tech / Compensation SaaS", score: 4.35, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/nehul-gupta/", linkedinDirect: "https://www.linkedin.com/in/nehul-gupta/", skills: ["Head of Sales", "HR Tech", "SaaS Sales", "Compensation SaaS", "Enterprise Sales", "Team Leadership"], sourceLinks: {google: "site:linkedin.com/in/ \"Nehul Gupta\" \"Compport\" \"Head of Sales\""}, scores: {role: 5, skills: 4.5, industry: 4.5, company: 4, trajectory: 4, location: 4, comp: 3.5, stability: 4}},
+  {id: 9021, name: "Praveen Prakash", title: "Sales Leader", company: "Darwinbox", location: "India", experience: "10-14 yrs", industry: "HR Tech / SaaS", score: 4.50, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/praveen-prakash-069a27124/", linkedinDirect: "https://www.linkedin.com/in/praveen-prakash-069a27124/", skills: ["Sales Leadership", "HR Tech", "SaaS Sales", "Enterprise Sales", "B2B Sales", "Team Leadership", "Revenue Growth"], sourceLinks: {google: "site:linkedin.com/in/ \"Praveen Prakash\" \"Darwinbox\" \"Sales Leader\""}, scores: {role: 5, skills: 4.5, industry: 4.5, company: 4.5, trajectory: 4.2, location: 4, comp: 4, stability: 4}},
+  {id: 9022, name: "Akshay Dogra", title: "Sales Leader / HRMS", company: "SaaS/HR Tech", location: "India", experience: "11-16 yrs", industry: "HR Tech / SaaS", score: 4.20, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://in.linkedin.com/in/akshay-dogra-0158651b1", linkedinDirect: "https://in.linkedin.com/in/akshay-dogra-0158651b1", skills: ["Sales Leadership", "HRMS", "SaaS Sales", "Enterprise Sales", "Product Sales", "Team Leadership"], sourceLinks: {google: "site:linkedin.com/in/ \"Akshay Dogra\" \"HR Tech\" \"Sales\""}, scores: {role: 5, skills: 4, industry: 4.5, company: 3.8, trajectory: 4, location: 4, comp: 3.8, stability: 4}},
+  {id: 9023, name: "Dakshdeep Singh", title: "Sales / HR Tech Product", company: "PeopleStrong", location: "Gurgaon, India", experience: "10-14 yrs", industry: "HR Tech / SaaS", score: 4.15, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://in.linkedin.com/in/dakshdeep-hrtech-product-gurgaon", linkedinDirect: "https://in.linkedin.com/in/dakshdeep-hrtech-product-gurgaon", skills: ["Sales Leadership", "HR Tech", "Product Sales", "SaaS Sales", "B2B Sales", "Team Leadership"], sourceLinks: {google: "site:linkedin.com/in/ \"Dakshdeep Singh\" \"PeopleStrong\" \"Sales\""}, scores: {role: 4.8, skills: 4, industry: 4.5, company: 4.2, trajectory: 4, location: 4.5, comp: 3.8, stability: 4}},
+  {id: 9024, name: "Manaswini Ramesh", title: "Senior Account Executive - Enterprise HR Tech", company: "TurboHire", location: "India", experience: "9-13 yrs", industry: "HR Tech / SaaS", score: 4.25, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/manaswini-ramesh-490951144/", linkedinDirect: "https://www.linkedin.com/in/manaswini-ramesh-490951144/", skills: ["Account Executive", "Enterprise Sales", "HR Tech", "SaaS Sales", "B2B Sales", "Account Management"], sourceLinks: {google: "site:linkedin.com/in/ \"Manaswini Ramesh\" \"TurboHire\" \"Account Executive\""}, scores: {role: 5, skills: 4.2, industry: 4.5, company: 4, trajectory: 4, location: 4, comp: 3.8, stability: 4}},
+  {id: 9025, name: "M Matiur Rahaman", title: "Sales Director & Country Manager - Enterprise SaaS", company: "IBM", location: "Hyderabad, India", experience: "14-18 yrs", industry: "Enterprise SaaS / Technology", score: 4.40, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://in.linkedin.com/in/salesleadermatiur", linkedinDirect: "https://in.linkedin.com/in/salesleadermatiur", skills: ["Sales Director", "Country Manager", "Enterprise Sales", "SaaS Sales", "Team Leadership", "Business Development"], sourceLinks: {google: "site:linkedin.com/in/ \"M Matiur Rahaman\" \"IBM\" \"Sales Director\""}, scores: {role: 5, skills: 4.5, industry: 4, company: 5, trajectory: 4.2, location: 4, comp: 4, stability: 4.5}},
+  {id: 9026, name: "Nilesh K Singh", title: "Senior Sales Leader", company: "Fintech/HRTech", location: "India", experience: "12-16 yrs", industry: "Fintech / HR Tech / SaaS", score: 4.30, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/nikusingh/", linkedinDirect: "https://www.linkedin.com/in/nikusingh/", skills: ["Senior Sales Leadership", "Fintech Sales", "HR Tech", "B2B Sales", "Enterprise Sales", "SaaS Sales", "Team Leadership"], sourceLinks: {google: "site:linkedin.com/in/ \"Nilesh Singh\" \"Senior Sales Leader\" \"Fintech\""}, scores: {role: 5, skills: 4.3, industry: 4.2, company: 4, trajectory: 4, location: 4, comp: 4, stability: 4}},
+  {id: 9027, name: "Kunal Sharma", title: "Sales Leadership", company: "HackerRank/Mercer Mettl", location: "Gurgaon, India", experience: "11-15 yrs", industry: "EdTech / HR Tech / Assessment", score: 4.05, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/cunal/", linkedinDirect: "https://www.linkedin.com/in/cunal/", skills: ["Sales Leadership", "B2B Sales", "SaaS Sales", "Assessment Tech", "HR Tech", "Team Leadership", "Business Development"], sourceLinks: {google: "site:linkedin.com/in/ \"Kunal Sharma\" \"HackerRank\" \"Sales\""}, scores: {role: 4.8, skills: 4, industry: 4, company: 4, trajectory: 3.8, location: 4.5, comp: 3.8, stability: 4}},
+  {id: 9028, name: "Akanksha Mishra", title: "Sales/BD", company: "PeopleStrong", location: "India", experience: "9-12 yrs", industry: "HR Tech / SaaS", score: 4.10, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/akanksha-mishra-918451150/", linkedinDirect: "https://www.linkedin.com/in/akanksha-mishra-918451150/", skills: ["Sales", "Business Development", "HR Tech", "SaaS Sales", "B2B Sales", "Account Management"], sourceLinks: {google: "site:linkedin.com/in/ \"Akanksha Mishra\" \"PeopleStrong\" \"Sales\""}, scores: {role: 4.8, skills: 4, industry: 4.5, company: 4.2, trajectory: 3.8, location: 4, comp: 3.8, stability: 4}},
+  {id: 9029, name: "Arun Prakash", title: "Enterprise Sales/Hiring", company: "Rippling", location: "Bengaluru, India", experience: "10-14 yrs", industry: "HR Tech / SaaS / Hiring", score: 4.45, rating: "STRONG_FIT", source: "Google X-Ray", linkedin: "https://www.linkedin.com/in/apr58/", linkedinDirect: "https://www.linkedin.com/in/apr58/", skills: ["Enterprise Sales", "Hiring Platform Sales", "SaaS Sales", "B2B Sales", "Account Management", "Team Leadership", "Revenue Growth"], sourceLinks: {google: "site:linkedin.com/in/ \"Arun Prakash\" \"Rippling\" \"Enterprise Sales\""}, scores: {role: 5, skills: 4.5, industry: 4.5, company: 4.5, trajectory: 4, location: 4.2, comp: 4, stability: 4.2}}];
 
 // Initial search data — only real sourced candidates (no fake/generated ones)
 const INITIAL_CANDIDATES = REAL_LINKEDIN_CANDIDATES.slice().sort(function(a,b){return b.score - a.score;});
@@ -290,7 +202,7 @@ const INITIAL_SEARCH_STRINGS = generateSearchStrings({
   industry: "SaaS / AI / HR Tech",
   location: "Gurgaon, India"
 });
-const KANBAN_STAGES = ["Sourced", "Screening", "Round 1", "Round 2", "Round 3", "Offer", "Hired"];
+const KANBAN_STAGES = ["Fresh", "Profile Viewed", "Shortlisted", "Outreached", "Replied", "Screening Call", "Interview", "Offer", "Hired", "Rejected"];
 
 // CHATBOT — now takes dynamic candidates
 function getChatResponse(msg, candidates) {
@@ -304,7 +216,7 @@ function getChatResponse(msg, candidates) {
     const top3 = candidates.slice(0, 3);
     return `**Top 3 Comparison:**\n\n${top3.map((c, i) => `${["🥇", "🥈", "🥉"][i]} **${c.name} (${c.score})** — ${c.company}\n${c.title}. ${c.strengths[0] || ""}`).join("\n\n")}`;
   }
-  if (lower.includes("market") || lower.includes("talent pool") || lower.includes("19k")) return `**Talent Market Snapshot:**\n\n• Total addressable pool: ~${Math.floor(Math.random() * 15) + 10}K+ professionals\n• Domain-specific matches: ~${50 + Math.floor(Math.random() * 100)}\n• Direct role matches: ~${20 + Math.floor(Math.random() * 40)}\n• Avg time-to-hire: 45-60 days\n• Offer acceptance rate (startup): ~65%\n• Counter-offer risk: HIGH`;
+  if (lower.includes("market") || lower.includes("talent pool") || lower.includes("19k")) return `**Talent Market Snapshot:**\n\n• Total addressable pool: ~${candidates.length > 50 ? '50K+' : candidates.length > 30 ? '35K+' : '25K+'} professionals\n• Domain-specific matches: ~${Math.max(candidates.length * 2, 45)}\n• Direct role matches: ~${Math.max(candidates.length, 30)}\n• Avg time-to-hire: 45-60 days\n• Offer acceptance rate (startup): ~65%\n• Counter-offer risk: HIGH`;;
   if (lower.includes("comp") || lower.includes("salary") || lower.includes("ctc") || lower.includes("pay")) return `**Compensation Benchmarks:**\n\n• Manager (SaaS startup): ₹18L-30L + variable + equity\n• Head/Director level (AI startup): ₹25L-40L CTC + equity\n• Lead (Unicorn tier): ₹20L-35L CTC\n• Sr. role (FAANG/MNC): ₹18L-30L + benefits\n\nRecommendation: Offer ₹30-35L CTC + 0.5-1% equity to be competitive.`;
   if (lower.includes("strong")) return `**Strong Fit Candidates (score ≥ 4.0):**\n\n${candidates.filter(c => c.rating === "STRONG_FIT").map((c, i) => `${i + 1}. **${c.name}** (${c.score}) — ${c.title} at ${c.company}`).join("\n")}`;
   if (lower.includes("good fit")) return `**Good Fit Candidates (3.5-3.9):**\n\n${candidates.filter(c => c.rating === "GOOD_FIT").map((c, i) => `${i + 1}. **${c.name}** (${c.score}) — ${c.title} at ${c.company}`).join("\n")}`;
@@ -881,7 +793,7 @@ function KanbanBoard({
   const [kanban, setKanban] = useState(() => {
     const init = {};
     KANBAN_STAGES.forEach(s => init[s] = []);
-    candidates.forEach(c => init["Sourced"].push({
+    candidates.forEach(c => init["Fresh"].push({
       ...c
     }));
     return init;
@@ -889,22 +801,28 @@ function KanbanBoard({
   const [dragging, setDragging] = useState(null);
   const [dragOver, setDragOver] = useState(null);
   const stageColors = {
-    "Sourced": "border-gray-600",
-    "Screening": "border-blue-600",
-    "Round 1": "border-purple-600",
-    "Round 2": "border-indigo-600",
-    "Round 3": "border-cyan-600",
+    "Fresh": "border-gray-600",
+    "Profile Viewed": "border-blue-600",
+    "Shortlisted": "border-cyan-600",
+    "Outreached": "border-purple-600",
+    "Replied": "border-indigo-600",
+    "Screening Call": "border-sky-600",
+    "Interview": "border-violet-600",
     "Offer": "border-amber-600",
-    "Hired": "border-emerald-600"
+    "Hired": "border-emerald-600",
+    "Rejected": "border-red-600"
   };
   const stageHeaderBg = {
-    "Sourced": "bg-gray-800",
-    "Screening": "bg-blue-900/50",
-    "Round 1": "bg-purple-900/50",
-    "Round 2": "bg-indigo-900/50",
-    "Round 3": "bg-cyan-900/50",
+    "Fresh": "bg-gray-800",
+    "Profile Viewed": "bg-blue-900/50",
+    "Shortlisted": "bg-cyan-900/50",
+    "Outreached": "bg-purple-900/50",
+    "Replied": "bg-indigo-900/50",
+    "Screening Call": "bg-sky-900/50",
+    "Interview": "bg-violet-900/50",
     "Offer": "bg-amber-900/50",
-    "Hired": "bg-emerald-900/50"
+    "Hired": "bg-emerald-900/50",
+    "Rejected": "bg-red-900/50"
   };
   const onDragStart = (e, candidateId, fromStage) => {
     setDragging({
@@ -936,8 +854,49 @@ function KanbanBoard({
     setDragging(null);
     setDragOver(null);
   };
+
+  // Smart Recommendations Logic
+  var shortlisted = kanban["Shortlisted"] || [];
+  var recommendations = [];
+  if (shortlisted.length > 0) {
+    var industries = {};
+    var skillCounts = {};
+    shortlisted.forEach(function(c) {
+      if (c.industry) {
+        var ind = c.industry.split("/")[0].trim();
+        industries[ind] = (industries[ind] || 0) + 1;
+      }
+      if (c.skills) {
+        c.skills.forEach(function(sk) {
+          skillCounts[sk] = (skillCounts[sk] || 0) + 1;
+        });
+      }
+    });
+    var topIndustry = Object.keys(industries).sort(function(a,b){return industries[b]-industries[a]})[0] || "";
+    var topSkills = Object.keys(skillCounts).sort(function(a,b){return skillCounts[b]-skillCounts[a]}).slice(0,3);
+    var avgScore = shortlisted.reduce(function(s,c){return s+c.score},0) / shortlisted.length;
+
+    // Find candidates in Fresh/Profile Viewed that match the shortlisted profile
+    var fresh = (kanban["Fresh"] || []).concat(kanban["Profile Viewed"] || []);
+    var recommended = fresh.filter(function(c) {
+      var matchScore = 0;
+      if (c.industry && c.industry.includes(topIndustry)) matchScore += 2;
+      if (c.skills) {
+        c.skills.forEach(function(sk) {
+          if (topSkills.indexOf(sk) !== -1) matchScore += 1;
+        });
+      }
+      if (c.score >= avgScore - 0.3) matchScore += 1;
+      return matchScore >= 2;
+    });
+
+    if (recommended.length > 0) {
+      recommendations = recommended;
+    }
+  }
+
   return /*#__PURE__*/React.createElement("div", {
-    className: "space-y-4"
+    className: "space-y-4 h-full"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between"
   }, /*#__PURE__*/React.createElement("h3", {
@@ -947,11 +906,39 @@ function KanbanBoard({
     className: "w-4 h-4 text-amber-400"
   }), " Hiring Pipeline \u2014 Drag candidates between stages"), /*#__PURE__*/React.createElement("div", {
     className: "text-xs text-gray-500"
-  }, candidates.length, " candidates in pipeline")), /*#__PURE__*/React.createElement("div", {
-    className: "flex gap-3 overflow-x-auto pb-4"
+  }, candidates.length, " candidates in pipeline")), shortlisted.length > 0 && recommendations.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "mb-4 bg-amber-900/20 border border-amber-700/50 rounded-xl p-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 mb-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "sparkles",
+    className: "w-4 h-4 text-amber-400"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-sm font-bold text-amber-400"
+  }, "Smart Recommendations"), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs text-gray-500"
+  }, "Based on your " + shortlisted.length + " shortlisted profile" + (shortlisted.length > 1 ? "s" : ""))), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2 overflow-x-auto pb-1"
+  }, recommendations.slice(0, 5).map(function(c) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: c.id,
+      className: "flex-shrink-0 bg-gray-800 border border-amber-700/30 rounded-lg p-2 w-44"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "text-xs font-semibold text-white truncate"
+    }, c.name), /*#__PURE__*/React.createElement("div", {
+      className: "text-xs text-gray-400 truncate"
+    }, c.company), /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-1 mt-1"
+    }, /*#__PURE__*/React.createElement(ScoreBadge, {
+      score: c.score
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "text-xs text-amber-400"
+    }, "Great match")));
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-3 overflow-x-auto overflow-y-auto pb-4"
   }, KANBAN_STAGES.map(stage => /*#__PURE__*/React.createElement("div", {
     key: stage,
-    className: `kanban-col flex-shrink-0 w-56 bg-gray-900/50 border ${stageColors[stage]} rounded-xl overflow-hidden ${dragOver === stage ? "drag-over" : ""}`,
+    className: `kanban-col flex-shrink-0 w-48 min-w-[192px] bg-gray-900/50 border ${stageColors[stage]} rounded-xl overflow-hidden ${dragOver === stage ? "drag-over" : ""}`,
     onDragOver: e => onDragOver(e, stage),
     onDragLeave: onDragLeave,
     onDrop: e => onDrop(e, stage)
@@ -962,13 +949,33 @@ function KanbanBoard({
   }, stage), /*#__PURE__*/React.createElement("span", {
     className: "text-xs bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded-full font-mono"
   }, kanban[stage].length)), /*#__PURE__*/React.createElement("div", {
-    className: "p-2 space-y-2 min-h-[200px]"
-  }, kanban[stage].map(c => /*#__PURE__*/React.createElement("div", {
+    className: "p-2 space-y-2 min-h-[120px] max-h-[60vh] overflow-y-auto"
+  }, kanban[stage].map(c => {
+    // Compute shortlist match info
+    var isShortlistBestMatch = false;
+    var matchReasons = [];
+    if (stage === "Shortlisted" && shortlisted.length > 1) {
+      var slAvg = shortlisted.reduce(function(s2,c2){return s2+c2.score},0) / shortlisted.length;
+      if (c.score >= slAvg) isShortlistBestMatch = true;
+      if (c.industry && topIndustry && c.industry.includes(topIndustry)) matchReasons.push(topIndustry + " match");
+      if (c.skills && topSkills.length > 0) {
+        var matched = c.skills.filter(function(sk){return topSkills.indexOf(sk) !== -1});
+        if (matched.length > 0) matchReasons.push(matched[0] + " skill");
+      }
+    }
+    return /*#__PURE__*/React.createElement("div", {
     key: c.id,
     draggable: true,
     onDragStart: e => onDragStart(e, c.id, stage),
     className: "bg-gray-800 border border-gray-700 rounded-lg p-2.5 cursor-grab active:cursor-grabbing hover:border-gray-600 transition-all"
-  }, /*#__PURE__*/React.createElement("div", {
+  },
+  // Stage-specific status badge
+  stage === "Fresh" && /*#__PURE__*/React.createElement("div", {className: "flex items-center gap-1 mb-1.5"}, /*#__PURE__*/React.createElement("span", {className: "text-xs bg-blue-900/60 text-blue-300 border border-blue-700/50 px-1.5 py-0.5 rounded-full font-bold"}, "NEW"), /*#__PURE__*/React.createElement("span", {className: "text-xs text-gray-500"}, "Not reviewed")),
+  stage === "Profile Viewed" && /*#__PURE__*/React.createElement("div", {className: "flex items-center gap-1 mb-1.5"}, /*#__PURE__*/React.createElement(Icon, {name: "eye", className: "w-3 h-3 text-blue-400"}), /*#__PURE__*/React.createElement("span", {className: "text-xs text-blue-400"}, "Viewed")),
+  stage === "Outreached" && /*#__PURE__*/React.createElement("div", {className: "flex items-center gap-1 mb-1.5 flex-wrap"}, /*#__PURE__*/React.createElement(Icon, {name: "send", className: "w-3 h-3 text-purple-400"}), /*#__PURE__*/React.createElement("span", {className: "text-xs text-purple-300"}, "via Soumya\u2019s LinkedIn"), c.linkedin && c.linkedin.includes("linkedin.com") && /*#__PURE__*/React.createElement("span", {className: "text-xs bg-purple-900/40 text-purple-300 px-1 py-0.5 rounded"}, "Connect Req")),
+  stage === "Replied" && /*#__PURE__*/React.createElement("div", {className: "flex items-center gap-1 mb-1.5"}, /*#__PURE__*/React.createElement(Icon, {name: "message-circle", className: "w-3 h-3 text-indigo-400"}), /*#__PURE__*/React.createElement("span", {className: "text-xs bg-emerald-900/50 text-emerald-300 px-1.5 py-0.5 rounded-full"}, "Interested")),
+  stage === "Shortlisted" && /*#__PURE__*/React.createElement("div", {className: "mb-1.5"}, isShortlistBestMatch && /*#__PURE__*/React.createElement("span", {className: "text-xs bg-amber-500/20 text-amber-300 border border-amber-600/40 px-1.5 py-0.5 rounded-full font-bold mr-1"}, "\u2B50 Best Match"), matchReasons.length > 0 && /*#__PURE__*/React.createElement("span", {className: "text-xs text-cyan-400"}, matchReasons.slice(0,2).join(" \u2022 "))),
+  /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between mb-1"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-xs font-semibold text-white truncate"
@@ -978,11 +985,14 @@ function KanbanBoard({
     className: "text-xs text-gray-400 truncate"
   }, c.title), /*#__PURE__*/React.createElement("div", {
     className: "text-xs text-gray-500 truncate"
-  }, c.company), /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-1 mt-1.5"
+  }, c.company),
+  // Source badge
+  /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-1 mt-1.5 flex-wrap"
   }, /*#__PURE__*/React.createElement(RatingBadge, {
     rating: c.rating
-  })))))))));
+  }), c.source && /*#__PURE__*/React.createElement("span", {className: "text-xs bg-gray-700/50 text-gray-400 px-1 py-0.5 rounded"}, c.source)));
+  }))))))
 }
 
 // ═══════════════════════════════════════════════════
@@ -993,7 +1003,9 @@ function CandidateCard({
   expanded,
   onToggle,
   notes,
-  onAddNote
+  onAddNote,
+  viewStatus,
+  onMarkViewed
 }) {
   const s = candidate.scores;
   const [noteInput, setNoteInput] = useState("");
@@ -1001,10 +1013,10 @@ function CandidateCard({
   return /*#__PURE__*/React.createElement("div", {
     className: `bg-gray-800 border rounded-xl overflow-hidden transition-all ${candidate.rating === "STRONG_FIT" ? "border-gray-700" : "border-gray-700/60"} hover:border-gray-600`
   }, /*#__PURE__*/React.createElement("div", {
-    className: "p-4 cursor-pointer",
+    className: "p-5 cursor-pointer",
     onClick: onToggle
   }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-start justify-between gap-3"
+    className: "flex items-start justify-between gap-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "min-w-0 flex-1"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1015,7 +1027,10 @@ function CandidateCard({
     score: candidate.score
   }), /*#__PURE__*/React.createElement(RatingBadge, {
     rating: candidate.rating
-  }), /*#__PURE__*/React.createElement("a", {
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: function(e) { e.stopPropagation(); if (onMarkViewed) onMarkViewed(candidate.id); },
+    className: viewStatus === "viewed" ? "text-xs px-2 py-0.5 rounded-full bg-blue-900/60 text-blue-300 border border-blue-700 cursor-pointer hover:bg-blue-800/60" : "text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-300 border border-gray-600 cursor-pointer hover:bg-gray-600 animate-pulse"
+  }, viewStatus === "viewed" ? "Profile Viewed" : "Fresh"), /*#__PURE__*/React.createElement("a", {
     href: candidate.linkedin,
     target: "_blank",
     rel: "noopener",
@@ -1034,9 +1049,9 @@ function CandidateCard({
     name: "search",
     className: "w-3 h-3"
   }), " LinkedIn")), /*#__PURE__*/React.createElement("div", {
-    className: "text-sm text-gray-300 mt-0.5"
+    className: "text-sm text-gray-300 mt-1"
   }, candidate.title), /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-3 mt-1 text-xs text-gray-500 flex-wrap"
+    className: "flex items-center gap-3 mt-1.5 text-xs text-gray-500 flex-wrap"
   }, /*#__PURE__*/React.createElement("span", {
     className: "flex items-center gap-1"
   }, /*#__PURE__*/React.createElement(Icon, {
@@ -1053,12 +1068,12 @@ function CandidateCard({
     name: "clock",
     className: "w-3 h-3"
   }), candidate.experience)), /*#__PURE__*/React.createElement("div", {
-    className: "flex gap-1.5 mt-2 flex-wrap"
+    className: "flex gap-1.5 mt-2.5 flex-wrap"
   }, candidate.skills.map((sk, i) => /*#__PURE__*/React.createElement("span", {
     key: i,
     className: "text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full"
   }, sk))), /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-2 mt-2 flex-wrap"
+    className: "flex items-center gap-2 mt-3 flex-wrap"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-xs text-gray-500"
   }, "Sourced:"), /*#__PURE__*/React.createElement("span", {
@@ -1238,15 +1253,25 @@ function CandidateCard({
 // MAIN APP
 // ═══════════════════════════════════════════════════
 function HiringRadarApp() {
-  const [tab, setTab] = useState("dashboard");
+  var hashTab = window.location.hash.replace("#","").toLowerCase();
+  var validTabs = ["dashboard","candidates","kanban","search","outreach","market"];
+  const [tab, setTab] = useState(validTabs.indexOf(hashTab) !== -1 ? hashTab : "dashboard");
   const [expandedId, setExpandedId] = useState(null);
-  const [filterRating, setFilterRating] = useState("STRONG_FIT");
+  const [filterRating, setFilterRating] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [chatOpen, setChatOpen] = useState(true);
   const [showNewSearch, setShowNewSearch] = useState(false);
   const [candidateNotes, setCandidateNotes] = useState({});
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState("Just now");
+  const [viewStatuses, setViewStatuses] = useState({});
+  const markViewed = function(candidateId) {
+    setViewStatuses(function(prev) {
+      var next = Object.assign({}, prev);
+      next[candidateId] = prev[candidateId] === "viewed" ? "fresh" : "viewed";
+      return next;
+    });
+  };
 
   // Dynamic candidates + search history
   const [activeCandidates, setActiveCandidates] = useState(INITIAL_CANDIDATES);
@@ -1310,7 +1335,7 @@ function HiringRadarApp() {
       return {
         ...prev,
         [candidateId]: [...existing, {
-          author: "Ishank",
+          author: "Soumya",
           text,
           tag,
           time: timeStr
@@ -1347,7 +1372,7 @@ function HiringRadarApp() {
   const handleRefresh = () => {
     setRefreshing(true);
     setTimeout(() => {
-      const newCandidates = generateCandidates(searchParams);
+      const newCandidates = REAL_LINKEDIN_CANDIDATES.slice().sort(function(a,b){return b.score - a.score;});
       const newStrings = generateSearchStrings(searchParams);
       setActiveCandidates(newCandidates);
       setActiveSearchStrings(newStrings);
@@ -1418,7 +1443,7 @@ function HiringRadarApp() {
 
   // Export outreach templates
   const exportOutreach = () => {
-    const text = activeCandidates.map((c, i) => `--- Candidate #${i + 1}: ${c.name} (${c.score}/5 — ${c.rating.replace(/_/g, " ")}) ---\n${c.title} at ${c.company}\nLinkedIn: ${c.linkedin}\nEmail: ${c.email}\n\nSubject: Exciting ${searchParams.role} opportunity at ${searchParams.company}\n\nHi ${c.name.split(" ")[0]},\n\n${c.outreach}\n\nWould love to chat about this opportunity. Are you open to a quick call this week?\n\nBest,\nIshank\n${searchParams.company}\n`).join("\n\n");
+    const text = activeCandidates.map((c, i) => `--- Candidate #${i + 1}: ${c.name} (${c.score}/5 — ${c.rating.replace(/_/g, " ")}) ---\n${c.title} at ${c.company}\nLinkedIn: ${c.linkedin}\nEmail: ${c.email}\n\nSubject: Exciting ${searchParams.role} opportunity at ${searchParams.company}\n\nHi ${c.name.split(" ")[0]},\n\n${c.outreach}\n\nI'd love to connect and share more about this role. Would you be open to a quick 15-min call this week?\n\nLooking forward,\nSoumya Sharma\nSoumya Sharma | Athena Executive Search & Consulting\nhttps://www.linkedin.com/in/soumya-sharma-4742251b0/\n`).join("\n\n");
     const blob = new Blob([text], {
       type: "text/plain"
     });
@@ -1625,7 +1650,8 @@ function HiringRadarApp() {
     name: t.icon,
     className: "w-4 h-4"
   }), t.label))))), /*#__PURE__*/React.createElement("div", {
-    className: "flex-1 overflow-y-auto px-4 py-6"
+    className: "flex-1 overflow-y-auto px-6 py-6 border-t border-gray-800",
+    style: {minHeight: 0}
   }, refreshing && /*#__PURE__*/React.createElement("div", {
     className: "bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-4 flex items-center gap-3 fade-in"
   }, /*#__PURE__*/React.createElement("div", {
@@ -2091,7 +2117,7 @@ function HiringRadarApp() {
       setShowNewSearch(false);
       setRefreshing(true);
       setTimeout(() => {
-        const newCandidates = generateCandidates(newSearchForm);
+        const newCandidates = [];
         const newStrings = generateSearchStrings(newSearchForm);
         const newId = Date.now();
         const newSearchEntry = {
@@ -2162,8 +2188,8 @@ function HiringRadarApp() {
   }, /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-2 md:grid-cols-5 gap-3"
   }, [{
-    label: "Total Pool",
-    value: "19,500+",
+    label: "Total Candidates",
+    value: activeCandidates.length,
     icon: "users",
     color: "text-blue-400"
   }, {
@@ -2182,9 +2208,9 @@ function HiringRadarApp() {
     icon: "minus-circle",
     color: "text-orange-400"
   }, {
-    label: "Portals Scanned",
-    value: "30+",
-    icon: "globe",
+    label: "Avg Score",
+    value: activeCandidates.length > 0 ? (activeCandidates.reduce(function(s,c){return s+c.score},0) / activeCandidates.length).toFixed(2) : "0",
+    icon: "bar-chart-2",
     color: "text-purple-400"
   }].map((s, i) => /*#__PURE__*/React.createElement("div", {
     key: i,
@@ -2257,11 +2283,147 @@ function HiringRadarApp() {
   }, Math.max(...activeCandidates.map(c => c.score)).toFixed(2))), /*#__PURE__*/React.createElement("div", null, "Lowest: ", /*#__PURE__*/React.createElement("span", {
     className: "text-orange-400 font-bold"
   }, Math.min(...activeCandidates.map(c => c.score)).toFixed(2)))))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
+    className: "grid grid-cols-1 md:grid-cols-3 gap-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-4"
   }, /*#__PURE__*/React.createElement(ScoreChart, {
     candidates: activeCandidates,
     onScoreChange: handleScoreChange
   })), /*#__PURE__*/React.createElement("div", {
+    className: "md:col-span-2 bg-gray-900 border border-gray-800 rounded-xl p-5"
+  },
+  // Sourcing Funnel & Intelligence Widget
+  /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-4 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {name: "trending-up", className: "w-4 h-4 text-amber-400"}), " Sourcing Intelligence"),
+  /*#__PURE__*/React.createElement("div", {className: "grid grid-cols-2 gap-4"},
+    // Source Effectiveness
+    /*#__PURE__*/React.createElement("div", null,
+      /*#__PURE__*/React.createElement("div", {className: "text-xs font-semibold text-gray-400 uppercase mb-2"}, "Source Effectiveness"),
+      /*#__PURE__*/React.createElement("div", {className: "space-y-2"},
+        (function() {
+          var sources = {};
+          activeCandidates.forEach(function(c) {
+            var s = c.source || "Other";
+            if (!sources[s]) sources[s] = {total: 0, scoreSum: 0};
+            sources[s].total++;
+            sources[s].scoreSum += c.score;
+          });
+          var sourceColors = {"LinkedIn": "bg-blue-500", "Google X-Ray": "bg-amber-500", "Apollo": "bg-emerald-500"};
+          return Object.keys(sources).map(function(key, i) {
+            var avg = (sources[key].scoreSum / sources[key].total).toFixed(1);
+            var pct = Math.round((sources[key].total / activeCandidates.length) * 100);
+            return /*#__PURE__*/React.createElement("div", {key: i, className: "space-y-1"},
+              /*#__PURE__*/React.createElement("div", {className: "flex justify-between text-xs"},
+                /*#__PURE__*/React.createElement("span", {className: "text-gray-300"}, key, " (", sources[key].total, ")"),
+                /*#__PURE__*/React.createElement("span", {className: "text-gray-400"}, "Avg ", avg)
+              ),
+              /*#__PURE__*/React.createElement("div", {className: "w-full bg-gray-800 rounded-full h-2"},
+                /*#__PURE__*/React.createElement("div", {className: (sourceColors[key] || "bg-gray-600") + " h-2 rounded-full", style: {width: pct + "%"}})
+              )
+            );
+          });
+        })()
+      )
+    ),
+    // Top Companies
+    /*#__PURE__*/React.createElement("div", null,
+      /*#__PURE__*/React.createElement("div", {className: "text-xs font-semibold text-gray-400 uppercase mb-2"}, "Top Companies in Pool"),
+      /*#__PURE__*/React.createElement("div", {className: "space-y-1.5"},
+        (function() {
+          var companies = {};
+          activeCandidates.forEach(function(c) {
+            var comp = c.company || "Unknown";
+            companies[comp] = (companies[comp] || 0) + 1;
+          });
+          return Object.keys(companies).sort(function(a,b){return companies[b]-companies[a]}).slice(0, 6).map(function(comp, i) {
+            return /*#__PURE__*/React.createElement("div", {key: i, className: "flex justify-between items-center text-xs"},
+              /*#__PURE__*/React.createElement("span", {className: "text-gray-300 truncate"}, comp),
+              /*#__PURE__*/React.createElement("span", {className: "text-xs bg-gray-800 text-amber-400 px-1.5 py-0.5 rounded-full font-mono"}, companies[comp])
+            );
+          });
+        })()
+      )
+    )
+  ),
+  // Response Rate & Pipeline Stats
+  /*#__PURE__*/React.createElement("div", {className: "mt-4 pt-3 border-t border-gray-800 grid grid-cols-3 gap-3"},
+    /*#__PURE__*/React.createElement("div", {className: "text-center"},
+      /*#__PURE__*/React.createElement("div", {className: "text-lg font-bold text-emerald-400"}, activeCandidates.filter(function(c){return c.rating === "STRONG_FIT"}).length),
+      /*#__PURE__*/React.createElement("div", {className: "text-xs text-gray-500"}, "Ready to Outreach")
+    ),
+    /*#__PURE__*/React.createElement("div", {className: "text-center"},
+      /*#__PURE__*/React.createElement("div", {className: "text-lg font-bold text-blue-400"}, activeCandidates.filter(function(c){return c.linkedin && c.linkedin.includes("linkedin.com")}).length),
+      /*#__PURE__*/React.createElement("div", {className: "text-xs text-gray-500"}, "LinkedIn Verified")
+    ),
+    /*#__PURE__*/React.createElement("div", {className: "text-center"},
+      /*#__PURE__*/React.createElement("div", {className: "text-lg font-bold text-amber-400"}, (function(){var locs={}; activeCandidates.forEach(function(c){var l=c.location||""; var city=l.split(",")[0].trim(); if(city) locs[city]=(locs[city]||0)+1;}); return Object.keys(locs).length;})()),
+      /*#__PURE__*/React.createElement("div", {className: "text-xs text-gray-500"}, "Unique Locations")
+    )
+  )
+  ), /*#__PURE__*/React.createElement("div", {
+    className: "md:col-span-3 bg-gray-900 border border-gray-800 rounded-xl p-5"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-300 uppercase mb-4 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "activity",
+    className: "w-4 h-4 text-amber-400"
+  }), " Sourcing Activity"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-4 gap-2"
+  }, [{
+    label: "LinkedIn",
+    count: activeCandidates.filter(function(c){return c.source === "LinkedIn"}).length,
+    color: "text-blue-400 bg-blue-900/30"
+  }, {
+    label: "Apollo",
+    count: activeCandidates.filter(function(c){return c.source === "Apollo"}).length,
+    color: "text-emerald-400 bg-emerald-900/30"
+  }, {
+    label: "Google X-Ray",
+    count: activeCandidates.filter(function(c){return c.source === "Google X-Ray"}).length,
+    color: "text-amber-400 bg-amber-900/30"
+  }, {
+    label: "Other",
+    count: activeCandidates.filter(function(c){return c.source !== "LinkedIn" && c.source !== "Apollo" && c.source !== "Google X-Ray"}).length,
+    color: "text-gray-400 bg-gray-800"
+  }].map(function(s, i) { return /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "rounded-lg p-2.5 " + s.color
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-lg font-bold"
+  }, s.count), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs opacity-70"
+  }, s.label)); })), /*#__PURE__*/React.createElement("div", {
+    className: "border-t border-gray-800 pt-3 mt-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-semibold text-gray-400 uppercase mb-2"
+  }, "Quick Stats"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1.5"
+  }, [{
+    icon: "users",
+    text: activeCandidates.length + " candidates sourced across portals",
+    color: "text-blue-400"
+  }, {
+    icon: "target",
+    text: activeCandidates.filter(function(c){return c.rating==="STRONG_FIT"}).length + " Strong Fits ready for outreach",
+    color: "text-emerald-400"
+  }, {
+    icon: "map-pin",
+    text: activeCandidates.filter(function(c){return c.location && c.location.includes("India")}).length + " based in India",
+    color: "text-cyan-400"
+  }, {
+    icon: "linkedin",
+    text: activeCandidates.filter(function(c){return c.linkedin && c.linkedin.includes("linkedin.com/in/")}).length + " with verified LinkedIn profiles",
+    color: "text-sky-400"
+  }].map(function(item, i) { return /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "flex items-center gap-2 text-xs text-gray-300"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: item.icon,
+    className: "w-3 h-3 " + item.color
+  }), item.text); }))))))), /*#__PURE__*/React.createElement("div", {
     className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
   }, /*#__PURE__*/React.createElement("h3", {
     className: "text-sm font-bold text-gray-300 uppercase mb-1 flex items-center gap-2"
@@ -2331,9 +2493,7 @@ function HiringRadarApp() {
   }, "No searches yet. Click \"New Search\" to get started."))), tab === "candidates" && /*#__PURE__*/React.createElement("div", {
     className: "space-y-4 fade-in"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-3 flex-wrap"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "relative flex-1 min-w-48"
+    className: "relative"
   }, /*#__PURE__*/React.createElement("div", {
     className: "absolute left-3 top-1/2 -translate-y-1/2"
   }, /*#__PURE__*/React.createElement(Icon, {
@@ -2341,27 +2501,31 @@ function HiringRadarApp() {
     className: "w-4 h-4 text-gray-500"
   })), /*#__PURE__*/React.createElement("input", {
     value: searchQuery,
-    onChange: e => setSearchQuery(e.target.value),
+    onChange: function(e) { setSearchQuery(e.target.value); },
     placeholder: "Search by name, company, title, industry...",
     className: "w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500"
   })), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3 flex-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center gap-1 bg-gray-800 border border-gray-700 rounded-lg p-0.5"
-  }, ["ALL", "STRONG_FIT", "GOOD_FIT", "PARTIAL_FIT"].map(r => /*#__PURE__*/React.createElement("button", {
+  }, ["ALL", "STRONG_FIT", "GOOD_FIT", "PARTIAL_FIT"].map(function(r) { return /*#__PURE__*/React.createElement("button", {
     key: r,
-    onClick: () => setFilterRating(r),
-    className: `text-xs px-2.5 py-1.5 rounded-md transition-colors ${filterRating === r ? "bg-amber-500 text-gray-950 font-semibold" : "text-gray-400 hover:text-white"}`
-  }, r === "ALL" ? "All" : r.replace(/_/g, " "))))), /*#__PURE__*/React.createElement("div", {
+    onClick: function() { setFilterRating(r); },
+    className: filterRating === r ? "text-xs px-2.5 py-1.5 rounded-md bg-amber-500 text-gray-950 font-semibold transition-colors" : "text-xs px-2.5 py-1.5 rounded-md text-gray-400 hover:text-white transition-colors"
+  }, r === "ALL" ? "All" : r.replace(/_/g, " ")); })), /*#__PURE__*/React.createElement("span", {
     className: "text-xs text-gray-500"
-  }, filteredCandidates.length, " candidates shown"), /*#__PURE__*/React.createElement("div", {
-    className: "space-y-3"
-  }, filteredCandidates.map(c => /*#__PURE__*/React.createElement(CandidateCard, {
+  }, filteredCandidates.length, " of ", activeCandidates.length, " candidates")), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, filteredCandidates.map(function(c) { return /*#__PURE__*/React.createElement(CandidateCard, {
     key: c.id,
     candidate: c,
     expanded: expandedId === c.id,
-    onToggle: () => setExpandedId(expandedId === c.id ? null : c.id),
+    onToggle: function() { setExpandedId(expandedId === c.id ? null : c.id); if (!viewStatuses[c.id]) markViewed(c.id); },
     notes: candidateNotes[c.id] || [],
-    onAddNote: addNote
-  })))), tab === "kanban" && /*#__PURE__*/React.createElement("div", {
+    onAddNote: addNote,
+    viewStatus: viewStatuses[c.id] || "fresh",
+    onMarkViewed: markViewed
+  }); }))), tab === "kanban" && /*#__PURE__*/React.createElement("div", {
     className: "fade-in"
   }, /*#__PURE__*/React.createElement(KanbanBoard, {
     candidates: activeCandidates
@@ -2417,7 +2581,7 @@ function HiringRadarApp() {
     className: "w-4 h-4 text-amber-400"
   }), " Personalized Outreach Templates"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-gray-500"
-  }, "Click copy to grab full email with greeting + angle + CTA.")), activeCandidates.map((c, i) => /*#__PURE__*/React.createElement("div", {
+  }, "LinkedIn connection request + Email templates — personalized for each candidate. Via Soumya Sharma's LinkedIn.")), activeCandidates.map((c, i) => /*#__PURE__*/React.createElement("div", {
     key: c.id,
     className: "bg-gray-800 border border-gray-700 rounded-xl p-4"
   }, /*#__PURE__*/React.createElement("div", {
@@ -2445,15 +2609,15 @@ function HiringRadarApp() {
     className: "flex items-center justify-between mb-2"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-xs font-semibold text-blue-400 uppercase"
-  }, "Email / InMail Template"), /*#__PURE__*/React.createElement(CopyBtn, {
-    text: `Hi ${c.name.split(" ")[0]},\n\n${c.outreach}\n\nWould love to chat about this opportunity. Are you open to a quick call this week?\n\nBest,\nIshank\nTheHireHub.AI`
+  }, "LinkedIn InMail Template"), /*#__PURE__*/React.createElement(CopyBtn, {
+    text: `Hi ${c.name.split(" ")[0]},\n\n${c.outreach}\n\nI'd love to connect and share more about this role. Would you be open to a quick 15-min call this week?\n\nLooking forward,\nSoumya Sharma\nSoumya Sharma | Athena Executive Search & Consulting\nhttps://www.linkedin.com/in/soumya-sharma-4742251b0/`
   })), /*#__PURE__*/React.createElement("div", {
     className: "text-sm text-gray-300 space-y-1.5"
   }, /*#__PURE__*/React.createElement("div", {
     className: "text-gray-500 text-xs"
-  }, "Subject: Exciting ", searchParams.role, " opportunity at ", searchParams.company), /*#__PURE__*/React.createElement("div", null, "Hi ", c.name.split(" ")[0], ","), /*#__PURE__*/React.createElement("div", null, c.outreach), /*#__PURE__*/React.createElement("div", null, "Would love to chat about this opportunity. Are you open to a quick call this week?"), /*#__PURE__*/React.createElement("div", {
+  }, "Subject: Exciting ", searchParams.role, " opportunity at ", searchParams.company), /*#__PURE__*/React.createElement("div", null, "Hi ", c.name.split(" ")[0], ","), /*#__PURE__*/React.createElement("div", null, c.outreach), /*#__PURE__*/React.createElement("div", null, "I'd love to connect and share more about this role. Would you be open to a quick 15-min call this week?"), /*#__PURE__*/React.createElement("div", {
     className: "text-gray-500"
-  }, "Best,", /*#__PURE__*/React.createElement("br", null), "Ishank", /*#__PURE__*/React.createElement("br", null), searchParams.company)))))), tab === "market" && /*#__PURE__*/React.createElement("div", {
+  }, "Looking forward,", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma | Athena Executive Search & Consulting"))))), tab === "market" && /*#__PURE__*/React.createElement("div", {
     className: "space-y-4 fade-in"
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
@@ -2465,17 +2629,17 @@ function HiringRadarApp() {
   }), " Talent Pool Breakdown"), /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-2 md:grid-cols-4 gap-3"
   }, [{
-    label: "Sales Managers (6-7yr, SaaS/AI, NCR)",
-    value: "~19,500"
+    label: "Total Sourced Candidates",
+    value: activeCandidates.length
   }, {
-    label: "HR Tech-specific sales (NCR)",
-    value: "~50-80"
+    label: "HR Tech Sales Matches",
+    value: activeCandidates.filter(function(c){return c.industry && c.industry.toLowerCase().includes("hr tech")}).length
   }, {
-    label: "AI company sales managers (NCR)",
-    value: "~150"
+    label: "Strong Fit Candidates",
+    value: activeCandidates.filter(function(c){return c.rating === "STRONG_FIT"}).length
   }, {
-    label: "Recruitment tech sales (direct match)",
-    value: "~30"
+    label: "With LinkedIn Profiles",
+    value: activeCandidates.filter(function(c){return c.linkedin && c.linkedin.includes("linkedin.com/in/")}).length
   }].map((s, i) => /*#__PURE__*/React.createElement("div", {
     key: i,
     className: "bg-gray-800 rounded-lg p-3"
