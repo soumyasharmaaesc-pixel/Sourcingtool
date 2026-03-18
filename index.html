@@ -150,6 +150,155 @@ function generateSearchStrings(params) {
   }];
 }
 
+// ── Live Search Engine — Google X-Ray via Serper.dev ──
+async function liveXRaySearch(searchParams, apiKey) {
+  var role = searchParams.role || "Head of Sales";
+  var location = (searchParams.location || "India").split(",")[0].trim();
+  var industry = (searchParams.industry || "SaaS").split("/")[0].trim();
+  var skills = searchParams.mustHave || searchParams.mustHaveSkills || "";
+  var topSkill = skills.split(",")[0].trim();
+  var company = searchParams.company || "";
+
+  // Build multiple X-Ray queries for breadth
+  var queries = [
+    { q: 'site:linkedin.com/in/ "' + role + '" "' + industry + '" "' + location + '"', source: "Google X-Ray", count: 20 },
+    { q: 'site:linkedin.com/in/ "' + role + '" "' + (topSkill || industry) + '"', source: "Google X-Ray", count: 15 },
+    { q: 'site:linkedin.com/in/ ("' + role + '" OR "' + role.replace("Head of", "Director") + '") "' + industry + '"', source: "Google X-Ray", count: 15 }
+  ];
+
+  var allResults = [];
+  var seenUrls = {};
+
+  for (var i = 0; i < queries.length; i++) {
+    try {
+      var resp = await fetch("https://google.serper.dev/search", {
+        method: "POST",
+        headers: { "X-API-KEY": apiKey, "Content-Type": "application/json" },
+        body: JSON.stringify({ q: queries[i].q, num: queries[i].count, gl: "in" })
+      });
+      if (!resp.ok) {
+        console.warn("Serper API error:", resp.status);
+        continue;
+      }
+      var data = await resp.json();
+      (data.organic || []).forEach(function(r) {
+        if (r.link && r.link.includes("linkedin.com/in/") && !seenUrls[r.link]) {
+          seenUrls[r.link] = true;
+          r._source = queries[i].source;
+          allResults.push(r);
+        }
+      });
+    } catch(e) {
+      console.warn("Search query failed:", e);
+    }
+  }
+
+  // Parse results into candidate objects
+  var candidates = allResults.map(function(r, idx) {
+    var titleParts = (r.title || "").replace(/ \| LinkedIn$/i, "").replace(/ - LinkedIn$/i, "");
+    var segments = titleParts.split(" - ").map(function(s) { return s.trim(); });
+    var name = segments[0] || "Unknown";
+    var jobTitle = segments[1] || "";
+    var companyName = segments[2] || "";
+    if (segments.length === 2) { companyName = ""; }
+
+    // Extract from snippet
+    var snippet = r.snippet || "";
+    var locationMatch = snippet.match(/(?:Location|Based in|Located in)[:\s]*([^·\n|]+)/i);
+    var expMatch = snippet.match(/(\d+)\+?\s*(?:yr|year)/i);
+    var candidateLocation = locationMatch ? locationMatch[1].trim() : "";
+
+    // Clean LinkedIn URL
+    var linkedinUrl = r.link.split("?")[0];
+    if (!linkedinUrl.endsWith("/")) linkedinUrl += "/";
+    var linkedinSlug = linkedinUrl.replace(/.*linkedin\.com\/in\//, "").replace(/\/$/, "");
+
+    // Score based on keyword matching
+    var score = 3.0;
+    var matchReasons = [];
+    var roleLower = role.toLowerCase();
+    var titleLower = (jobTitle + " " + titleParts).toLowerCase();
+    var snippetLower = snippet.toLowerCase();
+    var industryLower = industry.toLowerCase();
+
+    if (titleLower.includes(roleLower) || titleLower.includes(roleLower.replace("head of ", ""))) {
+      score += 0.6; matchReasons.push("Role title match");
+    }
+    if (titleLower.includes("head") || titleLower.includes("director") || titleLower.includes("vp")) {
+      score += 0.3; matchReasons.push("Senior leadership");
+    }
+    if (industryLower && (titleLower.includes(industryLower) || snippetLower.includes(industryLower))) {
+      score += 0.4; matchReasons.push("Industry match: " + industry);
+    }
+    if (topSkill && (titleLower.includes(topSkill.toLowerCase()) || snippetLower.includes(topSkill.toLowerCase()))) {
+      score += 0.3; matchReasons.push("Skill match: " + topSkill);
+    }
+    if (location.toLowerCase() !== "india" && (snippetLower.includes(location.toLowerCase()) || (candidateLocation && candidateLocation.toLowerCase().includes(location.toLowerCase())))) {
+      score += 0.2; matchReasons.push("Location match");
+    }
+    score = Math.min(score, 5.0);
+    score = Math.round(score * 100) / 100;
+
+    var rating = score >= 4.0 ? "STRONG_FIT" : score >= 3.5 ? "GOOD_FIT" : "PARTIAL_FIT";
+
+    // Extract skills from snippet keywords
+    var skillKeywords = (skills || "").split(",").map(function(s) { return s.trim(); }).filter(Boolean);
+    var detectedSkills = skillKeywords.filter(function(sk) {
+      return snippetLower.includes(sk.toLowerCase());
+    });
+    if (detectedSkills.length === 0) {
+      // Fallback: extract key phrases from title
+      detectedSkills = jobTitle.split(/[|,·]/).map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 2 && s.length < 40; }).slice(0, 5);
+    }
+
+    var encodedName = encodeURIComponent('"' + name + '"');
+    var encodedCompany = companyName ? encodeURIComponent('"' + companyName + '"') : "";
+
+    return {
+      id: Date.now() + idx + Math.floor(Math.random() * 10000),
+      name: name,
+      title: jobTitle || titleParts,
+      company: companyName,
+      location: candidateLocation || "India",
+      experience: expMatch ? expMatch[1] + "+ yrs" : "—",
+      industry: industry,
+      score: score,
+      rating: rating,
+      skills: detectedSkills.length > 0 ? detectedSkills : [industry, "Sales", "Leadership"],
+      email: "Enrichment needed",
+      phone: "Enrichment needed",
+      source: r._source || "Google X-Ray",
+      linkedin: linkedinUrl,
+      linkedinDirect: linkedinUrl,
+      sourceLinks: {
+        linkedin: linkedinUrl,
+        linkedinDirect: linkedinUrl,
+        naukri: "https://www.google.com/search?q=site:naukri.com+" + encodedName + (encodedCompany ? "+" + encodedCompany : ""),
+        google: "https://www.google.com/search?q=" + encodedName + (encodedCompany ? "+" + encodedCompany : "") + "+%22" + encodeURIComponent(role) + "%22"
+      },
+      strengths: matchReasons.length > 0 ? matchReasons : ["Found via Google X-Ray search"],
+      concerns: ["Verify profile details on LinkedIn"],
+      outreach: "Your profile came up in our search for " + role + " candidates — we'd love to connect about an exciting opportunity at " + company + ".",
+      scores: { role: score >= 4 ? 5 : 4, skills: detectedSkills.length >= 3 ? 5 : 3, industry: titleLower.includes(industryLower) ? 5 : 3, company: 3, trajectory: 4, location: candidateLocation.toLowerCase().includes(location.toLowerCase()) ? 5 : 3, comp: 3, stability: 3 }
+    };
+  });
+
+  // Sort by score descending
+  candidates.sort(function(a, b) { return b.score - a.score; });
+  return candidates;
+}
+
+// Fallback: open X-Ray search tabs in browser
+function openXRayTabs(searchParams) {
+  var role = searchParams.role || "Head of Sales";
+  var location = (searchParams.location || "India").split(",")[0].trim();
+  var industry = (searchParams.industry || "SaaS").split("/")[0].trim();
+  var q1 = encodeURIComponent('site:linkedin.com/in/ "' + role + '" "' + industry + '" "' + location + '"');
+  var q2 = encodeURIComponent('site:linkedin.com/in/ "' + role + '" "' + industry + '"');
+  window.open("https://www.google.com/search?q=" + q1, "_blank");
+  setTimeout(function() { window.open("https://www.google.com/search?q=" + q2, "_blank"); }, 500);
+}
+
 // Real candidates sourced from LinkedIn Search
 var REAL_LINKEDIN_CANDIDATES = [
   { id: 9001, name: "A. K. Chaubey", title: "Head of Sales (India) | Scaled HR Tech SaaS", company: "Keka", location: "Hyderabad, India", experience: "10+ yrs", industry: "HR Tech / SaaS", score: 4.65, rating: "STRONG_FIT", skills: ["HR Tech SaaS","Enterprise Sales","Mid-Market GTM","Team Building","Revenue Growth"], email: "Enrichment needed", phone: "Enrichment needed", source: "LinkedIn", linkedin: "https://www.linkedin.com/in/akchaubey/", linkedinDirect: "https://www.linkedin.com/in/akchaubey/", sourceLinks: { linkedin: "https://www.linkedin.com/in/akchaubey/", linkedinDirect: "https://www.linkedin.com/in/akchaubey/", naukri: "https://www.google.com/search?q=site:naukri.com+%22A+K+Chaubey%22+%22Keka%22", indeed: "https://www.google.com/search?q=site:indeed.com+%22A+K+Chaubey%22+%22Keka%22", google: "https://www.google.com/search?q=%22A+K+Chaubey%22+%22Keka%22+%22Head+of+Sales%22" }, strengths: ["Scaled HR Tech SaaS sales at Keka — direct domain match","Enterprise & Mid-Market GTM experience"], concerns: ["Based in Hyderabad — relocation may be needed"], outreach: "Your track record scaling HR Tech SaaS sales at Keka is exactly what TheHireHub.AI needs for the Head of Sales role.", scores: { role:5, skills:5, industry:5, company:5, trajectory:4, location:3, comp:4, stability:4 } },
@@ -1333,6 +1482,10 @@ function HiringRadarApp() {
   const [showNewSearch, setShowNewSearch] = useState(false);
   const [candidateNotes, setCandidateNotes] = useState({});
   const [refreshing, setRefreshing] = useState(false);
+  const [searchProgress, setSearchProgress] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
+  const [serperApiKey, setSerperApiKey] = useState(function() { try { return localStorage.getItem("hireintel_serper_key") || ""; } catch(e) { return ""; } });
+  const saveApiKey = function(key) { setSerperApiKey(key); try { localStorage.setItem("hireintel_serper_key", key); } catch(e) {} };
   const [lastRefresh, setLastRefresh] = useState("Just now");
   const [viewStatuses, setViewStatuses] = useState({});
   const markViewed = function(candidateId) {
@@ -1705,6 +1858,13 @@ function HiringRadarApp() {
     name: "file-json",
     className: "w-4 h-4 text-amber-400"
   }), " Full Report (.json)"))), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowSettings(!showSettings),
+    className: "flex items-center gap-1.5 text-gray-400 hover:text-white text-sm px-3 py-2 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors",
+    title: "API Settings"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "settings",
+    className: "w-4 h-4"
+  }), serperApiKey ? /*#__PURE__*/React.createElement("div", { className: "w-2 h-2 rounded-full bg-emerald-400" }) : /*#__PURE__*/React.createElement("div", { className: "w-2 h-2 rounded-full bg-gray-600" })), /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowNewSearch(!showNewSearch),
     className: "flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-gray-950 text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-lg shadow-amber-500/20"
   }, /*#__PURE__*/React.createElement(Icon, {
@@ -1722,7 +1882,43 @@ function HiringRadarApp() {
   }), t.label))))), /*#__PURE__*/React.createElement("div", {
     className: "flex-1 overflow-y-auto px-6 py-6 border-t border-gray-800",
     style: {minHeight: 0}
-  }, refreshing && /*#__PURE__*/React.createElement("div", {
+  }, showSettings && /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-900 border border-gray-800 rounded-xl p-5 mb-4 fade-in"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-4"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-white flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, { name: "settings", className: "w-4 h-4 text-amber-400" }), "Live Search Settings"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowSettings(false),
+    className: "text-gray-500 hover:text-white transition-colors"
+  }, /*#__PURE__*/React.createElement(Icon, { name: "x", className: "w-4 h-4" }))),
+    /*#__PURE__*/React.createElement("div", { className: "space-y-4" },
+      /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement("label", { className: "text-xs text-gray-400 block mb-1.5" }, "Serper.dev API Key ", /*#__PURE__*/React.createElement("span", { className: "text-gray-600" }, "(free — 2,500 searches)")),
+        /*#__PURE__*/React.createElement("div", { className: "flex gap-2" },
+          /*#__PURE__*/React.createElement("input", {
+            type: "password",
+            value: serperApiKey,
+            onChange: e => saveApiKey(e.target.value),
+            placeholder: "Paste your Serper.dev API key here...",
+            className: "flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500"
+          }),
+          serperApiKey && /*#__PURE__*/React.createElement("div", {
+            className: "flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 px-3 rounded-lg"
+          }, /*#__PURE__*/React.createElement(Icon, { name: "check-circle", className: "w-3.5 h-3.5" }), "Connected")
+        )
+      ),
+      /*#__PURE__*/React.createElement("div", {
+        className: "bg-gray-800/50 rounded-lg p-3 text-xs text-gray-400 space-y-1.5"
+      },
+        /*#__PURE__*/React.createElement("div", { className: "text-gray-300 font-semibold mb-1" }, "Quick Setup (2 minutes):"),
+        /*#__PURE__*/React.createElement("div", null, "1. Go to ", /*#__PURE__*/React.createElement("a", { href: "https://serper.dev", target: "_blank", className: "text-amber-400 hover:underline" }, "serper.dev"), " and create a free account"),
+        /*#__PURE__*/React.createElement("div", null, "2. Copy your API key from the dashboard"),
+        /*#__PURE__*/React.createElement("div", null, "3. Paste it above — that's it! Your searches will now find real LinkedIn profiles via Google X-Ray"),
+        /*#__PURE__*/React.createElement("div", { className: "text-gray-500 mt-2" }, "Without an API key, searches will open Google X-Ray tabs in your browser for manual sourcing.")
+      )
+    )
+  ), refreshing && /*#__PURE__*/React.createElement("div", {
     className: "bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-4 flex items-center gap-3 fade-in"
   }, /*#__PURE__*/React.createElement("div", {
     className: "animate-spin"
@@ -1731,9 +1927,9 @@ function HiringRadarApp() {
     className: "w-5 h-5 text-amber-400"
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "text-sm font-semibold text-amber-400"
-  }, "Searching for candidates..."), /*#__PURE__*/React.createElement("div", {
+  }, serperApiKey ? "Live sourcing in progress..." : "Searching for candidates..."), /*#__PURE__*/React.createElement("div", {
     className: "text-xs text-gray-500"
-  }, "Querying Apollo API \u2192 Scraping LinkedIn profiles \u2192 Scoring & ranking \u2192 Generating search strings"))), showNewSearch && /*#__PURE__*/React.createElement("div", {
+  }, searchProgress || "Google X-Ray \u2192 LinkedIn profiles \u2192 Scoring & ranking \u2192 Building candidate cards"))), showNewSearch && /*#__PURE__*/React.createElement("div", {
     className: "bg-gray-900 border border-amber-500/30 rounded-2xl p-6 mb-6 relative fade-in shadow-xl shadow-amber-500/5"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowNewSearch(false),
@@ -2186,11 +2382,38 @@ function HiringRadarApp() {
       setSearchParams(newParams);
       setShowNewSearch(false);
       setRefreshing(true);
-      setTimeout(() => {
-        const newCandidates = [];
-        const newStrings = generateSearchStrings(newSearchForm);
-        const newId = Date.now();
-        const newSearchEntry = {
+      setSearchProgress("Generating search strings...");
+
+      var doSearch = async function() {
+        var newStrings = generateSearchStrings(newSearchForm);
+        var newId = Date.now();
+        var newCandidates = [];
+
+        if (serperApiKey) {
+          // LIVE SEARCH via Serper.dev Google X-Ray
+          try {
+            setSearchProgress("Querying Google X-Ray for LinkedIn profiles...");
+            newCandidates = await liveXRaySearch({
+              role: newSearchForm.role,
+              location: newSearchForm.location,
+              industry: newSearchForm.industry,
+              mustHave: newSearchForm.mustHaveSkills,
+              company: newSearchForm.company
+            }, serperApiKey);
+            setSearchProgress("Found " + newCandidates.length + " candidates! Processing...");
+          } catch(e) {
+            console.error("Live search failed:", e);
+            setSearchProgress("API search failed — opening Google tabs instead...");
+            openXRayTabs(newSearchForm);
+          }
+        } else {
+          // No API key — open Google X-Ray tabs for manual sourcing
+          setSearchProgress("No API key set — opening Google X-Ray search tabs...");
+          openXRayTabs(newSearchForm);
+          await new Promise(function(r) { setTimeout(r, 2000); });
+        }
+
+        var newSearchEntry = {
           id: newId,
           date: new Date().toISOString().slice(0, 10),
           role: newSearchForm.role,
@@ -2211,6 +2434,7 @@ function HiringRadarApp() {
         setActiveSearchStrings(newStrings);
         setActiveSearchId(newId);
         setRefreshing(false);
+        setSearchProgress("");
         setTab("candidates");
         setLastRefresh(new Date().toLocaleTimeString("en-US", {
           hour: "2-digit",
@@ -2247,7 +2471,8 @@ function HiringRadarApp() {
           salesMethodology: "",
           notes: ""
         });
-      }, 3000);
+      };
+      doSearch();
     },
     className: "flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-gray-950 text-sm font-bold px-6 py-2.5 rounded-lg transition-colors shadow-lg shadow-amber-500/20"
   }, /*#__PURE__*/React.createElement(Icon, {
