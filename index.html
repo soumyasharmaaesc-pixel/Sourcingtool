@@ -2491,7 +2491,10 @@ function HiringRadarApp() {
   })))), searchHistory.length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "text-center text-gray-600 text-sm py-6"
   }, "No searches yet. Click \"New Search\" to get started."))), tab === "candidates" && /*#__PURE__*/React.createElement("div", {
-    className: "space-y-4 fade-in"
+    className: "fade-in flex flex-col",
+    style: {height: "calc(100vh - 180px)", minHeight: 0}
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex-shrink-0 space-y-3 pb-3"
   }, /*#__PURE__*/React.createElement("div", {
     className: "relative"
   }, /*#__PURE__*/React.createElement("div", {
@@ -2514,8 +2517,9 @@ function HiringRadarApp() {
     className: filterRating === r ? "text-xs px-2.5 py-1.5 rounded-md bg-amber-500 text-gray-950 font-semibold transition-colors" : "text-xs px-2.5 py-1.5 rounded-md text-gray-400 hover:text-white transition-colors"
   }, r === "ALL" ? "All" : r.replace(/_/g, " ")); })), /*#__PURE__*/React.createElement("span", {
     className: "text-xs text-gray-500"
-  }, filteredCandidates.length, " of ", activeCandidates.length, " candidates")), /*#__PURE__*/React.createElement("div", {
-    className: "space-y-4"
+  }, filteredCandidates.length, " of ", activeCandidates.length, " candidates"))), /*#__PURE__*/React.createElement("div", {
+    className: "flex-1 overflow-y-auto space-y-4",
+    style: {minHeight: 0}
   }, filteredCandidates.map(function(c) { return /*#__PURE__*/React.createElement(CandidateCard, {
     key: c.id,
     candidate: c,
