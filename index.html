@@ -2145,7 +2145,8 @@ function CandidateCard({
   notes,
   onAddNote,
   viewStatus,
-  onMarkViewed
+  onMarkViewed,
+  crossSearchBadges
 }) {
   const s = candidate.scores;
   const [noteInput, setNoteInput] = useState("");
@@ -2209,7 +2210,15 @@ function CandidateCard({
   }, candidate.skills.map((sk, i) => /*#__PURE__*/React.createElement("span", {
     key: i,
     className: "text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full"
-  }, sk))), /*#__PURE__*/React.createElement("div", {
+  }, sk))), crossSearchBadges && crossSearchBadges.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-1.5 mt-2 flex-wrap"
+  }, /*#__PURE__*/React.createElement(Icon, { name: "copy", className: "w-3 h-3 text-violet-400" }),
+    /*#__PURE__*/React.createElement("span", { className: "text-xs text-violet-400" }, "Also in:"),
+    crossSearchBadges.map(function(badge, bi) { return /*#__PURE__*/React.createElement("span", {
+      key: bi,
+      className: "text-xs px-1.5 py-0.5 rounded bg-violet-900/40 text-violet-300 border border-violet-700/50"
+    }, badge); })
+  ), /*#__PURE__*/React.createElement("div", {
     className: "flex items-center gap-2 mt-3 flex-wrap"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-xs text-gray-500"
@@ -2425,12 +2434,43 @@ function HiringRadarApp() {
     });
   };
 
-  // Dynamic candidates + search history
-  const [activeCandidates, setActiveCandidates] = useState(INITIAL_CANDIDATES);
-  const [activeSearchStrings, setActiveSearchStrings] = useState(INITIAL_SEARCH_STRINGS);
-  const [activeSearchId, setActiveSearchId] = useState(1);
-  const [searchHistory, setSearchHistory] = useState([{
-    id: 1,
+  // ── Deep clone helper (strips functions/_experienceData circular refs) ──
+  var deepCloneCandidates = function(cands) {
+    return cands.map(function(c) { return Object.assign({}, c); });
+  };
+
+  // ── localStorage helpers ──
+  var STORAGE_KEY = "hireintel_searches";
+  var saveSearchesToStorage = function(searches) {
+    try {
+      var serializable = searches.map(function(s) {
+        return Object.assign({}, s, {
+          candidates: deepCloneCandidates(s.candidates || [])
+        });
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
+    } catch(e) { console.warn("localStorage save failed:", e); }
+  };
+  var loadSearchesFromStorage = function() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Re-enrich experience data for loaded candidates
+        parsed.forEach(function(s) {
+          if (s.candidates) enrichCandidatesWithExperience(s.candidates);
+        });
+        return parsed;
+      }
+    } catch(e) { console.warn("localStorage load failed:", e); }
+    return null;
+  };
+
+  // ── Initialize from localStorage or defaults ──
+  var storedSearches = loadSearchesFromStorage();
+  var defaultSearch = {
+    id: "search_headofsales_1710001234",
     date: "2026-03-17",
     role: "Head of Sales",
     company: "TheHireHub.AI",
@@ -2438,8 +2478,8 @@ function HiringRadarApp() {
     experience: "6-7 years",
     industry: "SaaS / AI / HR Tech",
     status: "Active",
-    candidates: INITIAL_CANDIDATES,
-    searchStrings: INITIAL_SEARCH_STRINGS,
+    candidates: deepCloneCandidates(INITIAL_CANDIDATES),
+    searchStrings: INITIAL_SEARCH_STRINGS.slice(),
     params: {
       role: "Head of Sales",
       company: "TheHireHub.AI",
@@ -2449,23 +2489,100 @@ function HiringRadarApp() {
       mustHave: "B2B SaaS Sales, Revenue Growth, GTM Strategy, Team Building",
       niceToHave: "AI/HR Tech domain, Ecosystem-led sales",
       benchmark: "Debdeep Nandy — Manager Enterprise Sales, SaaS Labs",
-      priceBand: "₹25L-40L CTC + equity",
+      priceBand: "\u20B925L-40L CTC + equity",
       scope: "India"
     }
-  }]);
+  };
+  var initialSearches = storedSearches || [defaultSearch];
+  var initialActiveId = (function() {
+    var active = initialSearches.find(function(s) { return s.status === "Active"; });
+    return active ? active.id : initialSearches[0].id;
+  })();
+  var initialActiveCands = (function() {
+    var active = initialSearches.find(function(s) { return s.id === initialActiveId; });
+    return active ? deepCloneCandidates(active.candidates || []) : deepCloneCandidates(INITIAL_CANDIDATES);
+  })();
+  var initialActiveStrings = (function() {
+    var active = initialSearches.find(function(s) { return s.id === initialActiveId; });
+    return active && active.searchStrings ? active.searchStrings.slice() : INITIAL_SEARCH_STRINGS.slice();
+  })();
+
+  // Dynamic candidates + search history
+  const [activeCandidates, setActiveCandidates] = useState(initialActiveCands);
+  const [activeSearchStrings, setActiveSearchStrings] = useState(initialActiveStrings);
+  const [activeSearchId, setActiveSearchId] = useState(initialActiveId);
+  const [searchHistory, setSearchHistory] = useState(initialSearches);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  // ── Persist searchHistory to localStorage on every change ──
+  useEffect(function() {
+    saveSearchesToStorage(searchHistory);
+  }, [searchHistory]);
+
+  // ── Helper: sync active candidates into searchHistory for the active search ──
+  var syncActiveToHistory = function(candidates) {
+    setSearchHistory(function(prev) {
+      return prev.map(function(s) {
+        if (s.id === activeSearchId) {
+          return Object.assign({}, s, { candidates: deepCloneCandidates(candidates) });
+        }
+        return s;
+      });
+    });
+  };
+
+  // ── Delete a search from history ──
+  var deleteSearch = function(searchId) {
+    setSearchHistory(function(prev) {
+      var filtered = prev.filter(function(s) { return s.id !== searchId; });
+      // If we deleted the active search, switch to the first remaining one
+      if (searchId === activeSearchId && filtered.length > 0) {
+        var newActive = filtered[0];
+        setActiveCandidates(deepCloneCandidates(newActive.candidates || []));
+        setActiveSearchStrings(newActive.searchStrings ? newActive.searchStrings.slice() : []);
+        setActiveSearchId(newActive.id);
+        setSearchParams(newActive.params || {});
+        filtered = filtered.map(function(s, idx) {
+          return Object.assign({}, s, { status: idx === 0 ? "Active" : "Saved" });
+        });
+      }
+      return filtered;
+    });
+    setDeleteConfirm(null);
+    showToast("Search deleted", "info");
+  };
+
+  // ── Cross-search dedup: find which other searches contain a candidate ──
+  var getCrossSearchBadges = function(candidateLinkedin) {
+    if (!candidateLinkedin) return [];
+    var normalized = candidateLinkedin.toLowerCase().replace(/\/+$/, "");
+    var badges = [];
+    searchHistory.forEach(function(s) {
+      if (s.id === activeSearchId) return; // skip current
+      var found = (s.candidates || []).some(function(c) {
+        return c.linkedin && c.linkedin.toLowerCase().replace(/\/+$/, "") === normalized;
+      });
+      if (found) badges.push(s.role || "Other Search");
+    });
+    return badges;
+  };
 
   // Load a search from history
-  const loadSearch = searchId => {
-    const search = searchHistory.find(s => s.id === searchId);
+  const loadSearch = function(searchId) {
+    // First, save current active candidates into the current search before switching
+    syncActiveToHistory(activeCandidates);
+    var search = searchHistory.find(function(s) { return s.id === searchId; });
     if (!search) return;
-    setActiveCandidates(search.candidates);
-    setActiveSearchStrings(search.searchStrings);
+    // Deep clone to prevent reference sharing
+    setActiveCandidates(deepCloneCandidates(search.candidates || []));
+    setActiveSearchStrings(search.searchStrings ? search.searchStrings.slice() : []);
     setActiveSearchId(searchId);
-    setSearchParams(search.params);
-    setSearchHistory(prev => prev.map(s => ({
-      ...s,
-      status: s.id === searchId ? "Active" : "Saved"
-    })));
+    setSearchParams(search.params || {});
+    setSearchHistory(function(prev) {
+      return prev.map(function(s) {
+        return Object.assign({}, s, { status: s.id === searchId ? "Active" : "Saved" });
+      });
+    });
     setTab("candidates");
     setExpandedId(null);
     setFilterRating("ALL");
@@ -2497,47 +2614,33 @@ function HiringRadarApp() {
   };
 
   // Score edit handler — update a candidate's score from chart
-  const handleScoreChange = (candidateId, newScore) => {
+  const handleScoreChange = function(candidateId, newScore) {
     var newRating = newScore >= 4.0 ? "STRONG_FIT" : newScore >= 3.5 ? "GOOD_FIT" : "PARTIAL_FIT";
     setActiveCandidates(function(prev) {
-      return prev.map(function(c) {
+      var updated = prev.map(function(c) {
         if (c.id === candidateId) return Object.assign({}, c, { score: newScore, rating: newRating });
         return c;
       }).sort(function(a,b) { return b.score - a.score; });
-    });
-    // Update in search history too
-    setSearchHistory(function(prev) {
-      return prev.map(function(s) {
-        if (s.id === activeSearchId) {
-          var updatedCands = s.candidates.map(function(c) {
-            if (c.id === candidateId) return Object.assign({}, c, { score: newScore, rating: newRating });
-            return c;
-          }).sort(function(a,b) { return b.score - a.score; });
-          return Object.assign({}, s, { candidates: updatedCands });
-        }
-        return s;
-      });
+      // Sync to history with deep clone
+      syncActiveToHistory(updated);
+      return updated;
     });
   };
 
   // Refresh handler — regenerates candidates for active search
-  const handleRefresh = () => {
+  const handleRefresh = function() {
     setRefreshing(true);
-    setTimeout(() => {
+    setTimeout(function() {
       var refreshCandidates = getPreScrapedCandidates(searchParams);
       if (refreshCandidates.length === 0) refreshCandidates = REAL_LINKEDIN_CANDIDATES.slice();
-      const newCandidates = refreshCandidates.sort(function(a,b){return b.score - a.score;});
-      const newStrings = generateSearchStrings(searchParams);
+      var newCandidates = deepCloneCandidates(refreshCandidates.sort(function(a,b){return b.score - a.score;}));
+      var newStrings = generateSearchStrings(searchParams);
       setActiveCandidates(newCandidates);
       setActiveSearchStrings(newStrings);
-      // Update in history too
-      setSearchHistory(prev => prev.map(s => s.id === activeSearchId ? {
-        ...s,
-        candidates: newCandidates,
-        searchStrings: newStrings
-      } : s));
+      // Sync to history with deep clone
+      syncActiveToHistory(newCandidates);
       setRefreshing(false);
-      const now = new Date();
+      var now = new Date();
       setLastRefresh(now.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit"
@@ -3317,7 +3420,7 @@ function HiringRadarApp() {
         setSearchProgress("Step 1/5: Generating boolean search strings...");
         var newStrings = generateSearchStrings(newSearchForm);
         await new Promise(function(r) { setTimeout(r, 2000); });
-        var newId = Date.now();
+        var newId = "search_" + newSearchForm.role.toLowerCase().replace(/[^a-z0-9]+/g, "") + "_" + Date.now();
         var newCandidates = [];
 
         if (serperApiKey) {
@@ -3360,7 +3463,7 @@ function HiringRadarApp() {
               setSearchProgress("Step 5/5: Live search found 0 matches — loading pre-sourced candidates...");
               var preScrapedApi = getPreScrapedCandidates(newSearchForm);
               if (preScrapedApi.length > 0) {
-                preScrapedApi.forEach(function(c, ci) { c._searchId = newId; c.id = newId + ci + 1; });
+                preScrapedApi.forEach(function(c, ci) { c._searchId = newId; c.id = newId + "_c" + ci; });
                 newCandidates = preScrapedApi;
               }
               await new Promise(function(r) { setTimeout(r, 3000); });
@@ -3375,7 +3478,7 @@ function HiringRadarApp() {
             var preScrapedFallback = getPreScrapedCandidates(newSearchForm);
             if (preScrapedFallback.length > 0) {
               setSearchProgress("API failed — loading " + preScrapedFallback.length + " pre-sourced candidates...");
-              preScrapedFallback.forEach(function(c, ci) { c._searchId = newId; c.id = newId + ci + 1; });
+              preScrapedFallback.forEach(function(c, ci) { c._searchId = newId; c.id = newId + "_c" + ci; });
               newCandidates = preScrapedFallback;
             } else {
               setSearchProgress("API search failed — opening Google + LinkedIn tabs...");
@@ -3440,7 +3543,7 @@ function HiringRadarApp() {
             var preScraped = getPreScrapedCandidates(newSearchForm);
             if (preScraped.length > 0) {
               setSearchProgress("Step 5/5: Loading " + preScraped.length + " pre-sourced candidates...");
-              preScraped.forEach(function(c, ci) { c._searchId = newId; c.id = newId + ci + 1; });
+              preScraped.forEach(function(c, ci) { c._searchId = newId; c.id = newId + "_c" + ci; });
               newCandidates = preScraped;
               showToast(preScraped.length + " pre-sourced candidates loaded", "info");
             } else {
@@ -3453,6 +3556,8 @@ function HiringRadarApp() {
         }
 
         // ── Save previous search data into history before switching ──
+        // Deep clone all candidates for isolation
+        var clonedNewCandidates = deepCloneCandidates(newCandidates);
         var newSearchEntry = {
           id: newId,
           date: new Date().toISOString().slice(0, 10),
@@ -3462,22 +3567,22 @@ function HiringRadarApp() {
           experience: newSearchForm.experience,
           industry: newSearchForm.industry || "General",
           status: "Active",
-          candidates: newCandidates,
-          searchStrings: newStrings,
+          candidates: deepCloneCandidates(clonedNewCandidates),
+          searchStrings: newStrings.slice(),
           params: newParams
         };
         // Save current active candidates into the PREVIOUS active search before switching
-        setSearchHistory(prev => {
-          var updated = prev.map(s => {
+        setSearchHistory(function(prev) {
+          var updated = prev.map(function(s) {
             if (s.id === activeSearchId) {
-              // Preserve the previous search's candidates in history
-              return { ...s, status: "Saved", candidates: activeCandidates };
+              // Preserve the previous search's candidates in history (deep clone!)
+              return Object.assign({}, s, { status: "Saved", candidates: deepCloneCandidates(activeCandidates) });
             }
-            return { ...s, status: s.status === "Active" ? "Saved" : s.status };
+            return Object.assign({}, s, { status: s.status === "Active" ? "Saved" : s.status });
           });
           return updated.concat([newSearchEntry]);
         });
-        setActiveCandidates(newCandidates);
+        setActiveCandidates(clonedNewCandidates);
         setActiveSearchStrings(newStrings);
         setActiveSearchId(newId);
         setRefreshing(false);
@@ -3813,7 +3918,28 @@ function HiringRadarApp() {
               }, /*#__PURE__*/React.createElement("div", {
                 className: "w-1.5 h-1.5 rounded-full " + (search.status === "Active" ? "bg-emerald-400" : "bg-gray-500")
               }), search.status || "Active"),
-              /*#__PURE__*/React.createElement("div", { className: "text-xs text-gray-600 ml-1" }, search.date)
+              /*#__PURE__*/React.createElement("div", { className: "text-xs text-gray-600 ml-1" }, search.date),
+              // Delete button
+              searchHistory.length > 1 && /*#__PURE__*/React.createElement("button", {
+                onClick: function(e) { e.stopPropagation(); setDeleteConfirm(deleteConfirm === search.id ? null : search.id); },
+                className: "ml-1 p-1 rounded hover:bg-red-900/40 text-gray-600 hover:text-red-400 transition-colors",
+                title: "Delete search"
+              }, /*#__PURE__*/React.createElement(Icon, { name: "trash-2", className: "w-3.5 h-3.5" }))
+            ),
+            // Delete confirmation
+            deleteConfirm === search.id && /*#__PURE__*/React.createElement("div", {
+              className: "flex items-center gap-2 mt-2 p-2 bg-red-900/20 border border-red-700/40 rounded-lg",
+              onClick: function(e) { e.stopPropagation(); }
+            },
+              /*#__PURE__*/React.createElement("span", { className: "text-xs text-red-300 flex-1" }, "Delete this search and all its candidates?"),
+              /*#__PURE__*/React.createElement("button", {
+                onClick: function(e) { e.stopPropagation(); deleteSearch(search.id); },
+                className: "text-xs bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded transition-colors font-semibold"
+              }, "Delete"),
+              /*#__PURE__*/React.createElement("button", {
+                onClick: function(e) { e.stopPropagation(); setDeleteConfirm(null); },
+                className: "text-xs text-gray-400 hover:text-white px-2 py-1 rounded transition-colors"
+              }, "Cancel")
             )
           );
         })
@@ -3856,10 +3982,12 @@ function HiringRadarApp() {
     notes: candidateNotes[c.id] || [],
     onAddNote: addNote,
     viewStatus: viewStatuses[c.id] || "fresh",
-    onMarkViewed: markViewed
+    onMarkViewed: markViewed,
+    crossSearchBadges: getCrossSearchBadges(c.linkedin)
   }); }))), tab === "kanban" && /*#__PURE__*/React.createElement("div", {
     className: "fade-in"
   }, /*#__PURE__*/React.createElement(KanbanBoard, {
+    key: "kanban-" + activeSearchId,
     candidates: activeCandidates
   })), tab === "search" && /*#__PURE__*/React.createElement("div", {
     className: "space-y-4 fade-in"
