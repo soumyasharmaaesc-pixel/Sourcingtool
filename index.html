@@ -159,12 +159,25 @@ async function liveXRaySearch(searchParams, apiKey) {
   var topSkill = skills.split(",")[0].trim();
   var company = searchParams.company || "";
 
+  // Detect seniority level for Junior/Intern/Fresher support
+  var seniority = (searchParams.seniorityLevel || searchParams.seniority || "").toLowerCase();
+  var isJunior = seniority.includes("intern") || seniority.includes("fresher") || seniority.includes("junior") || seniority.includes("entry") || role.toLowerCase().includes("intern") || role.toLowerCase().includes("fresher") || role.toLowerCase().includes("junior") || role.toLowerCase().includes("trainee");
+
   // Build multiple X-Ray queries for breadth
-  var queries = [
-    { q: 'site:linkedin.com/in/ "' + role + '" "' + industry + '" "' + location + '"', source: "Google X-Ray", count: 20 },
-    { q: 'site:linkedin.com/in/ "' + role + '" "' + (topSkill || industry) + '"', source: "Google X-Ray", count: 15 },
-    { q: 'site:linkedin.com/in/ ("' + role + '" OR "' + role.replace("Head of", "Director") + '") "' + industry + '"', source: "Google X-Ray", count: 15 }
-  ];
+  var queries;
+  if (isJunior) {
+    queries = [
+      { q: 'site:linkedin.com/in/ "' + role + '" ("intern" OR "fresher" OR "junior" OR "trainee") "' + location + '"', source: "Google X-Ray", count: 20 },
+      { q: 'site:linkedin.com/in/ "' + role + '" ("0-2 years" OR "entry level" OR "graduate") "' + industry + '"', source: "Google X-Ray", count: 15 },
+      { q: 'site:linkedin.com/in/ "' + role + '" "' + industry + '" ("fresher" OR "junior" OR "campus")', source: "Google X-Ray", count: 15 }
+    ];
+  } else {
+    queries = [
+      { q: 'site:linkedin.com/in/ "' + role + '" "' + industry + '" "' + location + '"', source: "Google X-Ray", count: 20 },
+      { q: 'site:linkedin.com/in/ "' + role + '" "' + (topSkill || industry) + '"', source: "Google X-Ray", count: 15 },
+      { q: 'site:linkedin.com/in/ ("' + role + '" OR "' + role.replace("Head of", "Director") + '") "' + industry + '"', source: "Google X-Ray", count: 15 }
+    ];
+  }
 
   var allResults = [];
   var seenUrls = {};
@@ -288,6 +301,64 @@ async function liveXRaySearch(searchParams, apiKey) {
   return candidates;
 }
 
+// ── LinkedIn Direct Search — uses your logged-in LinkedIn session ──
+function buildLinkedInBooleans(searchParams) {
+  var role = searchParams.role || "";
+  var industry = (searchParams.industry || "").split("/")[0].trim();
+  var location = (searchParams.location || "").split(",")[0].trim();
+  var skills = (searchParams.mustHave || searchParams.mustHaveSkills || "").split(",").map(function(s){return s.trim();}).filter(Boolean);
+  var topSkills = skills.slice(0, 2).join(" OR ");
+
+  // Generate 2 focused boolean strings for LinkedIn search bar
+  var booleans = [];
+
+  // Boolean 1: Role + Industry + Location (broad)
+  var b1Parts = [];
+  if (role) b1Parts.push('"' + role + '"');
+  if (industry) b1Parts.push('"' + industry + '"');
+  if (location) b1Parts.push('"' + location + '"');
+  if (b1Parts.length > 0) booleans.push(b1Parts.join(" AND "));
+
+  // Boolean 2: Role variations + Skills (deep)
+  var roleWords = role.split(" ");
+  var roleAlt = roleWords.length > 2 ? '"' + role + '" OR "' + roleWords.slice(1).join(" ") + '"' : '"' + role + '"';
+  var b2 = roleAlt;
+  if (topSkills) b2 += " AND (" + topSkills + ")";
+  booleans.push(b2);
+
+  return booleans;
+}
+
+async function linkedInDirectSearch(searchParams, progressCallback) {
+  var booleans = buildLinkedInBooleans(searchParams);
+  var allCandidates = [];
+  var seenNames = {};
+
+  for (var i = 0; i < booleans.length; i++) {
+    if (progressCallback) progressCallback("LinkedIn search " + (i+1) + "/" + booleans.length + ": " + booleans[i].substring(0, 60) + "...");
+
+    // Open LinkedIn People search with boolean
+    var searchUrl = "https://www.linkedin.com/search/results/people/?keywords=" + encodeURIComponent(booleans[i]) + "&origin=GLOBAL_SEARCH_HEADER";
+    var tab = window.open(searchUrl, "_blank");
+
+    // Wait for page to load
+    await new Promise(function(r) { setTimeout(r, 4000); });
+
+    // Try to read results from the opened tab (same-origin policy will limit this)
+    // Instead, we'll parse the search URL and let the user review
+    // The tab stays open for manual review
+
+    // Create a lightweight candidate entry for each boolean
+    allCandidates.push({
+      _linkedInSearchUrl: searchUrl,
+      _boolean: booleans[i],
+      _searchIndex: i + 1
+    });
+  }
+
+  return { booleans: booleans, searchTabs: allCandidates.length };
+}
+
 // Fallback: open X-Ray search tabs in browser
 function openXRayTabs(searchParams) {
   var role = searchParams.role || "Head of Sales";
@@ -297,6 +368,19 @@ function openXRayTabs(searchParams) {
   var q2 = encodeURIComponent('site:linkedin.com/in/ "' + role + '" "' + industry + '"');
   window.open("https://www.google.com/search?q=" + q1, "_blank");
   setTimeout(function() { window.open("https://www.google.com/search?q=" + q2, "_blank"); }, 500);
+}
+
+// ── Seniority Level Detection — for Junior/Intern/Fresher support ──
+function getSeniorityQueries(role, seniorityLevel) {
+  var level = (seniorityLevel || "").toLowerCase();
+  if (level.includes("intern") || level.includes("fresher") || level.includes("junior") || level.includes("entry")) {
+    // For junior roles, search with junior-specific terms
+    return [
+      '"' + role + '" AND ("intern" OR "fresher" OR "junior" OR "entry level" OR "trainee")',
+      '"' + role + '" AND ("0-2 years" OR "0-1 years" OR "fresher" OR "graduate")'
+    ];
+  }
+  return null; // Use default queries for senior roles
 }
 
 // Real candidates sourced from LinkedIn Search
@@ -1009,6 +1093,66 @@ function KanbanBoard({ candidates }) {
         card.lastActionTime = Date.now();
         card.movedAt = Date.now();
         next[toStage].push(card);
+
+        // ── AUTO-REJECT SIMILAR CANDIDATES ──
+        // When dropping to "Not a Fit": auto-move similar Fresh candidates there too
+        // When dropping to "On Hold": remove matching candidates from consideration
+        if (toStage === "Not a Fit" || toStage === "On Hold") {
+          var rejected = card;
+          var rejectedCompany = (rejected.company || "").toLowerCase().trim();
+          var rejectedTitle = (rejected.title || "").toLowerCase().trim();
+          var rejectedSkills = (rejected.skills || []).map(function(s) { return s.toLowerCase(); });
+
+          // Find similar candidates in Fresh
+          var freshCards = next["Fresh"] || [];
+          var toRemove = [];
+          freshCards.forEach(function(fc, fi) {
+            var fcCompany = (fc.company || "").toLowerCase().trim();
+            var fcTitle = (fc.title || "").toLowerCase().trim();
+            var fcSkills = (fc.skills || []).map(function(s) { return s.toLowerCase(); });
+
+            var similarityScore = 0;
+
+            // Same company = strong signal
+            if (rejectedCompany && fcCompany && rejectedCompany === fcCompany) {
+              similarityScore += 3;
+            }
+
+            // Very similar title
+            if (rejectedTitle && fcTitle) {
+              var titleWords = rejectedTitle.split(/\s+/);
+              var matchingWords = titleWords.filter(function(w) { return w.length > 3 && fcTitle.includes(w); });
+              if (matchingWords.length >= 2) similarityScore += 2;
+            }
+
+            // Overlapping skills (3+ shared skills)
+            var sharedSkills = rejectedSkills.filter(function(s) { return fcSkills.includes(s); });
+            if (sharedSkills.length >= 3) similarityScore += 1;
+
+            // Same score bracket (within 0.3) + same company = almost certainly similar
+            if (Math.abs(fc.score - rejected.score) < 0.3 && similarityScore >= 3) {
+              similarityScore += 1;
+            }
+
+            // Threshold: score >= 4 means auto-reject (same company + similar title)
+            if (toStage === "Not a Fit" && similarityScore >= 4) {
+              toRemove.push(fi);
+            }
+          });
+
+          // Move matched candidates to "Not a Fit" (reverse order to preserve indices)
+          if (toRemove.length > 0) {
+            toRemove.sort(function(a, b) { return b - a; });
+            toRemove.forEach(function(ri) {
+              var removedCard = Object.assign({}, next["Fresh"][ri]);
+              removedCard.lastAction = "Auto-rejected (similar to " + rejected.name + ")";
+              removedCard.lastActionTime = Date.now();
+              removedCard.movedAt = Date.now();
+              next["Fresh"].splice(ri, 1);
+              next["Not a Fit"].push(removedCard);
+            });
+          }
+        }
       }
       return next;
     });
@@ -1745,10 +1889,6 @@ function HiringRadarApp() {
     id: "outreach",
     label: "Outreach",
     icon: "mail"
-  }, {
-    id: "market",
-    label: "Market Intel",
-    icon: "trending-up"
   }];
   const EditField = ({
     label,
@@ -1977,7 +2117,7 @@ function HiringRadarApp() {
     placeholder: "Manager",
     icon: "award",
     type: "select",
-    options: ["Individual Contributor", "Senior IC", "Lead", "Manager", "Senior Manager", "Director", "VP", "C-Level", "Founder"]
+    options: ["Intern", "Fresher / Junior", "Entry Level", "Individual Contributor", "Senior IC", "Lead", "Manager", "Senior Manager", "Director", "VP", "C-Level", "Founder"]
   }, {
     key: "experience",
     label: "Experience Range *",
@@ -2390,7 +2530,7 @@ function HiringRadarApp() {
         var newCandidates = [];
 
         if (serperApiKey) {
-          // LIVE SEARCH via Serper.dev Google X-Ray
+          // LIVE SEARCH via Serper.dev Google X-Ray + LinkedIn Direct
           try {
             setSearchProgress("Querying Google X-Ray for LinkedIn profiles...");
             newCandidates = await liveXRaySearch({
@@ -2398,19 +2538,47 @@ function HiringRadarApp() {
               location: newSearchForm.location,
               industry: newSearchForm.industry,
               mustHave: newSearchForm.mustHaveSkills,
-              company: newSearchForm.company
+              company: newSearchForm.company,
+              seniorityLevel: newSearchForm.seniorityLevel
             }, serperApiKey);
-            setSearchProgress("Found " + newCandidates.length + " candidates! Processing...");
+            setSearchProgress("Found " + newCandidates.length + " via Google X-Ray. Opening LinkedIn search...");
+
+            // Also open LinkedIn direct search with boolean queries
+            var linkedInBooleans = buildLinkedInBooleans({
+              role: newSearchForm.role,
+              location: newSearchForm.location,
+              industry: newSearchForm.industry,
+              mustHave: newSearchForm.mustHaveSkills
+            });
+            linkedInBooleans.forEach(function(bool, idx) {
+              setTimeout(function() {
+                var liUrl = "https://www.linkedin.com/search/results/people/?keywords=" + encodeURIComponent(bool) + "&origin=GLOBAL_SEARCH_HEADER";
+                window.open(liUrl, "_blank");
+              }, idx * 1500);
+            });
+            setSearchProgress("Found " + newCandidates.length + " candidates + " + linkedInBooleans.length + " LinkedIn search tabs opened!");
           } catch(e) {
             console.error("Live search failed:", e);
-            setSearchProgress("API search failed — opening Google tabs instead...");
+            setSearchProgress("API search failed — opening Google + LinkedIn tabs...");
             openXRayTabs(newSearchForm);
           }
         } else {
-          // No API key — open Google X-Ray tabs for manual sourcing
-          setSearchProgress("No API key set — opening Google X-Ray search tabs...");
+          // No API key — open Google X-Ray + LinkedIn tabs for manual sourcing
+          setSearchProgress("No API key — opening Google X-Ray + LinkedIn search tabs...");
           openXRayTabs(newSearchForm);
-          await new Promise(function(r) { setTimeout(r, 2000); });
+          // Also open LinkedIn direct search
+          var liBooleans = buildLinkedInBooleans({
+            role: newSearchForm.role,
+            location: newSearchForm.location,
+            industry: newSearchForm.industry,
+            mustHave: newSearchForm.mustHaveSkills
+          });
+          liBooleans.forEach(function(bool, idx) {
+            setTimeout(function() {
+              window.open("https://www.linkedin.com/search/results/people/?keywords=" + encodeURIComponent(bool) + "&origin=GLOBAL_SEARCH_HEADER", "_blank");
+            }, (idx + 2) * 1000);
+          });
+          await new Promise(function(r) { setTimeout(r, 3000); });
         }
 
         var newSearchEntry = {
@@ -2902,134 +3070,7 @@ function HiringRadarApp() {
     className: "text-gray-500 text-xs"
   }, "Subject: Exciting ", searchParams.role, " opportunity at ", searchParams.company), /*#__PURE__*/React.createElement("div", null, "Hi ", c.name.split(" ")[0], ","), /*#__PURE__*/React.createElement("div", null, c.outreach), /*#__PURE__*/React.createElement("div", null, "I'd love to connect and share more about this role. Would you be open to a quick 15-min call this week?"), /*#__PURE__*/React.createElement("div", {
     className: "text-gray-500"
-  }, "Looking forward,", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma | Athena Executive Search & Consulting"))))), tab === "market" && /*#__PURE__*/React.createElement("div", {
-    className: "space-y-4 fade-in"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
-  }, /*#__PURE__*/React.createElement("h3", {
-    className: "text-sm font-bold text-gray-300 uppercase mb-3 flex items-center gap-2"
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "trending-up",
-    className: "w-4 h-4 text-amber-400"
-  }), " Talent Pool Breakdown"), /*#__PURE__*/React.createElement("div", {
-    className: "grid grid-cols-2 md:grid-cols-4 gap-3"
-  }, [{
-    label: "Total Sourced Candidates",
-    value: activeCandidates.length
-  }, {
-    label: "HR Tech Sales Matches",
-    value: activeCandidates.filter(function(c){return c.industry && c.industry.toLowerCase().includes("hr tech")}).length
-  }, {
-    label: "Strong Fit Candidates",
-    value: activeCandidates.filter(function(c){return c.rating === "STRONG_FIT"}).length
-  }, {
-    label: "With LinkedIn Profiles",
-    value: activeCandidates.filter(function(c){return c.linkedin && c.linkedin.includes("linkedin.com/in/")}).length
-  }].map((s, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    className: "bg-gray-800 rounded-lg p-3"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "text-xl font-bold text-amber-400"
-  }, s.value), /*#__PURE__*/React.createElement("div", {
-    className: "text-xs text-gray-400 mt-0.5"
-  }, s.label))))), /*#__PURE__*/React.createElement("div", {
-    className: "grid grid-cols-1 md:grid-cols-2 gap-4"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
-  }, /*#__PURE__*/React.createElement("h3", {
-    className: "text-sm font-bold text-gray-300 uppercase mb-3 flex items-center gap-2"
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "building-2",
-    className: "w-4 h-4 text-amber-400"
-  }), " Competitor Talent Map"), /*#__PURE__*/React.createElement("div", {
-    className: "space-y-2"
-  }, [{
-    company: "PeopleStrong",
-    note: "India's leading HCM — strong HR Tech sellers",
-    growth: "+8%",
-    candidates: 1
-  }, {
-    company: "LinkedIn Talent Solutions",
-    note: "World-class sales training pipeline",
-    growth: "Stable",
-    candidates: 2
-  }, {
-    company: "Zeko AI",
-    note: "Direct AI recruitment competitor",
-    growth: "+15%",
-    candidates: 1
-  }, {
-    company: "SaaS Labs",
-    note: "$42.7M revenue B2B SaaS powerhouse",
-    growth: "+12%",
-    candidates: 1
-  }, {
-    company: "BrowserStack",
-    note: "Unicorn SaaS sales methodology",
-    growth: "+10%",
-    candidates: 1
-  }, {
-    company: "Freshworks",
-    note: "Unicorn with strong SaaS fundamentals",
-    growth: "+6%",
-    candidates: 1
-  }, {
-    company: "Darwinbox",
-    note: "India's top HCM unicorn",
-    growth: "+20%",
-    candidates: 1
-  }, {
-    company: "Zoho",
-    note: "Massive HR Tech portfolio (Zoho Recruit)",
-    growth: "Stable",
-    candidates: 1
-  }].map((c, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    className: "flex items-center gap-3 bg-gray-800 rounded-lg px-3 py-2"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex-1"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "text-sm font-medium text-white"
-  }, c.company), /*#__PURE__*/React.createElement("div", {
-    className: "text-xs text-gray-500"
-  }, c.note)), /*#__PURE__*/React.createElement("span", {
-    className: "text-xs text-gray-400"
-  }, c.candidates, " candidate", c.candidates > 1 ? "s" : ""), /*#__PURE__*/React.createElement("span", {
-    className: "text-xs font-semibold text-green-400 bg-green-900/50 px-2 py-0.5 rounded"
-  }, c.growth))))), /*#__PURE__*/React.createElement("div", {
-    className: "space-y-4"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
-  }, /*#__PURE__*/React.createElement("h3", {
-    className: "text-sm font-bold text-gray-300 uppercase mb-3 flex items-center gap-2"
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "dollar-sign",
-    className: "w-4 h-4 text-amber-400"
-  }), " Compensation Benchmarks"), /*#__PURE__*/React.createElement("div", {
-    className: "space-y-2 text-sm"
-  }, [["Sales Mgr (SaaS startup, 6-7yr)", "₹18L-30L + variable + equity"], ["Head of Sales (AI startup)", "₹25L-40L CTC + equity"], ["Lead AE (Unicorn tier)", "₹20L-35L CTC"], ["Sr AE (LinkedIn/PeopleStrong)", "₹18L-30L + benefits"]].map(([r, c], i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    className: "flex justify-between bg-gray-800 rounded-lg px-3 py-2 gap-2"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "text-gray-300"
-  }, r), /*#__PURE__*/React.createElement("span", {
-    className: "text-amber-400 font-semibold whitespace-nowrap"
-  }, c))))), /*#__PURE__*/React.createElement("div", {
-    className: "bg-gray-900 border border-gray-800 rounded-xl p-5"
-  }, /*#__PURE__*/React.createElement("h3", {
-    className: "text-sm font-bold text-gray-300 uppercase mb-3 flex items-center gap-2"
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "sparkles",
-    className: "w-4 h-4 text-amber-400"
-  }), " Key Insights"), /*#__PURE__*/React.createElement("div", {
-    className: "space-y-2"
-  }, ["6-7yr experience is the sweet spot for Head of Sales at early-stage AI startups", "HR Tech sales talent is scarce — only ~50-80 direct matches in Gurgaon", "BrowserStack/SaaS Labs alumni bring elite SaaS methodology even without HR domain", "Startup equity + title step-up is the key draw for mid-career candidates", "AI recruitment is growing 40%+ YoY — strong narrative for attracting talent"].map((s, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    className: "flex items-start gap-2 text-sm text-gray-300"
-  }, /*#__PURE__*/React.createElement(Icon, {
-    name: "arrow-up-right",
-    className: "w-4 h-4 text-amber-400 flex-shrink-0"
-  }), s)))))))))));
+  }, "Looking forward,", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma", /*#__PURE__*/React.createElement("br", null), "Soumya Sharma | Athena Executive Search & Consulting"))))))))  );
 }
 ReactDOM.render(/*#__PURE__*/React.createElement(HiringRadarApp, null), document.getElementById("root"));
   </script>
