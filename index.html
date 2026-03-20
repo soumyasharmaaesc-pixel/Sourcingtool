@@ -1444,21 +1444,152 @@ function getPreScrapedCandidates(searchParams) {
   var role = (searchParams.role || "").toLowerCase();
   var industry = (searchParams.industry || "").toLowerCase();
   var mustHave = (searchParams.mustHave || searchParams.mustHaveSkills || "").toLowerCase();
+  var location = (searchParams.location || "").toLowerCase();
   var allText = role + " " + industry + " " + mustHave;
-  // Check for CHRO-specific searches (higher seniority)
-  if (allText.includes("chro") || allText.includes("chief human resource") || allText.includes("chief people officer") || allText.includes("vp hr") || allText.includes("head of people") || allText.includes("fractional chro")) {
-    return CHRO_LINKEDIN_CANDIDATES.concat(HR_LINKEDIN_CANDIDATES).slice();
+
+  // ── Step 1: Pool ALL pre-scraped candidates ──
+  var allPool = REAL_LINKEDIN_CANDIDATES.concat(HR_LINKEDIN_CANDIDATES).concat(CHRO_LINKEDIN_CANDIDATES);
+
+  // ── Step 2: Build search keywords from the query (deduplicated) ──
+  var rawKeywords = (role + " " + industry + " " + mustHave)
+    .replace(/[\/,|&+()]/g, " ")
+    .split(/\s+/)
+    .filter(function(w) { return w.length > 2; })
+    .map(function(w) { return w.toLowerCase(); });
+
+  // Remove stop words and deduplicate
+  var stopWords = ["the","and","for","with","not","that","this","from","have","has","are","was","were","been","will","can","any","all","each","both","few","more","most","such","than","too","very","just","also","into","over","only","own","same"];
+  var seen = {};
+  var searchKeywords = [];
+  rawKeywords.forEach(function(w) {
+    if (stopWords.indexOf(w) === -1 && !seen[w]) {
+      seen[w] = true;
+      searchKeywords.push(w);
+    }
+  });
+
+  // Prioritize role keywords (they matter most for differentiation)
+  var roleKeywords = role.split(/\s+/).filter(function(w) { return w.length > 2; }).map(function(w) { return w.toLowerCase(); });
+
+  // ── Step 3: Score every candidate against THIS search's keywords ──
+  var scored = allPool.map(function(c) {
+    var candidateText = (
+      (c.name || "") + " " +
+      (c.title || "") + " " +
+      (c.company || "") + " " +
+      (c.industry || "") + " " +
+      (c.location || "") + " " +
+      (c.skills || []).join(" ") + " " +
+      (c.experience || "")
+    ).toLowerCase();
+
+    // Title-only text for role matching (more precise)
+    var titleText = ((c.title || "") + " " + (c.skills || []).join(" ")).toLowerCase();
+
+    var matchCount = 0;
+    var roleMatchCount = 0;
+    var matchedWords = [];
+    searchKeywords.forEach(function(kw) {
+      if (candidateText.includes(kw)) {
+        matchCount++;
+        matchedWords.push(kw);
+      }
+    });
+    // Count how many ROLE keywords match the candidate's title/skills
+    roleKeywords.forEach(function(rk) {
+      if (titleText.includes(rk)) roleMatchCount++;
+    });
+
+    // Relevance = weighted: 60% keyword match + 40% role match
+    var keywordRelevance = searchKeywords.length > 0 ? matchCount / searchKeywords.length : 0;
+    var roleRelevance = roleKeywords.length > 0 ? roleMatchCount / roleKeywords.length : 0;
+    var relevance = keywordRelevance * 0.6 + roleRelevance * 0.4;
+
+    return { candidate: c, matchCount: matchCount, roleMatchCount: roleMatchCount, relevance: relevance, matchedWords: matchedWords };
+  });
+
+  // ── Step 4: Filter — must match ≥30% overall AND at least 1 role keyword ──
+  var relevant = scored.filter(function(s) {
+    return s.relevance >= 0.3 && s.matchCount >= 2 && s.roleMatchCount >= 1;
+  });
+
+  // Sort by relevance (highest match first), then by original score
+  relevant.sort(function(a, b) {
+    if (b.relevance !== a.relevance) return b.relevance - a.relevance;
+    return (b.candidate.score || 0) - (a.candidate.score || 0);
+  });
+
+  // ── Step 5: Deep-clone matched candidates and re-score for THIS search ──
+  var results = relevant.map(function(s) {
+    var clone = JSON.parse(JSON.stringify(s.candidate));
+    // Re-evaluate with the actual search params using 3-signal engine
+    var evalResult = evaluateCandidate(clone, {
+      role: searchParams.role || "",
+      industry: searchParams.industry || "",
+      location: searchParams.location || "",
+      mustHave: searchParams.mustHave || searchParams.mustHaveSkills || ""
+    });
+    clone._evalSignals = evalResult.signals;
+    clone._evalOverallFit = evalResult.overallFit;
+
+    // Recalculate score based on keyword relevance to THIS search
+    var roleMatch = candidateText_roleMatch(clone, role);
+    var industryMatch = candidateText_industryMatch(clone, industry);
+    var locationMatch = candidateText_locationMatch(clone, location);
+    var baseScore = clone.score || 3.5;
+    // Adjust score: boost for high relevance, penalize for low
+    var adjustedScore = baseScore * (0.5 + 0.5 * s.relevance);
+    // Location bonus/penalty
+    if (locationMatch) adjustedScore = Math.min(5, adjustedScore + 0.15);
+    else adjustedScore = Math.max(2.5, adjustedScore - 0.2);
+    clone.score = Math.round(adjustedScore * 100) / 100;
+
+    // Re-assign rating based on adjusted score
+    if (clone.score >= 4.0) clone.rating = "STRONG_FIT";
+    else if (clone.score >= 3.5) clone.rating = "GOOD_FIT";
+    else clone.rating = "PARTIAL_FIT";
+
+    return clone;
+  });
+
+  // Cap at 30 candidates max
+  return results.slice(0, 30);
+}
+
+// Helper: check if candidate's title/skills match the searched role
+function candidateText_roleMatch(candidate, roleQuery) {
+  if (!roleQuery) return false;
+  var text = ((candidate.title || "") + " " + (candidate.skills || []).join(" ")).toLowerCase();
+  var roleWords = roleQuery.split(/\s+/).filter(function(w) { return w.length > 2; });
+  var matches = roleWords.filter(function(w) { return text.includes(w); });
+  return matches.length >= Math.ceil(roleWords.length * 0.5);
+}
+
+// Helper: check if candidate's industry matches
+function candidateText_industryMatch(candidate, industryQuery) {
+  if (!industryQuery) return false;
+  var text = ((candidate.industry || "") + " " + (candidate.company || "") + " " + (candidate.title || "")).toLowerCase();
+  var indWords = industryQuery.replace(/[\/,|&+()]/g, " ").split(/\s+/).filter(function(w) { return w.length > 2; });
+  var matches = indWords.filter(function(w) { return text.includes(w); });
+  return matches.length >= 1;
+}
+
+// Helper: check if candidate's location matches (with NCR/Bangalore equivalence)
+function candidateText_locationMatch(candidate, locationQuery) {
+  if (!locationQuery) return true; // no location filter = always match
+  var candLoc = (candidate.location || "").toLowerCase();
+  var queryLoc = locationQuery.toLowerCase();
+  // NCR equivalents
+  var ncrCities = ["gurgaon","gurugram","delhi","noida","new delhi","ncr","faridabad","ghaziabad"];
+  var bangaloreCities = ["bangalore","bengaluru","bengalore"];
+  var mumbaiCities = ["mumbai","bombay","navi mumbai","thane"];
+  function cityGroup(loc) {
+    if (ncrCities.some(function(c) { return loc.includes(c); })) return "ncr";
+    if (bangaloreCities.some(function(c) { return loc.includes(c); })) return "bangalore";
+    if (mumbaiCities.some(function(c) { return loc.includes(c); })) return "mumbai";
+    return loc;
   }
-  // Check for HR-related searches
-  if (allText.includes("hr") || allText.includes("human resource") || allText.includes("people") || allText.includes("talent") || allText.includes("hrbp")) {
-    return HR_LINKEDIN_CANDIDATES.concat(CHRO_LINKEDIN_CANDIDATES).slice();
-  }
-  // Check for Sales-related searches
-  if (allText.includes("sales") || allText.includes("revenue") || allText.includes("business development") || allText.includes("cro")) {
-    return REAL_LINKEDIN_CANDIDATES.slice();
-  }
-  // Default — return empty, live search must populate
-  return [];
+  return cityGroup(candLoc) === cityGroup(queryLoc) || candLoc.includes(queryLoc.split(",")[0].trim());
 }
 
 // Enrich all pre-scraped candidates with _experienceData from their experience field
